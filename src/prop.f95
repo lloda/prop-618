@@ -1,7 +1,7 @@
   ! (p676.f95) -*- coding: utf-8; mode: f90-mode -*-
   ! gfortran -std=f2008 -o p676.o p676.f95
 
-module p676
+module prop
   implicit none
 contains
 
@@ -14,9 +14,10 @@ contains
     real, intent(out) :: g_o
     real, intent(out) :: g_w
 
+
     g_o = 3.0
     g_w = 4.0
 
   end subroutine p676d11
 
-end module p676
+end module prop

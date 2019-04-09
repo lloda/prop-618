@@ -16,7 +16,7 @@ project(e2s-prop-models)
 enable_language(Fortran)
 cmake_minimum_required (VERSION 3.5)
 include_directories(".")
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 
 # -------------------
 # the meat
@@ -27,13 +27,21 @@ set (BASE_FFLAGS " \
 set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${BASE_FFLAGS} $ENV{FFLAGS}")
 set (LINK_FLAGS "-fopenmp $ENV{LINKFLAGS}")
 
-add_library (prop src/p676.f95)
+add_library (prop src/prop.f95)
 
 # foreach (target one two)
 #   add_executable (${target} "test/${target}.f95")
 #   target_link_libraries (${target} asu m -static)
 #   add_test (${target} ${target})
 # endforeach ()
+
+include(config/UseLATEX.cmake)
+set (LATEX_OUTPUT_PATH build)
+add_latex_document (docs/prop-doc.tex
+  INPUTS docs/paper-prologue.tex docs/margins.tex
+  BIBFILES docs/biblio.bib
+  USE_INDEX
+  USE_GLOSSARY)
 
 enable_testing ()
 

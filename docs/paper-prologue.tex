@@ -1,0 +1,136 @@
+% -*- coding: utf-8; mode: LaTeX; tab-width: 4 -*-
+
+% Prologue for doc/paper/*.tex.
+
+\input{docs/margins}
+\usepackage[nottoc,notbib]{tocbibind} % to put the bibliography in the toc
+\usepackage[square,comma,numbers,sort&compress]{natbib} % before hyperref
+\usepackage[pdfpagelabels,pdfpagemode=None,backref=page,pagebackref=true,colorlinks=true,bookmarks=true,bookmarksnumbered=true]{hyperref}
+
+\usepackage{parskip}
+\usepackage{mathptmx} % newtx is not available to me yet
+\usepackage[english]{babel}
+\usepackage{graphicx} % anything beyond pure text requires this
+\usepackage[centertags,sumlimits,nointlimits,reqno]{amsmath}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{amsxtra}
+\usepackage{bm}
+\usepackage{amsthm} % for newtheorem*
+\usepackage{engord}
+\usepackage{mathtools}
+% \usepackage[multiple]{footmisc} not compatible with hyperref, apparently
+
+\usepackage{chapterbib}
+\usepackage{verbatim}
+\usepackage{rotating}
+
+\usepackage{makeidx}
+\usepackage{idxlayout} % http://tex.stackexchange.com/a/30286
+\makeindex
+\newcommand{\inindex}[1]{#1\index{#1}}
+\newcommand{\inindexsub}[2]{#2\index{#1!#2}}
+
+\usepackage{todo}
+\renewcommand{\todoformat}{\bfseries\color{NavyBlue}}
+\renewcommand{\todomark}{todo}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclareMathAlphabet{\mathup}{OT1}{\familydefault}{m}{n}
+
+\newcommand{\pfrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\inprod}[2]{\langle #1, #2 \rangle}
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\othird}{\engordnumber{3}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Rtwo}{\mathbb{R}^2}
+\newcommand{\firstsaid}[1]{\textbf{#1}}
+\newcommand{\relphantom}[1]{\mathrel{\phantom{#1}}}
+\newcommand{\mbeq}{\overset{!}{=}}
+\newcommand{\wedgeseq}{\wedge\ldots\wedge}
+\newcommand{\imag}{\mathup{i}}
+\newcommand{\jmag}{\mathup{j}}
+\newcommand{\inner}[1]{\langle #1 \rangle}
+
+\newcommand{\figref}[1]{fig.~\ref{#1}}
+\newcommand{\Figref}[1]{Fig.~\ref{#1}}
+\newcommand{\ek}{\texttt{ek}}
+\newcommand{\src}[1]{\emph{#1}}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\newcommand{\dB}{\unit{dB}}
+\newcommand{\dyad}[1]{{\Bar{\Bar{#1}}}}
+\newcommand{\RR}{\dyad{R}}
+\newcommand{\II}{\dyad{I}}
+\newcommand{\cross}{\times}
+\DeclareMathOperator{\odd}{odd}
+\DeclareMathOperator{\Cos}{c}
+\DeclareMathOperator{\Sin}{s}
+\DeclareMathOperator{\sinc}{sinc}
+\renewcommand{\exp}[1]{\mathup{e}^{#1}}
+
+% Principal value integrals.
+\def\Xint#1{\mathchoice
+   {\XXint\displaystyle\textstyle{#1}}%
+   {\XXint\textstyle\scriptstyle{#1}}%
+   {\XXint\scriptstyle\scriptscriptstyle{#1}}%
+   {\XXint\scriptscriptstyle\scriptscriptstyle{#1}}%
+   \!\int}
+\def\XXint#1#2#3{{\setbox0=\hbox{$#1{#2#3}{\int}$}
+     \vcenter{\hbox{$#2#3$}}\kern-.5\wd0}}
+\def\ddashint{\Xint=}
+\def\dashint{\Xint-}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\DeclareMathOperator{\laplacian}{\Delta}
+\DeclareMathOperator{\diff}{d}
+\DeclareMathOperator{\codiff}{d^*}
+\DeclareMathOperator{\lapb}{\Delta} % Laplace-Beltrami
+\DeclareMathOperator{\hodge}{\star}
+\DeclareMathOperator{\diag}{diag}
+%% \DeclareMathOperator{\trace}{trace}
+%% \newcommand{\trace}[2]{\operatorname{tr}_{#1}}
+\newcommand{\trace}[2]{\mathmbox{#1}|_{#2}}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\rot}{curl}
+\DeclareMathOperator{\curl}{curl}
+\DeclareMathOperator{\divg}{div}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\rotp}{\nabla^\prime\times}
+\DeclareMathOperator{\curlp}{\nabla^\prime\times}
+\DeclareMathOperator{\divgp}{\nabla^\prime\cdot}
+\DeclareMathOperator{\gradp}{\nabla^\prime}
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\dimension}{dim}
+\DeclareMathOperator{\conv}{\ast}
+\DeclareMathOperator{\card}{\#}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\vol}{vol}
+
+\selectlanguage{english}
+
+% https://tex.stackexchange.com/a/425603
+\let\counterwithout\relax
+\let\counterwithin\relax
+\usepackage{chngcntr}
+
+\setcounter{secnumdepth}{5}
+\counterwithout{paragraph}{subsubsection}
+\counterwithout{paragraph}{subsection}
+\counterwithout{paragraph}{section}
+% todo Would like a dot here but not on \ref{}.
+\renewcommand{\theparagraph}{\S\arabic{paragraph}}
+
+\newcommand{\curlyle}{\preccurlyeq}
+\newcommand{\curlyge}{\succcurlyeq}
+\newcommand{\curlylt}{\precc}
+\newcommand{\curlygt}{\succ}
+\newcommand{\ECOS}{\textsc{ecos}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand*\conj[1]{\overline{#1}}
+\DeclareMathOperator{\avgpow}{avgpow}
+
+\newtheorem{problem}{Problem}
+\hypersetup{citecolor=Maroon}
+\setlength{\skip\footins}{5mm}

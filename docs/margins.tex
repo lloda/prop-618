@@ -1,0 +1,102 @@
+
+% A4 reasonable margins (ie not wasting margins).
+
+\usepackage{geometry} % to tell the pdf about our paper size
+\usepackage{calc} % dimensions, tipically
+\usepackage{subfigure}
+\usepackage{caption} % customize figure captions
+\usepackage{fancyhdr} % header-footer
+\usepackage{fancybox} % boxes
+
+\setlength{\paperwidth}{150mm}
+\setlength{\paperheight}{250mm}
+\setlength{\hoffset}{-1in} % Compensate the driver margins
+\setlength{\voffset}{-1in} % Compensate the driver margins
+\setlength{\oddsidemargin}{5mm} % original 20 25 % then 15 45
+\setlength{\evensidemargin}{5mm}
+%\setlength{\evensidemargin}{.382\paperwidth-\oddsidemargin}
+\newlength{\saveoddsidemargin}\setlength{\saveoddsidemargin}{\oddsidemargin}
+\newlength{\saveevensidemargin}\setlength{\saveevensidemargin}{\evensidemargin}
+% original 20 25 % then 15 40
+\newlength{\headoddsidemargin}\setlength{\headoddsidemargin}{\oddsidemargin}
+\newlength{\headevensidemargin}\setlength{\headevensidemargin}{\oddsidemargin}
+\setlength{\textwidth}{\paperwidth-\oddsidemargin-\evensidemargin}
+\setlength{\headwidth}{\paperwidth-\headoddsidemargin-\headevensidemargin}
+\setlength{\headheight}{15pt} % 15 pt
+\setlength{\headsep}{10pt} % 25 pt
+\setlength{\topmargin}{5mm}
+\setlength{\footskip}{0mm}
+\newlength{\bottommargin} % 20mm
+\setlength{\bottommargin}{5mm}
+\setlength{\textheight}{\paperheight-\topmargin-\headheight-\headsep-\footskip-\bottommargin}
+\renewcommand{\baselinestretch}{1}
+\flushbottom % same text height for all the pages
+
+%: ->  foot
+
+\setlength{\captionmargin}{10pt}
+\setlength{\abovecaptionskip}{10pt}
+\setlength{\belowcaptionskip}{0pt}
+\renewcommand{\captionfont}{\sffamily}
+\makeatletter
+\newcommand\figcaption{%
+	\renewcommand{\figurename}{Fig.}\def\@captype{figure}\caption}
+\newcommand\tabcaption{\def\@captype{table}\caption}
+\makeatother
+
+%: -> figures
+
+\renewcommand{\subfigtopskip}{10pt}
+\renewcommand{\subfigcapskip}{5pt}
+\renewcommand{\subfigbottomskip}{10pt}
+\newcommand{\goodgap}{%
+	\hspace{\subfigtopskip}%
+	\hspace{\subfigbottomskip}}
+
+%: -> line spacing
+
+\sloppy % imprescindible...
+\frenchspacing
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0ex}
+
+%: -> to adjust properly the figure
+
+\renewcommand{\floatpagefraction}{.8}
+\newcommand{\topnumber}{2}
+\renewcommand{\topfraction}{.8}
+\renewcommand{\bottomfraction}{.8}
+\renewcommand{\textfraction}{0.0}
+
+%: -> fancy pagestyle
+
+\usepackage[dvipsnames]{xcolor}
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[RO]{\flushright\thepage}
+\fancyhead[LO]{\rightmark}
+\renewcommand{\footrulewidth}{0.0pt}
+
+\makeatletter
+\renewcommand{\sectionmark}[1]{\markright{\protect\hyperlink{\@currentHref}{\textcolor{darkgray}{\thesection.\ #1}}}{}}
+\renewcommand{\subsectionmark}[1]{\markright{\protect\hyperlink{\@currentHref}{\textcolor{darkgray}{\thesubsection.\ #1}}}{}}
+\makeatother
+%% \renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}{}}
+
+\fancyhf{}
+\fancyhead[LE]{
+    \hyperlink{index}{\textcolor{darkgray}{[Index]}}\ %
+    \hyperlink{title}{\textcolor{darkgray}{[Title]}} -- \thepage}
+\fancyhead[RO]{
+    \hyperlink{index}{\textcolor{darkgray}{[Index]}}\ %
+    \hyperlink{title}{\textcolor{darkgray}{[Title]}} -- \thepage}
+\fancyhead[RE]{%
+    \Acrobatmenu{GoBack}{\textcolor{darkgray}{[Back]}}\ %
+    \hyperlink{toc}{\textcolor{darkgray}{[ToC]}}}
+\fancyhead[LO]{%
+    \Acrobatmenu{GoBack}{\textcolor{darkgray}{[Back]}}\ %
+    \hyperlink{toc}{\textcolor{darkgray}{[ToC]}}}
+\fancyhead[CO]{\rightmark}
+\fancyhead[CE]{\sc\leftmark}
+\fancypagestyle{plain}{\fancyhf{}}
