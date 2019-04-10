@@ -3,10 +3,10 @@
 
 \usepackage{geometry} % to tell the pdf about our paper size
 \usepackage{calc} % dimensions, tipically
-\usepackage{subfigure}
 \usepackage{caption} % customize figure captions
 \usepackage{fancyhdr} % header-footer
 \usepackage{fancybox} % boxes
+\usepackage{subfig}
 
 \setlength{\paperwidth}{150mm}
 \setlength{\paperheight}{250mm}
@@ -46,12 +46,7 @@
 
 %: -> figures
 
-\renewcommand{\subfigtopskip}{10pt}
-\renewcommand{\subfigcapskip}{5pt}
-\renewcommand{\subfigbottomskip}{10pt}
-\newcommand{\goodgap}{%
-	\hspace{\subfigtopskip}%
-	\hspace{\subfigbottomskip}}
+% TODO we changed from subfigure to subfig so now how to figure out how to set nearskip capskip farskip
 
 %: -> line spacing
 

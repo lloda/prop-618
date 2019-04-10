@@ -23,15 +23,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 # -------------------
 
 set (BASE_FFLAGS " \
--std=f2008 -fbounds-check -fimplicit-none -fdiagnostics-color=always -Wall -Werror")
+-std=f2018 -fdefault-real-8 -fbounds-check -fimplicit-none -fopenmp -fdiagnostics-color=always -Wall -Werror -ffpe-summary=invalid,overflow,zero")
 set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${BASE_FFLAGS} $ENV{FFLAGS}")
 set (LINK_FLAGS "-fopenmp $ENV{LINKFLAGS}")
 
-add_library (prop src/prop.f95)
+add_library (prop SHARED src/prop.f95)
+add_library (atmospheres SHARED src/atmospheres.f95)
 
 foreach (target test0)
   add_executable (${target} "src/${target}.f95")
-  target_link_libraries (${target} prop)
+  target_link_libraries (${target} prop atmospheres)
   add_test (${target} ${target})
 endforeach ()
 
@@ -39,6 +40,7 @@ include(config/UseLATEX.cmake)
 set (LATEX_OUTPUT_PATH build)
 add_latex_document (docs/prop-doc.tex
   INPUTS docs/paper-prologue.tex docs/margins.tex
+  # USE_BIBLATEX # problems with biblatex & biber
   BIBFILES docs/biblio.bib
   # USE_INDEX
   # USE_GLOSSARY

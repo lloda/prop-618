@@ -31,7 +31,7 @@ The overall attenuation is \cite[(60)]{ITU-P.618-13}
 Each component is ‘attenuation exceeded for $p$ of an average year’ \cite[\S2.2.2.1 Step 9]{ITU-P.618-13},
 
 \begin{itemize}
-\item $A_G$: atmospheric gases \cite[(20)]{ITU-P.676-11} (‘Annex 1’).
+\item $A_G$: atmospheric gases \cite[(20)]{ITU-P.676-11}
 \item $A_R$: rain \cite[(8)]{ITU-P.618-13}.
 \item $A_C$: clouds \cite{ITU-P.840-7}.
 \item $A_S$: tropospheric scintillation \cite[(46)]{ITU-P.618-13}.
@@ -41,9 +41,11 @@ Each component is ‘attenuation exceeded for $p$ of an average year’ \cite[\S
 
 The computation in \cite[(20)]{ITU-P.676-11} requires pressure, temperature and humidity data for each layer of the atmosphere. In the absence of specific data, location-dependent reference data is provided in~\cite[Annex~2]{ITU-P.835-6}\footnote{Cf accompanying data in \cite{ITU-prop-soft}.} and a generic mean global atmosphere is provided in~\cite[Annex~1]{ITU-P.835-6}.
 
-\paragraph{Topic C}\todo{Something to do.}
+\paragraph{Rain} A procedure to compute attenuation due to rain is given in \cite[\S2.2.1.1]{ITU-P.618-13}. This uses the rain height map from \cite[\S2.2.1.1]{ITU-P.839-4}, the average annual rainfall rate map from \cite{ITU-P.837-7}\footnote{A procedure to compute monthly rainfall rates is also given in~\cite{ITU-P.837-7} and is not yet implemented.\todo{}}, and the specific attenuation coefficients from \cite{ITU-P.838-3}.
 
 \cite{ITU-P.676-11}
+
+\cite{ITU-e2s-val}
 
 \selectlanguage{english}
 \small

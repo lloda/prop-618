@@ -3,4 +3,29 @@
 help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip checkbox [C-ct] flip TODO
 
 * TODO
-  - [ ] Enforce src/test0.f95 as test
+  - [-] gas & water vapor, P676 [4/7]
+    + [X] specific attenuation
+    + [X] tests from validation table (P676-11 SpAtt 1-9)
+    + [X] tests from validation table (P676-11 SpAtt 22-23)
+    + [X] e2s propagation, simpler P676-11 Annex 2 method
+    + [ ] slant propagation, simpler P676-11 Annex 2 method
+    + [ ] tests from validation table (P676-11 A_Gas)
+    + [ ] any path propagation, less simple P676-11 Annex 1 method
+  - [X] rain, P618 [2/2]
+    + [X] model
+    + [X] tests from validation table (P618-13 A_Rain)
+  - [ ] clouds, P840 [0/2]
+    + [ ] model
+    + [ ] clouds (P840-7 A_Clouds)
+  - [ ] atmospheres.f95, P835 [0/6]
+    + [ ] low latitude (annual)
+    + [ ] mid latitude (summer)
+    + [ ] mid latitude (winter)
+    + [ ] high latitude (summer)
+    + [ ] high latitude (winter)
+    + [ ] experimental atmospheres
+  - [ ] other ITU datasets
+    + [ ] heights from P.1511
+    + [ ] Vt for P676-11 (37) from P.836-6
+  - [ ] tests
+    + [ ] look into pfUnit (https://sourceforge.net/projects/pfunit/files/)
