@@ -1,0 +1,409 @@
+STATION_NAME
+WMO_N: World Met. Organization Station Number
+LAT: Latitude in Degrees.minutes
+LON: Longitude in Degrees.minutes
+ELE: Altitude (amsl) in meters
+TOT: Total number of radiosonde launches in the 10 year period
+LAN: Number of radiosonde launches per day
+RG: WMO Region
+CLM: WMO Climate Region
+
+       STATION_NAME             CO  WMO_N   LAT    LON  ELE(m)  TOT  LAN RG CLM
+-------------------------------------------------------------------------------
+       OSLO/GARDERMOEN          NO  13840  60.12  11.06   201   7104  2  6  PB
+       STAVANGER/SOLA           NO  14150  58.52   5.40    33   7006  2  6   T
+       SODANKYLA                FI  28360  67.22  26.39   178  13132  2  6  PB
+       JYVASKYLA (FIN-AFB)      FI  29350  62.24  25.40   139  13085  2  6  PB
+       JOKIOINEN                FI  29630  60.49  23.30   103  13029  2  6  PB
+       LERWICK-IN-SHETLAND      UK  30050  60.08 358.49    82  13656  2  6  PB
+       STORNOWAY                UK  30260  58.13 353.41    14  13716  2  6   T
+       AUGHTON-IN-LANCS         UK  33220  53.33 357.05    56  13748  2  6   T
+       HEMSBY-IN-NORFOLK        UK  34960  52.41   1.41    13  13693  2  6   T
+       CAMBORNE                 UK  38080  50.13 354.41    88  13658  2  6   T
+       LONG KESH                UK  39200  54.29 353.54    38  13577  2  6   T
+       VALENTIA (OBSERVAT)      IE  39530  51.56 349.45    14  12199  2  6   T
+       THULE AB                 GL  42020  76.32 291.15    59   5978  2  6  PB
+       DE BILT                  NL  62600  52.06   5.11     2  13535  4  6   T
+       UCCLE                    BX  64470  50.48   4.21   104   7934  2  6   T
+       ST-HUBERT                BX  64760  50.02   5.24   558   7189  2  6   T
+       PAYERNE (AUT)            SW  66100  46.49   6.57   501  13229  2  6   T
+       BREST/GUIPAVAS           FR  71100  48.27 355.35    94  13032  2  6   T
+       TRAPPES                  FR  71450  48.46   2.01   168  13262  2  6   T
+       LYON/SATOLAS             FR  74810  45.44   5.05   240  12760  2  6   T
+       BORDEAUX/MERIGNAC        FR  75100  44.50 359.18    51  13210  2  6   T
+       NIMES/COURBESSAC         FR  76450  43.52   4.24    62  12511  2  6   T
+       AJACCIO/C. DEL ORO       FR  77610  41.55   8.48     8  12470  2  6  ST
+       LA CORUNA CITY           SP  80010  43.22 351.35    67   7060  2  6   T
+       MADRID/BARAJAS           SP  82210  40.30 356.25   633   7253  2  6  ST
+       GIBRALTAR/N.FRONT        GI  84950  36.09 354.40     4  13722  2  6  ST
+       LAJES AB                 AZ  85090  38.44 332.55   112   5356  2  6  ST
+       GREIFSWALD               DD  91840  54.06  13.24     6  13671  3  6   T
+       LINDENBERG               DD  93930  52.13  14.07   115  13644  4  6   T
+       MEININGEN                DD  95480  50.34  10.22   456  13701  3  6   T
+       SCHLESWIG                DL 100350  54.32   9.33    50  13935  2  6   T
+       HANNOVER                 DL 103380  52.28   9.42    55  13472  2  6   T
+       BERLIN/TEMPLEHOF(US      DL 103840  52.29  13.25    46   5578  2  6   T
+       ESSEN                    DL 104100  51.24   6.58   153  13899  2  6   T
+       WIEN/HOHE WARTE          OS 110350  48.15  16.22   200  13723  2  6   T
+       PRAGUE/LIBUS             CZ 115200  50.00  14.27   303  13408  2  6   T
+       LEBA                     PL 121200  54.45  17.32     2  12259  2  6   T
+       POZNAN/LAWICA            PL 123300  52.25  16.50    92  12177  2  6   T
+       ZAGREB-MAKSIMIR          YG 131300  45.49  16.02   131   9322  2  6   T
+       BUCHAREST/IMH            RO 154200  44.30  26.08   100  11000  3  6   T
+       CONSTANTA                RO 154800  44.13  28.38    17  10138  2  6   T
+       SOFIA (OBSERVATORY)      BU 156140  42.49  23.23   587  10177  3  6   T
+       KURDJALI                 BU 157300  41.38  25.24   336   5240  2  6  ST
+       MILANO/LINATE            IY 160800  45.26   9.17   107  12332  4  6   T
+       BRINDISI                 IY 163200  40.39  17.57     7  12261  4  6  ST
+       TRAPANI/BIRGI            IY 164290  37.55  12.30     5  10207  2  6  ST
+       CAGLIARI/ELMAS           IY 165600  39.15   9.03     4   8231  4  6  ST
+       ATHENS/HELLINIKON        GR 167160  37.54  23.44    15  12600  2  6  ST
+       SAMSUN CITY              TU 170300  41.17  36.20     4   6722  2  6  ST
+       ISPARTA                  TU 172400  37.45  30.33   997   6538  2  6  ST
+       DIYARBAKIR               TU 172800  37.53  40.11   667   5423  2  6  ST
+       KEM--PORT              LERS 225220  64.59  34.47    10  13171  2  6  PB
+       ARHANGEL-SK            ARRS 225500  64.35  40.30     3  13425  2  6  PB
+       SORTOVALA              LERS 228020  61.43  30.43    18  12641  2  6  PB
+       NARYAN-MAR             ARRA 232050  67.39  53.01     7  13449  2  2  PB
+       PECHORA-IN-KOMI        ARRA 234180  65.07  57.06    56  12716  2  2  PB
+       SIKTIVKAR-IN-KOMI      ARRA 238040  61.40  50.51   118  13109  2  2  PB
+       IVDEL-IN-SVERDLOV      SVRA 239210  60.41  60.26    92  12826  2  2  PB
+       ALEKSANDROVSKOYE       NORA 239550  60.26  77.52    48  12952  2  2  PB
+       YAKUTSK ARPT           HARA 249590  62.05 129.45   103  12983  2  2  PB
+       MAGADAN/NAGAEVO        HARA 259130  59.35 150.47   118  12630  2  2  PB
+       KORF-IN-KAMCHAT        HARA 259540  60.21 166.00     2  13244  2  2  PB
+       TALLIN-IN-ESTONIA        BY 260380  59.27  24.48    40  12254  2  6  PB
+       LENINGRAD (GMO)        LERS 260630  59.59  30.36    70  12762  2  6  PB
+       RIGA/SPILVE              BY 264220  56.58  24.04    30  12752  2  6   T
+       KAUNAS                   BY 266290  54.53  23.53    90  13080  2  6   T
+       MINSK-IN-MIN           MIBY 268500  53.52  27.32   223  12963  2  6   T
+       VOLOGDA-IN-VOLOGDA     ARRS 270370  59.17  39.52   127  12818  2  6  PB
+       GOR-KIY                MSRS 275530  56.13  43.56   160  13032  2  6   T
+       MOSCOW                 MSRS 276120  55.45  37.34   184  11492  2  6   T
+       OMSK-IN-OM             NORA 286980  54.56  73.24    94  12127  2  2   T
+       NOVO-SIBIRSK/TOLMAC    NORA 296340  55.02  82.54   141  12584  2  2   T
+       MOGOCHA-IN-CHITA       IRRA 306730  53.44 119.47   619   8858  2  2   T
+       SKOVORODINO            HARA 306920  54.00 123.58   400   5733  2  2   T
+       CHITA-IN-CHITA         IRRA 307580  52.01 113.20   668  12909  2  2   T
+       KRASNIY CHIKOY         IRRA 309350  50.22 108.45   770  12910  2  2   T
+       AYAN-IN-KHABAROV       HARA 311680  56.27 138.09     9   8663  2  2   T
+       ZEYA                   HARA 313000  53.45 127.14   232  10080  2  2   T
+       EKIMCHAN-IN-AMUR       HARA 313290  53.04 132.56   543   6064  2  2   T
+       YEKATERINO-NIKOLSK     HARA 317070  47.44 130.58    74   7971  2  2   T
+       TERNEY-IN-PRIMOR       HARA 319090  45.03 136.37    70   9940  2  2   T
+       VLADI-VOSTOK           HARA 319600  43.07 131.54    80  11444  2  2   T
+       ALEKSANDROVSK-SAKH.    HARA 320610  50.54 142.10    30  12516  2  2   T
+       YUZHNO-SAKHALINSK      HARA 321500  46.55 142.44    23  13189  2  2   T
+       YUZHNO-KURILSK         HARA 321650  44.02 145.51    50  12660  2  2   T
+       PETROPAVLOVSK-KAMCH    HARA 325400  53.01 158.43    78  13405  2  2   T
+       NIKOLSKOYE-ON-BERIN    HARA 326180  55.12 165.59    13  12930  2  2   T
+       BREST-IN-BREST         MIBY 330080  52.07  23.41   144  13266  2  6   T
+       GOMEL-                 MIBY 330410  52.27  31.00   120  13019  2  6   T
+       KIEV/ZHULYANY          KIUR 333450  50.24  30.27   168  12672  2  6   T
+       L-VOV                  KIUR 333930  49.49  23.57   334  12997  2  6   T
+       UZHGOROD               KIUR 336310  48.38  22.16   118  12526  2  6   T
+       CHERNOVTSY             KIUR 336580  48.16  25.58   220  12686  2  6   T
+       ODESSA/TSENTRALNY      KIUR 338370  46.29  30.38    41  11798  2  6   T
+       ROSTOV-ON-DON          TBRS 347310  47.15  39.49    77  12697  2  6   T
+       DIVNOYE                TBRS 348580  45.55  43.21    77   9493  2  6   T
+       ASTRAHAN-              TBRS 348800  46.21  47.58   -15  10203  2  6   T
+       URALSK                 ALRA 351080  51.15  51.24    36   9743  2  2   T
+       BALKHASH               ALRA 357960  46.54  75.00   423   9732  2  2   T
+       ALMA-ATA               ALRA 368700  43.14  76.56   847  10581  2  2   T
+       TUAPSE                 TBRS 370180  44.06  39.04    96   9801  2  6   T
+       TASHAUZ-IN-TURKMEN     TARA 383920  41.50  59.59    88  12625  2  2  ST
+       TASHKENT-IN-UZBEK      TARA 384570  41.16  69.16   493  12792  2  2  ST
+       TABUK                    SD 403750  28.22  36.35   771   7904  2  2  ST
+       DHAHRAN                  SD 404160  26.16  50.10    19   8031  2  2  ST
+       MADINAH                  SD 404300  24.33  39.43   646   5641  2  2  ST
+       KUWAIT INTL ARPT         KW 405820  29.13  47.59    55   8345  2  2  ST
+       SEEB INTL ARPT           OM 412560  23.35  58.17    17   3780  2  2  ST
+       PESHAWAR (PAK-AFB)       PK 415300  34.01  71.35   360   8658  2  2  ST
+       KARACHI AIRPORT          PK 417800  24.54  67.08    23  10276  2  2  ST
+       SRINAGAR                 IN 420270  34.05  74.50  1585   5153  2  2  ST
+       PATIALA-IN-PUNJAB        IN 421010  30.20  76.28   249   5758  2  2  ST
+       DELHI/SAFDARJUNG         IN 421820  28.35  77.12   281  13004  2  2  ST
+       DIBRUGARH/MOHANBARI      IN 423140  27.29  95.01   110   4856  2  2  ST
+       JODHPUR                  IN 423390  26.18  73.01   224  11072  2  2  ST
+       GWALIOR/MAHARAJ AFB      IN 423610  26.14  78.15   207   9485  2  2  ST
+       LUCKNOW/AMAUSI           IN 423690  26.45  80.53   125  10569  2  2  ST
+       GAUHATI-IN-ASSAM         IN 424100  26.06  91.35    54   9756  2  2  ST
+       AHMADABAD                IN 426470  23.04  72.38    55  10179  2  2  ST
+       BHOPAL/BAIRAGARH         IN 426670  23.17  77.21   523   9547  2  2  ST
+       PENDRA                   IN 427790  22.46  81.54   624   3519  2  2  TR
+       CALCUTTA/DUM DUM         IN 428090  22.39  88.27     6  12082  2  2  TR
+       NAGPUR/SONEGAON          IN 428670  21.06  79.03   310  11480  2  2  TR
+       BHUBANESWAR              IN 429710  20.15  85.50    45  11025  2  2  TR
+       BOMBAY/SANTA CRUZ        IN 430030  19.05  72.51    14  11801  2  2  TR
+       AURANGABAD ARPT          IN 430140  19.51  75.24   582   8073  2  2  TR
+       JAGDALPUR                IN 430410  19.05  82.02   552   6425  2  2  TR
+       HYDERABAD ARPT           IN 431280  17.27  78.28   545  12292  2  2  TR
+       MACHILIPATNAM            IN 431850  16.21  81.09     3   4675  2  2  TR
+       GOA/PANJIM               IN 431920  15.29  73.49    60   5909  2  2  TR
+       MADRAS/MINAMBAKKAM       IN 432790  13.00  80.11    16  12364  2  2  TR
+       BANGALORE                IN 432950  12.58  77.35   920  10810  2  2  TR
+       PORT BLAIR               IN 433330  11.40  92.43    79   8257  2  2  TR
+       MINICOY ISLAND           IN 433690   8.18  73.00     2   8286  2  2  TR
+       TRIVANDRUM               IN 433710   8.29  76.57    64  12032  2  2  TR
+       HONG KONG/KINGS PK.      HK 450040  22.19 114.10    65  13544  2  2  TR
+       HAMHEUNG                 KR 470410  39.56 127.33    18   7201  2  2  ST
+       PYONGYANG                KR 470580  39.02 125.47    38   7271  2  2  ST
+       POHANG                   KO 471380  36.02 129.23     5   6848  2  2  ST
+       KWANGJU (KOR-AFB)        KO 471580  35.07 126.49    13   8149  2  2  ST
+       SAPPORO-ON-HOKKAIDO      JP 474120  43.03 141.20    19  13296  2  2   T
+       NEMURO-ON-HOKKAIDO       JP 474200  43.20 145.35    26  13323  2  2   T
+       SENDAI-IN-TOHOKU         JP 475900  38.16 140.54    38  13309  2  2  ST
+       WAJIMA                   JP 476000  37.23 136.54     5  13262  2  2  ST
+       HACHIJOJIMA/OMURE        JP 476780  33.07 139.47   153  13271  2  2  ST
+       YONAGO                   JP 477440  35.26 133.21     7  13272  2  2  ST
+       SHIONO (LGT-H)           JP 477780  33.27 135.46    73  13255  2  2  ST
+       FUKUOKA-ON-KYUSHU        JP 478070  33.35 130.23    12  13299  2  2  ST
+       KAGOSHIMA/YOSHINO        JP 478270  31.38 130.35   283  13274  2  2  ST
+       NAZE-ON-AMAMI            JP 479090  28.23 129.33   295  13233  2  2  ST
+       ISHIGAKIJIMA ISLAND      JP 479180  24.20 124.10     7  13258  2  2  ST
+       NAHA AIRPORT             JP 479360  26.12 127.40    29  13218  2  2  ST
+       MINAMIDAITOJIMA          JP 479450  25.50 131.14    15  13151  2  2  ST
+       CHIANG MAI INTL          TH 483270  18.47  98.59   323  11613  2  2  TR
+       UBON (THAI-AFB)          TH 484070  15.15 104.52   123  10560  2  2  TR
+       BANGKOK                  TH 484550  13.44 100.30     4  12422  2  2  TR
+       SONGKHLA(THAI-NAVY)      TH 485680   7.12 100.36     4  11402  2  2  TR
+       PENANG/BAYAN LEPAS       MS 486010   5.18 100.16     3  12230  2  5  TR
+       KOTA BHARU/PENCKLAN      MS 486150   6.10 102.17     5  12106  2  5  TR
+       KUANTAN/BESERAH          MS 486570   3.47 103.13    18  12450  2  5  TR
+       SINGAPORE/CHANGI         SR 486980   1.22 103.59    14   9907  2  5  TR
+       HA NOI                   VS 488200  21.01 105.48     9   5300  2  2  TR
+       ALTAY                  UQCI 510760  47.44  88.05   737   8231  2  2   T
+       YINING                 UQCI 514310  43.57  81.20   663   8192  2  2   T
+       URUMQI                 UQCI 514630  43.47  87.37   919   8332  2  2   T
+       KUQA                   UQCI 516440  41.43  82.57  1100   7284  2  2  ST
+       KASHI                  UQCI 517090  39.28  75.59  1291   8301  2  2  ST
+       RUOQIANG               UQCI 517770  39.02  88.10   889   8216  2  2  ST
+       HOTAN                  UQCI 518280  37.08  79.56  1375   8305  2  2  ST
+       HAMI                   UQCI 522030  42.49  93.31   739   8314  2  2   T
+       XINING                 LZCI 528660  36.43 101.45  2296   7274  2  2  ST
+       TAIYUAN                BJCI 537720  37.47 112.33   779   8014  2  2  ST
+       YAN AN                 LZCI 538450  36.36 109.30   959   8041  2  2  ST
+       PINGLIANG              LZCI 539150  35.33 106.40  1348   7273  2  2  ST
+       CHIFENG                SYCI 542180  42.16 118.58   572   8023  2  2   T
+       BEIJING                BJCI 545110  39.48 116.28    55   8043  2  2  ST
+       CHENGDU                CDCI 562940  30.40 104.01   508   8033  2  2  ST
+       HANZHONG               LZCI 571270  33.04 107.02   509   7284  2  2  ST
+       SHANGHAI               SHCI 583670  31.10 121.26     3   8186  2  2  ST
+       GUANGZHOU              GZCI 592870  23.08 113.19     7   8343  2  2  ST
+       NANNING                GZCI 594310  22.49 108.21    73   7717  2  2  TR
+       SANTA CRUZ TENERIFE      CR 600200  28.28 343.45    36   6561  2  1  ST
+       CASABLANCA               MC 601550  33.34 352.20    62   7018  2  1  ST
+       DAR-EL-BEIDA             AL 603900  36.43   3.15    25  12475  2  1  ST
+       BECHAR                   AL 605710  31.37 357.46   773  11896  2  1  ST
+       NIAMEY-AERO              NR 610520  13.29   2.10   227  12584  2  1  TR
+       BAMAKO/SENOU             MI 612910  12.32 352.03   380  11637  2  1  TR
+       DAKAR/YOFF               SG 616410  14.44 342.30    27  12611  2  1  TR
+       TRIPOLI INTL             LY 620100  32.41  13.10    80   6777  2  1  ST
+       BENINA                   LY 620530  32.05  20.16    38   4708  2  1  ST
+       MERSA MATRUH             EG 623060  31.20  27.13    28   4750  2  1  ST
+       ASSWAN                   EG 624140  23.58  32.47   200   5042  2  1  ST
+       GARISSA                  KN 637230   -.28  39.38   138   2972  2  1  TR
+       NAIROBI/DAGORETTI        KN 637410  -1.18  36.45  1798   6209  2  1  TR
+       ABIDJAN                  IV 655780   5.15 356.04     8  10114  2  1  TR
+       ANTANANARIVO/IVATO       MG 670830 -18.48  47.29  1260   9469  2  1  TR
+       J. G. STRIJDOM           NM 681120 -22.29  17.28  1715   3595  2  1  TR
+       PIETERSBURG SAAF         ZA 681740 -23.52  29.27  1242   3598  2  1  ST
+       CAPETOWN/D-MALAN         ZA 688160 -33.58  18.36    46   7256  2  1  ST
+       PORT ELIZABETH           ZA 688420 -33.59  25.36    66   7322  2  1  ST
+       MARION ISLAND            ZA 689940 -46.53  37.52    22   7200  2  1   T
+       FAIRBANKS INTL         AKUS 702610  64.49 212.08   135   7202  2  4  PB
+       ANCHORAGE INTL         AKUS 702730  61.10 209.59    45   7233  2  4  PB
+       SAINT PAUL ISLAND      AKUS 703080  57.09 189.47    10   7488  2  4   T
+       COLD BAY               AKUS 703160  55.12 197.17    30   7119  2  4   T
+       KING SALMON            AKUS 703260  58.41 203.21    15   7133  2  4   T
+       KODIAK                 AKUS 703500  57.45 207.30     4   7176  2  4   T
+       ANNETTE ISLAND         AKUS 703980  55.02 228.26    37   7185  2  4   T
+       ADAK NS./MITCHELL F    AKUS 704540  51.53 183.21     4   6051  2  4   T
+       NORMAN WELLS           NTCN 710430  65.17 233.12    60   7218  2  4  PB
+       PORT HARDY             BCCN 711090  50.41 232.38    17   7538  2  4   T
+       SABLE ISLAND           NSCN 716000  43.56 299.59     4   7244  2  4   T
+       MANIWAKI               QBCN 717220  46.22 284.01   170   7244  2  4   T
+       SEPT-ILES              QBCN 718110  50.13 293.45    52   7249  2  4   T
+       STEPHENVILLE           NFCN 718150  48.32 301.27    61   7274  2  4   T
+       MOOSONEE               ONCN 718360  51.16 279.21    10   7182  2  4   T
+       THE PAS                MNCN 718670  53.58 258.54   273   7228  2  4   T
+       KUUJJUAQ               QBCN 719060  58.06 291.35    36   7222  2  4   T
+       INUKJUAK               QBCN 719070  58.27 281.53     7   7160  2  4   T
+       CHURCHILL              MNCN 719130  58.45 265.56    30   7155  2  4   T
+       CORAL HARBOUR          NTCN 719150  64.12 276.38    62   7043  2  4  PB
+       RESOLUTE               NTCN 719240  74.43 265.01    40   7257  2  4  PB
+       FORT NELSON            BCCN 719450  58.50 237.24   379   7227  2  4   T
+       INUVIK                 NTCN 719570  68.19 226.28   103   7322  2  4  PB
+       KEY WEST INTL          FLUS 722010  24.33 278.15     3   7195  2  4  ST
+       WEST PALM BEACH        FLUS 722030  26.41 279.53     3   7209  2  4  ST
+       DEL RIO (AUTOB)        TXUS 722610  29.22 259.05   314   7245  2  4  ST
+       TUCSON                 AZUS 722740  32.07 249.04   789   7185  2  4  ST
+       SAN DIEGO/LINDBERG     CAUS 722900  32.49 242.52   124   6950  2  4  ST
+       ATHENS MUNICIPAL       GAUS 723110  33.57 276.41   246   7258  2  4  ST
+       GREENSBORO-HIGH PT     NCUS 723170  36.05 280.03   275   7274  2  4  ST
+       NASHVILLE              TNUS 723270  36.15 273.26   180   7270  2  4  ST
+       NORTH LITTLE ROCK      ARUS 723400  34.50 267.45   172   7262  2  4  ST
+       OKLAHOMA CITY/WILL     OKUS 723530  35.24 262.24   392   6721  2  4  ST
+       AMARILLO               TXUS 723630  35.14 258.18  1094   7254  2  4  ST
+       WALLOPS ISLAND         VAUS 724020  37.51 284.31     4   7258  2  4  ST
+       ATLANTIC CITY          NJUS 724070  39.27 285.26    21   6612  2  4  ST
+       HUNTINGTON/TRI STAT    WVUS 724250  38.22 277.27   246   7334  2  4  ST
+       DAYTON/JAMES M COX     OHUS 724290  39.52 275.53   298   7248  2  4  ST
+       TOPEKA/BILLARD         KSUS 724560  39.04 264.22   268   7252  2  4  ST
+       DENVER/STAPLETON       COUS 724690  39.45 255.08  1611   7263  2  4  ST
+       ALBANY                 NYUS 725180  42.45 286.12    86   7190  2  4   T
+       PITTSBURGH             PAUS 725200  40.32 279.46   359   7275  2  4  ST
+       BUFFALO                NYUS 725280  42.56 281.16   218   7239  2  4   T
+       PEORIA                 ILUS 725320  40.40 270.19   200   7372  2  4  ST
+       NORTH OMAHA            NEUS 725530  41.22 263.59   400   7276  2  4  ST
+       NORTH PLATTE/LEE BI    NEUS 725620  41.08 259.19   847   7248  2  4  ST
+       SALT LAKE CITY INTL    UTUS 725720  40.46 248.02  1288   7217  2  4  ST
+       LANDER/HUNT FLD        WYUS 725760  42.49 251.16  1695   7127  2  4   T
+       MEDFORD                ORUS 725970  42.22 237.08   401   7295  2  4   T
+       PORTLAND INTL JET      MEUS 726060  43.39 289.41    20   7300  2  4   T
+       FLINT/BISHOP           MIUS 726370  42.58 276.16   236   7229  2  4   T
+       GREEN BAY/STRAUBEL     WIUS 726450  44.29 271.52   210   7235  2  4   T
+       HURON REGIONAL         SDUS 726540  44.23 261.47   392   7134  2  4   T
+       ST CLOUD/WHITNEY       MNUS 726550  45.33 265.56   315   7422  2  4   T
+       RAPID CITY REGIONAL    SDUS 726620  44.03 256.56   966   7340  2  4   T
+       BOISE MUNICIPAL        IDUS 726810  43.34 243.47   871   7255  2  4   T
+       SALEM/MCNARY           ORUS 726940  44.55 236.59    61   7283  2  4   T
+       CARIBOU MUNICIPAL      MEUS 727120  46.52 291.59   191   7259  2  4   T
+       SAULT STE MARIE        MIUS 727340  46.28 275.38   221   7217  2  4   T
+       INTERNATIONAL FALLS    MNUS 727470  48.34 266.37   359   7149  2  4   T
+       BISMARCK MUNICIPAL     NDUS 727640  46.46 259.15   503   7274  2  4   T
+       GLASGOW                MTUS 727680  48.13 253.23   696   7296  2  4   T
+       GREAT FALLS            MTUS 727750  47.29 248.38  1118   7143  2  4   T
+       SPOKANE INTL           WAUS 727850  47.38 242.28   720   7203  2  4   T
+       QUILLAYUTE STATE       WAUS 727970  47.57 235.27    56   7121  2  4   T
+       ISLA GUADALUPE           MX 761510  28.53 241.42    23   6196  2  4  ST
+       CHIHUAHUA UNIVERSIT      MX 762250  28.42 253.56  1429   6679  2  4  ST
+       EMPALME-IN-SONORA        MX 762560  27.57 249.12    12   6674  2  4  ST
+       MAZATLAN                 MX 764580  23.12 253.35     4   6675  2  4  ST
+       MERIDA INTL ARPT         MX 766440  20.57 270.20    11   6746  2  4  TR
+       MEXICO CITY/JUAREZ       MX 766790  19.26 260.55  2231   6701  2  4  TR
+       BERMUDA NAS/KINDLEY      BE 780160  32.22 295.19    27   6160  2  4  ST
+       GUANTANAMO BAY NAS       CU 783670  19.54 284.51    32   3636  2  4  TR
+       OWEN ROBERTS ARPT        GC 783840  19.18 278.38     3   6402  2  4  TR
+       KINGSTON/N-MANLEY        JM 783970  17.56 283.13     1   6498  2  4  TR
+       SANTO DOMINGO            DR 784860  18.28 290.07    14   4219  2  4  TR
+       SAN JUAN INTL            PU 785260  18.26 294.00     3   6977  2  4  TR
+       BELIZE INTL              BH 785830  17.32 271.42     5   4085  2  4  TR
+       HOWARD AFB               PM 788060   8.58 280.27    66   6846  2  4  TR
+       GRANTLEY ADAMS           BR 789540  13.04 300.30    47   5639  2  4  TR
+       BOGOTA/ELDORADO          CO 802220   4.42 285.51  2541   3195  2  3  TR
+       BRASILIA ARPT.           BZ 833780 -15.52 312.04  1061   3965  2  3  TR
+       CAMPO GRANDE ARPT        BZ 836120 -20.28 305.20   567   4737  2  3  TR
+       GALEAO/RIO DE JANEI      BZ 837460 -22.49 316.45    42   5511  2  3  TR
+       SAO PAULO AIRPORT        BZ 837800 -23.37 313.21   802   5100  2  3  ST
+       CURITIBA AIRPORT         BZ 838400 -25.31 310.50   908   4647  2  3  ST
+       ANTOFAGASTA/CERRO        CH 854420 -23.25 289.32   137   4978  2  3  ST
+       QUINTERO                 CH 855430 -32.47 288.28     7   6187  2  3  ST
+       PUERTO MONTT/TEPUAL      CH 857990 -41.26 286.53    84   3747  2  3  ST
+       SALTA AIRPORT            AG 870470 -24.51 294.31  1231   6276  2  3  ST
+       RESISTENCIA AIRPORT      AG 871550 -27.27 300.57    53   5655  2  3  ST
+       MENDOZA AIRPORT          AG 874180 -32.50 291.13   705   4268  2  3  ST
+       BUENOS AIRES/EZEIZA      AG 875760 -34.49 301.28    20   7071  2  3  ST
+       SANTA ROSA AIRPORT       AG 876230 -36.34 295.44   189   4314  2  3  ST
+       COMODORO RIVADAVIA       AG 878600 -45.47 292.33    58   4775  2  3   T
+       SANAE SAF-BASE           ZA 890010 -70.19 357.38    52   4370  2  7  PB
+       AMUNDSEN-SCOTT           US 890090 -90.00    .00  2835   3268  2  7  PB
+       SYOWA JAPAN-BASE         JP 895320 -69.00  39.35    18   5181  2  7  PB
+       MOLODEZHNAYA             RA 895420 -67.40  45.51    40   6887  2  7  PB
+       MCMURDO USA-BASE         US 896640 -77.51 166.40    24   3072  2  7  PB
+       LIHUE-ON-KAUAI         HIUS 911650  21.59 200.39    36  12602  2  5  TR
+       ANDERSEN AFB/GUAM        MY 912170  13.33 144.50   111   8721  2  5  TR
+       WAKE ISLAND AIRFLD       WK 912450  19.17 166.39     5   7120  2  5  TR
+       HILO/LYMAN             HIUS 912850  19.43 204.56    10  11581  2  5  TR
+       PAGO PAGO INTL ARPT      ZM 917650 -14.20 189.17     5  10187  2  5  TR
+       INVERCARGILL ARPT        NZ 938440 -46.25 168.20     2  12616  2  5   T
+       CAMPBELL ISLAND          NZ 939440 -52.33 169.09    15   6716  2  5   T
+       CHATHAM ISLAND           NZ 939860 -43.57 183.26    46   4134  2  5   T
+       PERTH INTL ARPT        WEAU 946100 -31.55 115.58     8  13470  2  5  ST
+       NOWRA (AUS-NAVY)       NWAU 947500 -34.57 150.32   110   6834  2  5  ST
+       WILLIAMTOWN AERO       NWAU 947760 -32.47 151.49    11  12732  2  5  ST
+       MOUNT GAMBIER ARPT     SAAU 948210 -37.44 140.47    69  12850  2  5  ST
+       LAVERTON (AUS-AFB))    VCAU 948650 -37.52 144.45    14  13511  2  5  ST
+       HOBART AIRPORT         TAAU 949750 -42.50 147.30     3  13072  2  5   T
+       MEDAN/POLONIA            ID 960350   3.34  98.41    25   6698  2  5  TR
+       BRUNEI AIRPORT           BF 963150   4.56 114.56    30   2907  2  5  TR
+       KUCHING-IN-SARAWAK       SK 964130   1.29 110.20    26   9593  2  5  TR
+       BINTULU-IN-SARAWAK       SK 964410   3.12 113.02     3   9085  2  5  TR
+       KOTA KINABALU            SK 964710   5.57 116.03     3  10225  2  5  TR
+       SURABAYA/JUANDA NAB      ID 969350  -7.22 112.46     3   3188  2  5  TR
+       MENADO/SAM RATULANG      ID 970140   1.32 124.55    80   3903  2  5  TR
+       CLARK AFB/ANGELES        PH 983270  15.10 120.34   166   6621  2  5  TR
+       JAN MAYEN ISLAND         NO 010010  70.56 351.20     9   7032     6  PB
+       BJORNOYA ISLAND          NO 010280  74.31  19.01    18   7035     6  PB
+       SCORESBYSUND             GL 043390  70.29 338.02    66   6260     6  PB
+       KHEYSA ISLAND          DKRA 200460  80.37  58.03    20  10478     2  PB
+       CAPE ZHELANIYA         DKRA 203530  76.57  68.35     8   7700     2  PB
+       PREOBRAZHENIYA ISL       RA 215040  74.40 112.56    35  10480     2  PB
+       MURMANSK-IN-MURMAN     ARRS 221130  68.58  33.03    65  12129     2  PB
+       PODKAMENNAYA TUNGUS    NORA 238840  61.36  90.00    63  10655     2  PB
+       OLENEK-IN-YAKUT        HARA 241250  68.30 112.26   209   9255     2  PB
+       OYMYAKON-IN-YAKUT      HARA 246880  63.28 142.48   750  11650     2  PB
+       OLEKHMINSK-IN-YAKUT    HARA 249440  60.24 120.25   147  11314     2  PB
+       CAPE SHMIDTA           HARA 251730  68.55 180.31    -1   8982     2  PB
+       PROVIDENIYA BAY        HARA 255940  64.26 186.46     3   8047     2  PB
+       IN SALAH                 AL 606300  27.12   2.28   293  10990     1  ST
+       TAMANRASSET              AL 606800  22.47   5.31  1378  10844     1  ST
+       TOMBOUCTOU               MI 612230  16.43 357.00   263   9399     1  TR
+       NOUADHIBOU               MT 614150  20.56 342.58     5   7989     1  TR
+       DIEGO GARCIA             BT 619670  -7.18  72.24     2   5141     1  TR
+       BENINA                   LY 620530  32.05  20.16    38   4708     1  ST
+       GHADAMES                 LY 621030  30.08   9.30   338   4074     1  ST
+       MERSA MATRUH             EG 623060  31.20  27.13    28   4750     1  ST
+       ASSWAN                   EG 624140  23.58  32.47   200   5042     1  ST
+       GARISSA                  KN 637230  -0.28  39.38   138   2972     1  ST
+       FORT-DAUPHIN             MG 671970 -25.02  46.57     8   8247     1  ST
+       BARTER ISLAND (DEW)    AKUS 700860  70.08 216.22    15   6292     4  PB
+       ANCHORAGE INTL         AKUS 702730  61.10 209.59    45   7233     4  PB
+       SACHS HARBOUR(MAPS)    NTCN 710510  72.00 234.44    84   4647     4  PB
+       ALERT                  NTCN 710820  82.30 297.40    66   7200     4  PB
+       EUREKA                 NTCN 719170  80.00 274.04    10   7207     4  PB
+       RESOLUTE               NTCN 719240  74.43 265.01    40   7257     4  PB
+       BAKER LAKE             NTCN 719260  64.18 264.00    49   6646     4  PB
+       NATAL/AUGUSTO SEVER      BZ 825990  -5.55 324.45    49   2916     3  TR
+       BROOME AIRPORT         WEAU 942030 -17.57 122.14     9  12432     5  TR
+       TOWNSVILLE(AUS-AFB)    QUAU 942940 -19.15 146.45     6  12865     5  TR
+       LEARMONTH (AUS-AFB)    WEAU 943020 -22.14 114.05     6   8432     5  TR
+       ALICE SPRINGS ARPT     NTAU 943260 -23.48 133.54   544  13056     5  TR
+       GERALDTON AIRPORT      WEAU 944030 -28.48 114.42    33  12153     5  ST
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
