@@ -1,7 +1,6 @@
-% -*- Mode: LaTeX; tab-width: 4 -*-
+% -*- coding: utf-8; mode: LaTeX; tab-width: 4 -*-
 
 % Propagation models from ITU
-% (c) Daniel Llorens - VAS 2019
 
 \documentclass[10pt,notitlepage,oneside]{article}
 \input{docs/paper-prologue}
@@ -21,21 +20,34 @@
 
 Something here.
 
-\paragraph{Topic A}
+\paragraph{Total attenuation}
 
-Notes.
+The overall attenuation is \cite[(60)]{ITU-P.618-13}
 
-\paragraph{Topic B}
+\begin{align}
+  A_T(p) = A_G(p) + \sqrt{(A_R(p) + A_C(p))^2 + A_S^2(p)}
+\end{align}
 
-More notes.
+Each component is ‘attenuation exceeded for $p$ of an average year’ \cite[\S2.2.2.1 Step 9]{ITU-P.618-13},
+
+\begin{itemize}
+\item $A_G$: atmospheric gases \cite[(20)]{ITU-P.676-11} (‘Annex 1’).
+\item $A_R$: rain \cite[(8)]{ITU-P.618-13}.
+\item $A_C$: clouds \cite{ITU-P.840-7}.
+\item $A_S$: tropospheric scintillation \cite[(46)]{ITU-P.618-13}.
+\end{itemize}
+
+\paragraph{Atmospheric gases}
+
+The computation in \cite[(20)]{ITU-P.676-11} requires pressure, temperature and humidity data for each layer of the atmosphere. In the absence of specific data, location-dependent reference data is provided in~\cite[Annex~2]{ITU-P.835-6}\footnote{Cf accompanying data in \cite{ITU-prop-soft}.} and a generic mean global atmosphere is provided in~\cite[Annex~1]{ITU-P.835-6}.
 
 \paragraph{Topic C}\todo{Something to do.}
 
-\cite{ITU-S-1428-1}
+\cite{ITU-P.676-11}
 
 \selectlanguage{english}
 \small
-\bibliography{biblio}
+\bibliography{docs/biblio}
 \bibliographystyle{alpha}
 
 \tableofcontents

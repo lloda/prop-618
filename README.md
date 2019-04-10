@@ -5,5 +5,8 @@ This is after [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-
 
 ## References
 
-* [Fortran](http://www.egr.unlv.edu/~ed/fortranv3.pdf)
+* [Fortran guide](http://www.egr.unlv.edu/~ed/fortranv3.pdf)
+* [Fortran wiki book](https://en.wikibooks.org/wiki/Category:Book:Fortran)
+* [gfortran intrinsic procedures](https://gcc.gnu.org/onlinedocs/gfortran/Intrinsic-Procedures.html#Intrinsic-Procedures)
 * [UseLATEX.cmake](https://gitlab.kitware.com/kmorel/UseLATEX/blob/master/UseLATEX.pdf)
+* [Water humidity calculator](https://www.cactus2000.de/uk/unit/masshum.shtml)

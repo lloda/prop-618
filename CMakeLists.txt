@@ -23,25 +23,26 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 # -------------------
 
 set (BASE_FFLAGS " \
--std=f2008 -fbounds-check")
+-std=f2008 -fbounds-check -fimplicit-none -fdiagnostics-color=always -Wall -Werror")
 set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${BASE_FFLAGS} $ENV{FFLAGS}")
 set (LINK_FLAGS "-fopenmp $ENV{LINKFLAGS}")
 
 add_library (prop src/prop.f95)
 
-# foreach (target one two)
-#   add_executable (${target} "test/${target}.f95")
-#   target_link_libraries (${target} asu m -static)
-#   add_test (${target} ${target})
-# endforeach ()
+foreach (target test0)
+  add_executable (${target} "src/${target}.f95")
+  target_link_libraries (${target} prop)
+  add_test (${target} ${target})
+endforeach ()
 
 include(config/UseLATEX.cmake)
 set (LATEX_OUTPUT_PATH build)
 add_latex_document (docs/prop-doc.tex
   INPUTS docs/paper-prologue.tex docs/margins.tex
   BIBFILES docs/biblio.bib
-  USE_INDEX
-  USE_GLOSSARY)
+  # USE_INDEX
+  # USE_GLOSSARY
+  )
 
 enable_testing ()
 
