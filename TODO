@@ -1,0 +1,6 @@
+# ! (TODO) -*- coding: utf-8; mode: org-mode -*-
+
+help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip checkbox [C-ct] flip TODO
+
+* TODO
+  - [ ] Enforce src/test0.f95 as test
