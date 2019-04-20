@@ -170,20 +170,6 @@ contains
   end subroutine p838_coeffs
 
 
-  subroutine p838_rain_attenuation(fghz, el, taudeg, k, a) bind(c, name='__p838_attenuation')
-
-    real(C_DOUBLE), intent(in) :: fghz, el, taudeg
-    real(C_DOUBLE), intent(out) :: k, a
-    real :: tau, kh, ah, kv, av
-
-    tau = deg2rad(taudeg)
-    call p838_coeffs(fghz, kh, ah, kv, av)
-    k = (kh + kv + (kh-kv)*(cos(el)**2.)*cos(2.*tau)) / 2.
-    a = (kh*ah + kv*av + (kh*ah - kv*av)*(cos(el)**2.)*cos(2.*tau)) / (2.*k)
-
-  end subroutine p838_rain_attenuation
-
-
   real(C_DOUBLE) function p618_rain(latdeg, londeg, hs, fghz, eldeg, taudeg, p, r001) &
        bind(c, name='__p618_rain') &
        result(att)
@@ -235,8 +221,13 @@ contains
     ! step 5 - specific attenuation (P838)
 
     block
+      real :: tau, kh, ah, kv, av
       real :: k, a
-      call p838_rain_attenuation(fghz, el, taudeg, k, a)
+
+      tau = deg2rad(taudeg)
+      call p838_coeffs(fghz, kh, ah, kv, av)
+      k = (kh + kv + (kh-kv)*(cos(el)**2.)*cos(2.*tau)) / 2.
+      a = (kh*ah + kv*av + (kh*ah - kv*av)*(cos(el)**2.)*cos(2.*tau)) / (2.*k)
 
       ! FIXME optional arguments don't work with bind(c) (gfortran 8.3) :-/
       if (r001<0) then
