@@ -26,12 +26,12 @@
      (pointer-to args 0)
      (pointer-to args 1))))
 
-(define __p676_gas
-  (pointer->procedure void (dynamic-func "__p676_gas" libprop) '(* * * * * * *)))
-(define* (p676-gas fghz p e T #:key short?)
+(define __p676_gas_specific
+  (pointer->procedure void (dynamic-func "__p676_gas_specific" libprop) '(* * * * * * *)))
+(define* (p676-gas-specific fghz p e T #:key short?)
   (let* ((short (s32vector (if short? 1 0)))
          (args (f64vector fghz p e T 0 0)))
-    (__p676_gas
+    (__p676_gas_specific
      (pointer-to short 0)
      (pointer-to args 0)
      (pointer-to args 1)
@@ -172,7 +172,7 @@
 (let* ((fghz (linspace. 1 350 10000))
        (T (+ 273.15 15))
        (e (p676-vapor-pressure 7.5 T))
-       (gas (ply (lambda (fghz) (call-with-values (lambda () (p676-gas fghz 1013.25 e T)) vector)) fghz))
+       (gas (ply (lambda (fghz) (call-with-values (lambda () (p676-gas-specific fghz 1013.25 e T)) vector)) fghz))
        (loglinesx (array->list (ply log10 (ravel (out * #(2 3 4 5 6 7 8 9) #(1e0 1e1 1e2 1e3))))))
        (loglinesy (array->list (ply log10 (ravel (out * #(2 3 4 5 6 7 8 9) #(1e-5 1e-4 1e-3 1e-2 1e-1 1e0 1e1)))))))
   ((yak-graph "p676-11-fig5.pdf" #:line-width .007 #:width 1000 #:height 1300 #:subgrid 'lines #:scale 1.4 #:place-legend '(1 0)

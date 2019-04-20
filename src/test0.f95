@@ -13,8 +13,8 @@ program test0
   n = n + test_p839_rain_height()
   n = n + test_p838_coeffs()
   n = n + test_p618_rain()
+  n = n + test_p676_gas_specific()
   n = n + test_p676_gas()
-  n = n + test_p676_att_e2s()
 
   write(*, *) achar(10), n, ' errors.'
   stop n
@@ -218,10 +218,10 @@ contains
   end function test_p618_rain
 
   ! ---------------------
-  ! p676_gas
+  ! p676_gas_specific
   ! ---------------------
 
-  integer function test_p676_gas() &
+  integer function test_p676_gas_specific() &
        result(ne)
 
     real :: go, gw
@@ -231,14 +231,14 @@ contains
     ! 50% humidity - [g0, gw] = p676d11_ga(20.0, 1013.25, 11.508, 300.0)
 
     write(*, *) achar(10), 'p676 50%'
-    call p676_gas(0, 20.0, 1013.25, vapor_pressure(11.508, 300.), 300.0, go, gw)
+    call p676_gas_specific(0, 20.0, 1013.25, vapor_pressure(11.508, 300.), 300.0, go, gw)
     ne = ne + num_test('g₀', 0.0106557034883802, go, rspec=5e-15)
     ne = ne + num_test('gw', 0.145950346093096, gw, rspec=5e-15)
 
     ! 30% humidity - [g0, gw] = p676d11_ga(20.0, 1013.25, 6.9045, 300.0)
 
     write(*, *) achar(10), 'p676 30%'
-    call p676_gas(0, 20.0, 1013.25, vapor_pressure(6.9045, 300.), 300.0, go, gw)
+    call p676_gas_specific(0, 20.0, 1013.25, vapor_pressure(6.9045, 300.), 300.0, go, gw)
     ne = ne + num_test('g₀', 0.0105877535759878, go, rspec=5e-15)
     ne = ne + num_test('gw', 0.0867126146205278, gw, rspec=5e-15)
 
@@ -252,7 +252,7 @@ contains
       integer :: i
 
       do i = 1, size(fghz, 1)
-         call p676_gas(0, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
+         call p676_gas_specific(0, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
       end do
@@ -268,19 +268,19 @@ contains
       integer :: i
 
       do i = 1, size(fghz, 1)
-         call p676_gas(1, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
+         call p676_gas_specific(1, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
       end do
     end block
 
-  end function test_p676_gas
+  end function test_p676_gas_specific
 
   ! ---------------------
   ! p676 total path
   ! ---------------------
 
-  integer function test_p676_att_e2s() &
+  integer function test_p676_gas() &
        result(ne)
 
     ne = 0
@@ -307,11 +307,11 @@ contains
       do i=1, 64
          write(line, '(I2, A)') i+21, ' A_gas'
          ne = ne + num_test(trim(line), c(i, 31), &
-              p676_att_e2s(c(i, 7), c(i, 8), c(i, 11), c(i, 10), c(i, 9), c(i, 18), c(i, 3)), &
+              p676_gas(c(i, 7), c(i, 8), c(i, 11), c(i, 10), c(i, 9), c(i, 18), c(i, 3)), &
               rspec=5e-15)
       end do
     end block
 
-  end function test_p676_att_e2s
+  end function test_p676_gas
 
 end program test0

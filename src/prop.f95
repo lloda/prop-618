@@ -301,7 +301,7 @@ contains
   end function vapor_pressure
 
 
-  subroutine p676_gas(short, f, p, e, T, go, gw) bind(c, name='__p676_gas')
+  subroutine p676_gas_specific(short, f, p, e, T, go, gw) bind(c, name='__p676_gas_specific')
 
     ! Equation & table numbers from ITU-R P.676-11.
 
@@ -475,7 +475,7 @@ contains
       end if
     end block
 
-  end subroutine p676_gas
+  end subroutine p676_gas_specific
 
 
   subroutine p676_eq_height(f, e, p, ho, hw) bind(c, name='__p676_eq_height')
@@ -527,7 +527,7 @@ contains
 
   ! FIXME have to pick p-dry from hs (P835-6). Otherwise att dry is independent of hs!
   ! one way is, make p optional, and in that case compute it from P835-6.
-  real(C_DOUBLE) function p676_att_e2s(eldeg, fghz, p, e, T, Vt, hs) bind(c, name='__p676_att_e2s') &
+  real(C_DOUBLE) function p676_gas(eldeg, fghz, p, e, T, Vt, hs) bind(c, name='__p676_gas') &
        result(att)
 
     real(C_DOUBLE), intent(in) :: eldeg  ! elevation angle (°)
@@ -540,7 +540,7 @@ contains
 
     real :: go, gw, ho, hw, attw
 
-    call p676_gas(1, fghz, p, e, T, go, gw)           ! (2a-2b)
+    call p676_gas_specific(1, fghz, p, e, T, go, gw)           ! (2a-2b)
     call p676_eq_height(fghz, e, p, ho, hw)           ! (25-26)
 
     if (.not. present(Vt)) then
@@ -559,8 +559,8 @@ contains
 
          ! go1 go2 are wasted here. Maybe we should go back to split gas -> dry & wet.
 
-         call p676_gas(1, fghz, pref, eref, Tref, go1, gw1)
-         call p676_gas(1, fref, pref, eref, Tref, go2, gw2)
+         call p676_gas_specific(1, fghz, pref, eref, Tref, go1, gw1)
+         call p676_gas_specific(1, fref, pref, eref, Tref, go2, gw2)
 
          if (fghz<1.) then
             stop 103
@@ -619,6 +619,6 @@ contains
        stop 105
     end if
 
-  end function p676_att_e2s
+  end function p676_gas
 
 end module prop
