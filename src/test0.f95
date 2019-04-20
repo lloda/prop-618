@@ -118,16 +118,29 @@ contains
     real :: lat, lon, hspec
     character(len=30) :: line
 
-    write(line, '(A, F8.3, A, F7.3, A)') 'lat =', lat, ' lon =', lon, ' h '
-    ne = num_test(trim(line), hspec, p839_rain_height(lat, lon), rspec=1e-15)
+    write(line, '(A, F8.3, A, F7.3, A)') 'lat =', lat, ' lon =', lon, ' hr '
+    ne = num_test(trim(line), hspec, p839_rain_height(lat, lon), rspec=5e-15)
 
   end function test_p839_rain_height_ref
 
   integer function test_p839_rain_height() &
        result(ne)
 
-    write(*, *) achar(10), 'p839_rain_height'
     ne = 0
+
+    write(*, *) achar(10), 'p839 rain height (CG-3M3J-13-ValEx-Rev4_2.xlsx / P839-4 Rain_Height)'
+    block
+      real, dimension(8) :: lat = (/ 3.133, 22.9, 23., 25.78, 28.717, 33.94, 41.9, 51.5 /)
+      real, dimension(8) :: lon = (/ 101.7, -43.23, 30., -80.22, 77.3, 18.43, 12.49, -0.14 /)
+      real, dimension(8) :: hr = (/ 4.9579744, 4.15877866666667, 4.52800000000000, 4.56946133333333, &
+           5.25820404444445, 2.56330275555556, 3.04749333333333, 2.45273333333333 /)
+      integer :: i
+      do i = 1, size(hr, 1)
+         ne = ne + test_p839_rain_height_ref(lat(i), lon(i), hr(i))
+      end do
+    end block
+
+    write(*, *) achar(10), 'p839, other cases'
     ne = ne + test_p839_rain_height_ref(0., 0., 4.926)
     ne = ne + test_p839_rain_height_ref(0., 0., 4.926)
     ne = ne + test_p839_rain_height_ref(90., 0., 2.456)

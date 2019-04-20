@@ -27,5 +27,6 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
   - [ ] other ITU datasets
     + [ ] heights from P.1511
     + [ ] Vt for P676-11 (37) from P.836-6
+  - [ ] frequency scaling procedure from P.618-13 2.2.1.3
   - [ ] tests
     + [ ] look into pfUnit (https://sourceforge.net/projects/pfunit/files/)
