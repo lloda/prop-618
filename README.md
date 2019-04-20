@@ -1,11 +1,21 @@
 
 ## Propagation models for Earth-space telecommuncations systems
 
-This is after [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). It's meant to be a fairly straightforward implementation. The ones I could find were in Matlab/Octave (from ITU & national offices) or gave no source [(from CNES)](https://logiciels.cnes.fr/fr/content/propa).
+This is a translation into code of [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The ones I could find were in Matlabese (from ITU & national offices) or gave no source [(from CNES)](https://logiciels.cnes.fr/fr/content/propa).
 
-## Other
+The library is written in Fortran and it uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI.
 
-This is the first anything I write in Fortran so be understanding :p  I've read that `.f95` is the customary extension for Fortran >95 code, including 2008, so the Fortran files have that extension. They are meant to be Fortran 2008.
+To build and test, do `cd build && cmake .. && make && make test`.
+
+## Conventions
+
+I use the same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
+
+## Outlook
+
+This is the first time I write Fortran. I've read somewhere that `.f95` is customary for Fortran >95 code, including later Fortran versions, so the Fortran files have that extension. I'm using `-std=f2018`. There will be a C/C++ header and Python bindings at some point.
+
+The library is about 20% complete. Look at the tests `src/test0.f95` to see what's implemented. My priority is to have useful functionality before working on the documentation or the bindings. Probably want to autogenerate those in some way.
 
 ## Links
 

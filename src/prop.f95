@@ -130,9 +130,9 @@ contains
   end function p838_coeff
 
 
-  subroutine p838_coeffs(fghz, kh, ah, kv, av) bind(c, name='__p838_coeffs')
+  subroutine p838_coeffs(freq, kh, ah, kv, av) bind(c, name='__p838_coeffs')
 
-    real(C_DOUBLE), intent(in) :: fghz
+    real(C_DOUBLE), intent(in) :: freq
     real(C_DOUBLE), intent(out) :: kv, kh, av, ah
 
     real, dimension(4) :: &
@@ -161,7 +161,7 @@ contains
 
     real :: logf
 
-    logf = log10(fghz)
+    logf = log10(freq)
     kh = 10.**p838_coeff(logf, kha, khb, khc, khm, khx)
     kv = 10.**p838_coeff(logf, kva, kvb, kvc, kvm, kvx)
     ah = p838_coeff(logf, aha, ahb, ahc, ahm, ahx)
@@ -170,18 +170,18 @@ contains
   end subroutine p838_coeffs
 
 
-  real(C_DOUBLE) function p618_rain(latdeg, londeg, hs, fghz, eldeg, taudeg, p, r001) &
+  real(C_DOUBLE) function p618_rain(lat, lon, hs, freq, eldeg, taudeg, p, r001) &
        bind(c, name='__p618_rain') &
        result(att)
 
     ! Specific attenuation exceeded p*100% on an average year, for rain and clouds in Earth to space links.
     ! Equation & table numbers from ITU-R P.618-13 except where indicated.
 
-    real(C_DOUBLE), intent(in) :: fghz     ! frequency (GHz)
+    real(C_DOUBLE), intent(in) :: freq     ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: taudeg   ! polarization parameter (H 0, V 90, L/R 45)
     real(C_DOUBLE), intent(in) :: hs       ! height above mean sea for Earth station
-    real(C_DOUBLE), intent(in) :: latdeg   ! latitude (°)
-    real(C_DOUBLE), intent(in) :: londeg   ! longitude (°)
+    real(C_DOUBLE), intent(in) :: lat      ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon      ! longitude (°)
     real(C_DOUBLE), intent(in) :: eldeg    ! elevation angle (°)
     real(C_DOUBLE), intent(in) :: p        ! probability (%)
     real(C_DOUBLE), intent(inout) :: r001  ! point rainfall rate for 0.01% of average year (mm/h)
@@ -197,7 +197,7 @@ contains
 
     ! step 1 - rain height (P839)
 
-    hr = p839_rain_height(latdeg, londeg)
+    hr = p839_rain_height(lat, lon)
     if (hr<=hs) then
        att = 0
        return
@@ -225,20 +225,19 @@ contains
       real :: k, a
 
       tau = deg2rad(taudeg)
-      call p838_coeffs(fghz, kh, ah, kv, av)
+      call p838_coeffs(freq, kh, ah, kv, av)
       k = (kh + kv + (kh-kv)*(cos(el)**2.)*cos(2.*tau)) / 2.
       a = (kh*ah + kv*av + (kh*ah - kv*av)*(cos(el)**2.)*cos(2.*tau)) / (2.*k)
 
-      ! FIXME optional arguments don't work with bind(c) (gfortran 8.3) :-/
       if (r001<0) then
-         r001 = p837_rainfall_rate(latdeg, londeg)
+         r001 = p837_rainfall_rate(lat, lon)
       end if
       gr = k * (r001 ** a)
     end block
 
     ! step 6 - horizontal reduction factor
 
-    horiz001 = 1./(1 + 0.78*sqrt(lg*gr/fghz) - 0.38*(1-exp(-2*lg)))
+    horiz001 = 1./(1 + 0.78*sqrt(lg*gr/freq) - 0.38*(1-exp(-2*lg)))
 
     ! step 7 - vertical adjustment factor
 
@@ -250,8 +249,8 @@ contains
 
     block
       real :: chi
-      chi = max(0., 36.-abs(latdeg))
-      nu001 = 1./(1. + sqrt(sin(el)) * (31. * (1. - exp(-eldeg/(1+chi))) * sqrt(lr*gr)/(fghz**2) - 0.45))
+      chi = max(0., 36.-abs(lat))
+      nu001 = 1./(1. + sqrt(sin(el)) * (31. * (1. - exp(-eldeg/(1+chi))) * sqrt(lr*gr)/(freq**2) - 0.45))
     end block
 
     ! step 8 - effective path length
@@ -265,12 +264,12 @@ contains
     ! step 10 - predicted attenuation for p (%) (0.001 ≤ p ≤ 5)
 
     block
-      if ((p >= 1.) .or. (abs(latdeg) >= 36.)) then
+      if ((p >= 1.) .or. (abs(lat) >= 36.)) then
          beta = 0.
-      else if ((p < 1.) .and. (abs(latdeg) < 36.) .and. (eldeg >= 25.)) then
-         beta = -.005*(abs(latdeg)-36.)
+      else if ((p < 1.) .and. (abs(lat) < 36.) .and. (eldeg >= 25.)) then
+         beta = -.005*(abs(lat)-36.)
       else
-         beta = -.005*(abs(latdeg)-36.) + 1.8 - 4.25*sin(el)
+         beta = -.005*(abs(lat)-36.) + 1.8 - 4.25*sin(el)
       end if
       att = att001 * ((p/.01) ** (-0.655 -0.033*log(p) +0.045*log(att001) +beta*(1-p)*sin(el)))
     end block
@@ -527,11 +526,11 @@ contains
 
   ! FIXME have to pick p-dry from hs (P835-6). Otherwise att dry is independent of hs!
   ! one way is, make p optional, and in that case compute it from P835-6.
-  real(C_DOUBLE) function p676_gas(eldeg, fghz, p, e, T, Vt, hs) bind(c, name='__p676_gas') &
+  real(C_DOUBLE) function p676_gas(eldeg, freq, p, e, T, Vt, hs) bind(c, name='__p676_gas') &
        result(att)
 
     real(C_DOUBLE), intent(in) :: eldeg  ! elevation angle (°)
-    real(C_DOUBLE), intent(in) :: fghz   ! frequency (GHz)
+    real(C_DOUBLE), intent(in) :: freq   ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: p      ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e      ! vapor part. pressure e(P) (hPa)
     real(C_DOUBLE), intent(in) :: T      ! temperature (K)
@@ -540,8 +539,8 @@ contains
 
     real :: go, gw, ho, hw, attw
 
-    call p676_gas_specific(1, fghz, p, e, T, go, gw)           ! (2a-2b)
-    call p676_eq_height(fghz, e, p, ho, hw)           ! (25-26)
+    call p676_gas_specific(1, freq, p, e, T, go, gw)           ! (2a-2b)
+    call p676_eq_height(freq, e, p, ho, hw)           ! (25-26)
 
     if (.not. present(Vt)) then
        attw = hw*gw
@@ -559,12 +558,12 @@ contains
 
          ! go1 go2 are wasted here. Maybe we should go back to split gas -> dry & wet.
 
-         call p676_gas_specific(1, fghz, pref, eref, Tref, go1, gw1)
+         call p676_gas_specific(1, freq, pref, eref, Tref, go1, gw1)
          call p676_gas_specific(1, fref, pref, eref, Tref, go2, gw2)
 
-         if (fghz<1.) then
+         if (freq<1.) then
             stop 103
-         else if (fghz<20.) then
+         else if (freq<20.) then
             attw = 0.0176 * Vt * (gw1 / gw2)
 
             ! ! debug intermediate values
@@ -573,15 +572,15 @@ contains
             ! write(*, *) 'g1', gw1
             ! write(*, *) 'g2', gw2
 
-         else if (fghz<350.) then
+         else if (freq<350.) then
             block
               real :: a, b, h
 
               a = -0.113 &
-                   + 0.2048*exp(-(((fghz-22.43)/3.097)**2)) &
-                   + 0.2326*exp(-(((fghz-183.5)/4.096)**2)) &
-                   + 0.2073*exp(-(((fghz-325.)/3.651)**2))
-              b = 8.741e4*exp(-0.587*fghz) + 312.2*(fghz**(-2.38)) + 0.723
+                   + 0.2048*exp(-(((freq-22.43)/3.097)**2)) &
+                   + 0.2326*exp(-(((freq-183.5)/4.096)**2)) &
+                   + 0.2073*exp(-(((freq-325.)/3.651)**2))
+              b = 8.741e4*exp(-0.587*freq) + 312.2*(freq**(-2.38)) + 0.723
               h = min(4., hs)
 
               ! ! debug intermediate values
@@ -620,5 +619,6 @@ contains
     end if
 
   end function p676_gas
+
 
 end module prop
