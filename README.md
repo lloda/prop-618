@@ -1,24 +1,24 @@
 
 ## Propagation models for Earth-space telecommuncations systems
 
-This is a translation into code of [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The ones I could find were in Matlabese (from ITU & national offices) or gave no source [(from CNES)](https://logiciels.cnes.fr/fr/content/propa).
+This is a translation into code of [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The implementations I could find were all in Matlabese (from ITU & national offices) or don't seem to give the source [(e.g. CNES)](https://logiciels.cnes.fr/fr/content/propa).
 
-The library is written in Fortran and it uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI.
+The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI.
 
 To build and test, do `cd build && cmake .. && make && make test`.
 
 ## Conventions
 
-* I use the same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
-* I try to use similar names to those in ITU's reports. There are some exceptions where I don't think the ITU name works in code (like `freq` for `f` or `temp` for `T`. I also use `el` instead of θ where that means elevation (I really bad habit by ITU if I may say).
+* Same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
+* Similar variable names as in ITU's reports. An exception is that I use `el` instead of `θ` or `th` where that means elevation.
 
 ## Outlook
 
-This is the first time I write Fortran. I've read somewhere that `.f95` is customary for Fortran >95 code, including later Fortran versions, so the Fortran files have that extension. I'm using `-std=f2018`. There will be a C/C++ header and Python bindings at some point.
+This is the first time I write Fortran. I've read that `.f95` is customary for Fortran >95 code, including later Fortran versions, so the Fortran files have that extension. There will be a C/C++ header and Python bindings at some point.
 
-The library is about 20% complete. Look at the tests `src/test0.f95` to see what's implemented. My priority is to have useful functionality before working on the documentation or the bindings. Probably want to autogenerate those in some way.
+The library is about 30% complete. Look at the tests `src/test0.f95` to see what's implemented. My priority is to have useful functionality before working on the documentation or the bindings. Probably want to autogenerate those in some way.
 
-## Links
+## Random links
 
 * [Fortran libraries](https://github.com/rabbiabram/awesome-fortran)
 * [Generating Fortran interfaces](http://fortranwiki.org/fortran/show/Generating+C+Interfaces)

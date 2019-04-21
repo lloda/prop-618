@@ -14,9 +14,11 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
   - [X] rain, P618 [2/2]
     + [X] model
     + [X] tests from validation table (P618-13 A_Rain)
-  - [ ] clouds, P840 [0/2]
-    + [ ] model
-    + [ ] clouds (P840-7 A_Clouds)
+  - [X] clouds, P840 [2/2]
+    + [X] model
+    + [X] clouds (P840-7 A_Clouds)
+  - [ ] scintillation loss (P.618-13 2.4)
+  - [ ] total loss (P.618-13)
   - [-] atmospheres.f95, P835 [1/7]
     + [X] reference
     + [ ] low latitude (annual)
@@ -25,7 +27,6 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
     + [ ] high latitude (summer)
     + [ ] high latitude (winter)
     + [ ] experimental atmospheres
-  - [ ] scintillation loss (P.618-13 2.4)
   - [ ] other ITU datasets
     + [ ] heights from P.1511
     + [ ] Vt for P676-11 (37) from P.836-6

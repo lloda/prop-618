@@ -104,14 +104,22 @@
     (values attp (array-ref args 7))))
 
 (define __p840_Lred
-  (pointer->procedure double (dynamic-func "__p840_Lred" libprop) '(* * * *)))
+  (pointer->procedure double (dynamic-func "__p840_Lred" libprop) '(* * *)))
 (define (p840-Lred latdeg londeg p)
-  (let* ((args (f64vector latdeg londeg p))
-         (val (__p840_Lred
+  (let ((args (f64vector latdeg londeg p)))
+    (__p840_Lred
                (pto args 0)
                (pto args 1)
                (pto args 2))))
-    (values val (array-ref ip 0))))
+
+(define __p840_clouds
+  (pointer->procedure double (dynamic-func "__p840_clouds" libprop) '(* * *)))
+(define (p840-clouds fghz eldeg Lred)
+  (let ((args (f64vector fghz eldeg Lred)))
+    (__p840_clouds
+               (pto args 0)
+               (pto args 1)
+               (pto args 2))))
 
 
 ; -----------------------------------------
@@ -122,6 +130,7 @@
 (p839-rain-height 0 0)
 (p837-rainfall-rate 0 0)
 (p835-ref 11.)
+(p840-clouds 14.25 31.07694309 (p840-Lred 51.50 -0.14 1)) ; 0.455170459072589
 
 
 ; -----------------------------------------

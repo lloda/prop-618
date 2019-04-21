@@ -90,7 +90,6 @@ contains
             read(1, *) x
             p840ap(i, :, :) = transpose(x)
          end do
-         write(*, *) 'TEST = ', p840ap(:, 1, 1:2)
        end block
 
        done = .true.
@@ -332,31 +331,31 @@ contains
   end function p618_rain
 
 
-  real(C_DOUBLE) function vapor_pressure(rho, T) bind(c, name='__p676_vapor_pressure') &
+  real(C_DOUBLE) function vapor_pressure(rho, temp) bind(c, name='__p676_vapor_pressure') &
        result(e)
 
     real(C_DOUBLE), intent(in) :: rho   ! water vapor density (g/m³)
-    real(C_DOUBLE), intent(in) :: T     ! temperature (K)
+    real(C_DOUBLE), intent(in) :: temp  ! temperature (K)
 
-    e = rho * T/216.7;                  ! P676 (4)
+    e = rho * temp/216.7;               ! P676 (4)
 
   end function vapor_pressure
 
 
   ! Equation & table numbers from ITU-R P.676-11.
 
-  subroutine p676_gas_specific(short, f, p, e, T, go, gw) bind(c, name='__p676_gas_specific')
+  subroutine p676_gas_specific(short, f, p, e, temp, go, gw) bind(c, name='__p676_gas_specific')
 
     integer(C_INT32_T), intent(in) :: short  ! use Annex 1 (20) if 0, else use Annex 2 (22-23)
     real(C_DOUBLE), intent(in) :: f          ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: p          ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e          ! vapor part. pressure e(P) (hPa) (4)
-    real(C_DOUBLE), intent(in) :: T          ! temperature (K)
+    real(C_DOUBLE), intent(in) :: temp       ! temperature (K)
     real(C_DOUBLE), intent(out) :: go        ! Specific attenuation for dry air, γₒ (dB/km)
     real(C_DOUBLE), intent(out) :: gw        ! Specific attenuation for water vapor, γw (dB/km)
 
     real :: th
-    th = 300.0/T;
+    th = 300.0/temp;
 
     block
       real, dimension(0:43, 0:6) :: dry = transpose(reshape( (/ &
@@ -570,25 +569,25 @@ contains
   ! FIXME have to pick p-dry from hs (P835-6). Otherwise att dry is independent of hs!
   ! one way is, make p optional, and in that case compute it from P835-6.
 
-  real(C_DOUBLE) function p676_gas(eldeg, freq, p, e, T, Vt, hs) bind(c, name='__p676_gas') &
+  real(C_DOUBLE) function p676_gas(eldeg, freq, p, e, temp, Vt, hs) bind(c, name='__p676_gas') &
        result(att)
 
     real(C_DOUBLE), intent(in) :: eldeg  ! elevation angle (°)
     real(C_DOUBLE), intent(in) :: freq   ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: p      ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e      ! vapor part. pressure e(P) (hPa)
-    real(C_DOUBLE), intent(in) :: T      ! temperature (K)
+    real(C_DOUBLE), intent(in) :: temp   ! temperature (K)
     real(C_DOUBLE), intent(in), optional :: Vt  ! temperature (K)
     real(C_DOUBLE), intent(in), optional :: hs  ! station height above mean sea level (km)
 
     real :: go, gw, ho, hw, attw
 
-    call p676_gas_specific(1, freq, p, e, T, go, gw)           ! (2a-2b)
-    call p676_eq_height(freq, e, p, ho, hw)           ! (25-26)
+    call p676_gas_specific(1, freq, p, e, temp, go, gw) ! (2a-2b)
+    call p676_eq_height(freq, e, p, ho, hw)             ! (25-26)
 
     if (.not. present(Vt)) then
        attw = hw*gw
-    else                                              ! (37)
+    else                                                ! (37)
        block
          real, parameter :: fref = 20.6, pref = 815.
          real :: Tref, eref, go1, gw1, go2, gw2
@@ -710,5 +709,48 @@ contains
     Lred = L(1)*(1.-dp) + L(2)*dp
 
   end function p840_Lred
+
+
+  ! Attenuation by clouds (dB), after ITU-R P.840-7.
+  ! Equation numbers from ITU-R P.840-7 except where indicated.
+
+  real(C_DOUBLE) function p840_clouds(freq, eldeg, Lred) bind(c, name='__p840_clouds') &
+       result(Ac)
+
+    real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
+    real(C_DOUBLE), intent(in) :: eldeg     ! elevation (deg)
+    real(C_DOUBLE), intent(in) :: Lred      ! reduced total columnar content of liquid water (kg/m²), cf ITU-R P.840-7 §3
+
+    real, parameter :: temp = 273.15                    ! §3, (12)
+    real :: fp, fs, dp, ds, th, Kl, e0, e1, e2, er, ei, eta
+
+    if (eldeg<5. .or. eldeg>90.) then
+       stop 108
+    end if
+
+    th = 300./temp                                     ! (9)
+    fp = 20.20 - 146*(th-1.) + 316*(th-1.)**2          ! (GHz) (10)
+    fs = 39.8 * fp                                     ! (11)
+    dp = 1+(freq/fp)**2
+    ds = 1+(freq/fs)**2
+
+    e0 = 77.66 + 103.3*(th-1)                          ! (6)
+    e1 = 0.0671*e0                                     ! (7)
+    e2 = 3.52                                          ! (8)
+    er = (e0-e1)/dp + (e1-e2)/ds + e2                  ! (5)
+    ei = freq*( (e0-e1)/(fp*dp) + (e1-e2)/(fs*ds) )    ! (4)
+
+    eta = (2 + er)/ei                                  ! (3)
+    Kl = 0.819*freq / (ei*(1 + eta**2))                ! (dB/km)/(g/m³)   (2)
+    Ac = (Lred * Kl) / sin(deg2rad(eldeg))             ! (12)
+
+    ! ! debug intermediate values
+    ! write(*, *) 'er', er
+    ! write(*, *) 'ei', ei
+    ! write(*, *) 'eta', eta
+    ! write(*, *) 'Lred', Lred
+    ! write(*, *) 'Kl', Kl
+
+  end function p840_clouds
 
 end module prop
