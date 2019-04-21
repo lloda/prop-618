@@ -22,6 +22,7 @@ contains
   integer(C_INT32_T) function init() bind(c, name='__prop_init') &
     result(ierror)
 
+    real, allocatable :: x(:, :)
     logical, save :: done = .false.
     character(256) :: iomsg
     ierror = 1
@@ -31,50 +32,41 @@ contains
        ! according to ITU-R P.839-4, lat +90:-1.5:-90 (or th 0:1.5:180) and lon 0:1.5:360.
        ! used by p839_rain_height.
 
-       allocate(p839h0(241, 121), STAT=ierror)
-       if (ierror/=0) then
-          write(*, *) 'cannot allocate p839h0'
-          return
-       end if
+       allocate(x(241, 121), STAT=ierror)
        open(1, file='../data/P839/h0.txt', &   ! FIXME install path
             action='read', iostat=ierror, iomsg=iomsg)
        if (ierror/=0) then
           write(*, *) 'cannot open ', '../data/P839/h0.txt', trim(iomsg)
           return
        end if
-       read(1, *) p839h0
-       p839h0 = transpose(p839h0)
+       read(1, *) x
+       allocate(p839h0(121, 241), STAT=ierror)
+       p839h0 = transpose(x)
+       deallocate(x)
 
        ! according to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
        ! used by p837_rainfall_rate.
 
-       allocate(p837R001(2881, 1441), STAT=ierror)
-       if (ierror/=0) then
-          write(*, *) 'cannot allocate p837R001'
-          return
-       end if
+       allocate(x(2881, 1441), STAT=ierror)
        open(1, file='../data/P837/R001.txt', &  ! FIXME install path
             action='read', iostat=ierror, iomsg=iomsg)
        if (ierror/=0) then
           write(*, *) 'cannot open ', '../data/P837/R001.txt', trim(iomsg)
           return
        end if
-       read(1, *) p837R001
-       p837R001 = transpose(p837R001)
+       read(1, *) x
+       allocate(p837R001(1441, 2881), STAT=ierror)
+       p837R001 = transpose(x)
+       deallocate(x)
 
        ! according to ITU-R P.840-7, lat +90:1.125:-90 (or th: -90:1.125:+90) and lon 0:1.125:+360.
        ! used by p840_Lred.
 
        block
-         real, allocatable :: x(:, :)
          integer :: i
          character(32) :: fname
 
          allocate(x(321, 161), STAT=ierror)
-         if (ierror/=0) then
-            write(*, *) 'cannot allocate x'
-            return
-         end if
          allocate(p840ap(size(p840p, 1), 161, 321), STAT=ierror)
          if (ierror/=0) then
             write(*, *) 'cannot allocate p840ap'
@@ -97,6 +89,7 @@ contains
             p840ap(i, :, :) = transpose(x)
          end do
        end block
+       deallocate(x)
 
        done = .true.
     end if

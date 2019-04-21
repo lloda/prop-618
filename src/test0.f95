@@ -211,17 +211,22 @@ contains
        result(ne)
 
     integer ierror, i
-    real, allocatable :: c(:, :)
+    real, allocatable :: x(:, :), c(:, :)
     open(1, file='../data/P618/P618-13A_Rain.txt', action='read')   ! FIXME install path
-    allocate(c(9, 64), STAT=ierror)
-    read(1, *) c
-    c = transpose(c)
+    allocate(x(9, 64), STAT=ierror)
+    allocate(c(64, 9), STAT=ierror)
+    read(1, *) x
+    c = transpose(x)
 
     ne = 0
-    write(*, *) achar(10), 'p618_rain, rows as in ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain)'
+    write(*, *) achar(10), 'p618_rain, ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain)'
     do i=1, size(c, 1)
-       ne = ne + test_p618_rain_ref(i+22, c(i, 9), c(i, 1), c(i, 2), c(i, 3), c(i, 4), c(i, 5), c(i, 6), c(i, 7), c(i, 8))
+       ne = ne + test_p618_rain_ref(i+22, c(i, 9), c(i, 1), c(i, 2), c(i, 3), &
+            c(i, 4), c(i, 5), c(i, 6), c(i, 7), c(i, 8))
     end do
+
+    deallocate(c)
+    deallocate(x)
 
   end function test_p618_rain
 
@@ -297,16 +302,17 @@ contains
       integer :: ierror, i
       character(256) :: iomsg
       character(len=200) :: line
-      real, allocatable :: c(:, :)
+      real, allocatable :: c(:, :), x(:, :)
 
       write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas)'
 
       open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
-      allocate(c(31, 64), STAT=ierror)
+      allocate(x(31, 64), STAT=ierror)
+      allocate(c(64, 31), STAT=ierror)
       read(1, *)
       read(1, *)
-      read(1, *, iostat=ierror, iomsg=iomsg) c
-      c = transpose(c)
+      read(1, *, iostat=ierror, iomsg=iomsg) x
+      c = transpose(x)
       if (ierror/=0) then
          write(*, *) 'cannot open ' // '../data/P676/P676-11A_Gas.csv' // trim(iomsg)
          return
@@ -318,6 +324,9 @@ contains
               p676_gas(c(i, 7), c(i, 8), c(i, 11), c(i, 10), c(i, 9), c(i, 18), c(i, 3)), &
               rspec=5e-15)
       end do
+
+      deallocate(c)
+      deallocate(x)
     end block
 
   end function test_p676_gas
