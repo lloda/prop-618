@@ -9,7 +9,8 @@ To build and test, do `cd build && cmake .. && make && make test`.
 
 ## Conventions
 
-I use the same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
+* I use the same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
+* I try to use similar names to those in ITU's reports. There are some exceptions where I don't think the ITU name works in code (like `freq` for `f` or `temp` for `T`. I also use `el` instead of θ where that means elevation (I really bad habit by ITU if I may say).
 
 ## Outlook
 
@@ -19,8 +20,11 @@ The library is about 20% complete. Look at the tests `src/test0.f95` to see what
 
 ## Links
 
+* [Fortran libraries](https://github.com/rabbiabram/awesome-fortran)
+* [Generating Fortran interfaces](http://fortranwiki.org/fortran/show/Generating+C+Interfaces)
 * [Fortran guide](http://www.egr.unlv.edu/~ed/fortranv3.pdf)
 * [Fortran wiki book](https://en.wikibooks.org/wiki/Category:Book:Fortran)
+* [Array functions in Fortran](https://www.phy.ornl.gov/csep/pl/node18.html)
 * [gfortran intrinsic procedures](https://gcc.gnu.org/onlinedocs/gfortran/Intrinsic-Procedures.html#Intrinsic-Procedures)
 * [UseLATEX.cmake](https://gitlab.kitware.com/kmorel/UseLATEX/blob/master/UseLATEX.pdf)
 * [Water humidity calculator](https://www.cactus2000.de/uk/unit/masshum.shtml)

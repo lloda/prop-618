@@ -15,6 +15,7 @@ program test0
   n = n + test_p618_rain()
   n = n + test_p676_gas_specific()
   n = n + test_p676_gas()
+  n = n + test_p840_Lred()
 
   write(*, *) achar(10), n, ' errors.'
   stop n
@@ -62,7 +63,7 @@ contains
                  legend, ' = ', actual, ' (exp ', expected, ') rerror ', err, ' ≤ ', rspec, ''
          else
             ne = ne + 1
-            write(*, '(A, A, ES12.6, A, ES12.6, A, ES8.2, A, ES8.2, A)') &
+            write(*, '(A, A, ES20.14, A, ES20.14, A, ES8.2, A, ES8.2, A)') &
                  legend, ' = ', actual, ' (exp ', expected, ') rerror ', err, ' > ', rspec, ' (*)'
          end if
        end block
@@ -135,7 +136,7 @@ contains
       real, dimension(8) :: hr = (/ 4.9579744, 4.15877866666667, 4.52800000000000, 4.56946133333333, &
            5.25820404444445, 2.56330275555556, 3.04749333333333, 2.45273333333333 /)
       integer :: i
-      do i = 1, size(hr, 1)
+      do i=1, size(hr, 1)
          ne = ne + test_p839_rain_height_ref(lat(i), lon(i), hr(i))
       end do
     end block
@@ -204,14 +205,14 @@ contains
 
     integer ierror, i
     real, allocatable :: c(:, :)
-    open(1, file='../data/P618/P618-13A_Rain.txt')   ! FIXME install path
+    open(1, file='../data/P618/P618-13A_Rain.txt', action='read')   ! FIXME install path
     allocate(c(9, 64), STAT=ierror)
     read(1, *) c
     c = transpose(c)
 
     ne = 0
     write(*, *) achar(10), 'p618_rain, rows as in ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain)'
-    do i=1,size(c, 1)
+    do i=1, size(c, 1)
        ne = ne + test_p618_rain_ref(i+22, c(i, 9), c(i, 1), c(i, 2), c(i, 3), c(i, 4), c(i, 5), c(i, 6), c(i, 7), c(i, 8))
     end do
 
@@ -251,7 +252,7 @@ contains
            0.341973394422181, 0.751844703646129 /)
       integer :: i
 
-      do i = 1, size(fghz, 1)
+      do i=1, size(fghz, 1)
          call p676_gas_specific(0, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
@@ -267,7 +268,7 @@ contains
            0.33927973759541800, 0.74582386063772800 /)
       integer :: i
 
-      do i = 1, size(fghz, 1)
+      do i=1, size(fghz, 1)
          call p676_gas_specific(1, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
@@ -286,14 +287,14 @@ contains
     ne = 0
 
     block
-      integer ierror, i
+      integer :: ierror, i
       character(256) :: iomsg
       character(len=200) :: line
       real, allocatable :: c(:, :)
 
       write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas)'
 
-      open(1, file='../data/P676/P676-11A_Gas.csv') ! FIXME install path
+      open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
       allocate(c(31, 64), STAT=ierror)
       read(1, *)
       read(1, *)
@@ -313,5 +314,44 @@ contains
     end block
 
   end function test_p676_gas
+
+
+  ! ---------------------
+  ! p840_Lred
+  ! ---------------------
+
+  integer function test_p840_Lred() &
+       result(ne)
+
+    integer :: i
+    character(len=200) :: line
+    real, dimension(32) :: lat = (/ 3.133, 3.133, 3.133, 3.133, 22.9, 22.9, 22.9, 22.9, 23., 23., 23., &
+         23., 25.78, 25.78, 25.78, 25.78, 28.717, 28.717, 28.717, 28.717, 33.94, 33.94, 33.94, 33.94, 41.9, &
+         41.9, 41.9, 41.9, 51.5, 51.5, 51.5, 51.5 /)
+    real, dimension(32) :: lon = (/ 101.7, 101.7, 101.7, 101.7, -43.23, -43.23, -43.23, -43.23, 30., &
+         30., 30., 30., -80.22, -80.22, -80.22, -80.22, 77.3, 77.3, 77.3, 77.3, 18.43, 18.43, 18.43, 18.43, &
+         12.49, 12.49, 12.49, 12.49, -0.14, -0.14, -0.14, -0.14/)
+    real, dimension(32) :: p = (/ 0.1, 0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35, 0.1, &
+         0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35, 0.1, 0.15, 0.3, 0.35/)
+
+    ! the last value of Lred is missing from CG-3M3J-13-ValEx-Rev4_2.xlsx, so it's only a regression here.
+
+    real, dimension(32) :: Lred = (/ 3.80525120796445, 3.74451232860507, 3.63095776597333, 3.59494611097836, &
+         2.82993166918519, 2.61542833066688, 2.15256093108148, 2.0304247957397, 0.443821013333333, 0.367758573782867, &
+         0.252495970370371, 0.230476913654263, 3.52927514027852,  3.36805310943291, 3.09003116666667, 2.98280225960877, &
+         4.23072601368889, 4.00495166454066, 3.64194330426469, 3.55006805438526, 1.47628567661235, 1.34266249702586, &
+         1.11763012935704, 1.06127889148178, 1.49845951814321, 1.41141171895762, 1.25417612763457, 1.21423952416498, &
+         1.90329848661728, 1.8038036039028,  1.64128907698765, 1.59372131785357 /)
+
+    ne = 0
+    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P840-7 Lred annual avg)'
+    do i=1,size(Lred, 1)
+       write(line, '(A, F7.3, A, F7.3, A, F5.2, A)') &
+            'lat ', lat(i), ' lon ', lon(i), ' p ', p(i), ' Lred '
+       ne = ne + num_test(trim(line), Lred(i), p840_lred(lat(i), lon(i), p(i)), rspec=5e-15)
+    end do
+
+  end function test_p840_Lred
+
 
 end program test0

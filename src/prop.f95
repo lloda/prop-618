@@ -3,9 +3,14 @@
 ! 2019-04
 
 module prop
+
   use iso_c_binding
   real, allocatable, save :: p839h0(:, :)
   real, allocatable, save :: p837R001(:, :)
+  real, parameter, dimension(18) :: p840p = (/ 0.1, 0.2, 0.3, 0.5, 1., 2., 3., 5., &
+       10., 20., 30., 50., 60., 70., 80., 90., 95., 99. /)
+  real, allocatable, save :: p840ap(:, :, :)
+
 contains
 
   integer(C_INT32_T) function init() bind(c, name='__prop_init') &
@@ -25,9 +30,10 @@ contains
           write(*, *) 'cannot allocate p839h0'
           return
        end if
-       open(1, file='../data/P839/h0.txt', iostat=ierror, iomsg=iomsg) ! FIXME install path
+       open(1, file='../data/P839/h0.txt', &   ! FIXME install path
+            action='read', iostat=ierror, iomsg=iomsg)
        if (ierror/=0) then
-          write(*, *) 'cannot open ' // '../data/P839/h0.txt' // trim(iomsg)
+          write(*, *) 'cannot open ', '../data/P839/h0.txt', trim(iomsg)
           return
        end if
        read(1, *) p839h0
@@ -41,13 +47,51 @@ contains
           write(*, *) 'cannot allocate p837R001'
           return
        end if
-       open(1, file='../data/P837/R001.txt', iostat=ierror, iomsg=iomsg) ! FIXME install path
+       open(1, file='../data/P837/R001.txt', &  ! FIXME install path
+            action='read', iostat=ierror, iomsg=iomsg)
        if (ierror/=0) then
-          write(*, *) 'cannot open ' // '../data/P837/R001.txt' // trim(iomsg)
+          write(*, *) 'cannot open ', '../data/P837/R001.txt', trim(iomsg)
           return
        end if
        read(1, *) p837R001
        p837R001 = transpose(p837R001)
+
+       ! according to ITU-R P.840-7, lat +90:1.125:-90 (or th: -90:1.125:+90) and lon 0:1.125:+360.
+       ! used by p840_Lred.
+
+       block
+         real, allocatable :: x(:, :)
+         integer :: i
+         character(32) :: fname
+
+         allocate(x(321, 161), STAT=ierror)
+         if (ierror/=0) then
+            write(*, *) 'cannot allocate x'
+            return
+         end if
+         allocate(p840ap(size(p840p, 1), 161, 321), STAT=ierror)
+         if (ierror/=0) then
+            write(*, *) 'cannot allocate p840ap'
+            return
+         end if
+
+         do i=1, size(p840p, 1)
+            if (p840p(i)>=1.) then
+               write(fname, '(I2)') int(p840p(i))
+            else
+               write(fname, '(A, I1)') '0', int(p840p(i)*10)
+            end if
+            open(1, file=('../data/P840/Lred Annual Maps/Lred_' // trim(adjustl(fname)) // '_v4.txt'), &  ! FIXME install path
+                 action='read', iostat=ierror, iomsg=iomsg)
+            if (ierror/=0) then
+               write(*, *) 'cannot open ' // fname, trim(iomsg)
+               return
+            end if
+            read(1, *) x
+            p840ap(i, :, :) = transpose(x)
+         end do
+         write(*, *) 'TEST = ', p840ap(:, 1, 1:2)
+       end block
 
        done = .true.
     end if
@@ -73,20 +117,19 @@ contains
   end function rad2deg
 
 
+  ! According to ITU-R P.839-4, lat +90:-1.5:-90 lon 0:1.5:360
+
   real(C_DOUBLE) function p839_rain_height(lat, lon) bind(c, name='__p839_rain_height') &
        result(h)
 
-    ! according to ITU-R P.839-4, lat +90:-1.5:90 lon 0:1.5:360
     real(C_DOUBLE) :: lat, lon
     real :: x, y, dx, dy
     integer :: ix, iy
 
     x = max(0., min(180., (90.-lat)))/1.5
     y = modulo(lon, 360.)/1.5
-
     ix = max(0, min(size(p839h0, 1)-2, int(floor(x))))     ! x = 180 will use dx = 1.
     iy = max(0, min(size(p839h0, 2)-2, int(floor(y))))     ! y = 360 will use dy = 1.
-
     dx = x-ix
     dy = y-iy
 
@@ -98,20 +141,20 @@ contains
 
   end function p839_rain_height
 
+
+  ! According to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
+
   real(C_DOUBLE) function p837_rainfall_rate(lat, lon) bind(c, name='__p837_rainfall_rate') &
        result(R001)
 
-    ! according to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
     real(C_DOUBLE) :: lat, lon
     real :: x, y, dx, dy
     integer :: ix, iy
 
     x = max(0., min(180., lat+90.))/0.125
     y = modulo(lon+180., 360.)/0.125
-
     ix = max(0, min(size(p837R001, 1)-2, int(floor(x))))     ! x = 180 will use dx = 1.
     iy = max(0, min(size(p837R001, 2)-2, int(floor(y))))     ! y = 360 will use dy = 1.
-
     dx = x-ix
     dy = y-iy
 
@@ -170,12 +213,12 @@ contains
   end subroutine p838_coeffs
 
 
+  ! Specific attenuation exceeded p*100% on an average year, for rain and clouds in Earth to space links.
+  ! Equation & table numbers from ITU-R P.618-13 except where indicated.
+
   real(C_DOUBLE) function p618_rain(lat, lon, hs, freq, eldeg, taudeg, p, r001) &
        bind(c, name='__p618_rain') &
        result(att)
-
-    ! Specific attenuation exceeded p*100% on an average year, for rain and clouds in Earth to space links.
-    ! Equation & table numbers from ITU-R P.618-13 except where indicated.
 
     real(C_DOUBLE), intent(in) :: freq     ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: taudeg   ! polarization parameter (H 0, V 90, L/R 45)
@@ -300,9 +343,9 @@ contains
   end function vapor_pressure
 
 
-  subroutine p676_gas_specific(short, f, p, e, T, go, gw) bind(c, name='__p676_gas_specific')
+  ! Equation & table numbers from ITU-R P.676-11.
 
-    ! Equation & table numbers from ITU-R P.676-11.
+  subroutine p676_gas_specific(short, f, p, e, T, go, gw) bind(c, name='__p676_gas_specific')
 
     integer(C_INT32_T), intent(in) :: short  ! use Annex 1 (20) if 0, else use Annex 2 (22-23)
     real(C_DOUBLE), intent(in) :: f          ! frequency (GHz)
@@ -494,7 +537,7 @@ contains
 
       rp = (p+e) / 1013.25
 
-      ! (25) (FIXME not sure about 25e)
+      ! (25)
 
       t1 = 4.64/(1.+0.066*(rp**(-2.3))) * exp(-((f-59.7)/(2.87 + 12.4 * exp(-7.9*rp)))**2)
       t2 = (0.14*exp(2.12*rp)) / ((f-118.75)**2 + 0.031*exp(2.2*rp))
@@ -526,6 +569,7 @@ contains
 
   ! FIXME have to pick p-dry from hs (P835-6). Otherwise att dry is independent of hs!
   ! one way is, make p optional, and in that case compute it from P835-6.
+
   real(C_DOUBLE) function p676_gas(eldeg, freq, p, e, T, Vt, hs) bind(c, name='__p676_gas') &
        result(att)
 
@@ -620,5 +664,51 @@ contains
 
   end function p676_gas
 
+
+  ! Annual averages of total columnar content of liquid water reduced to a temperature
+  ! of 273.15 K, Lred (kg/m²), from the dataset in R-REC-P.840-7-Maps.zip. As described
+  ! in ITU-R P.840-7 §3.1.
+  ! Equation numbers from ITU-R P.840-7 except where indicated.
+
+  real(C_DOUBLE) function p840_Lred(lat, lon, p) bind(c, name='__p840_Lred') &
+       result(Lred)
+
+    real(C_DOUBLE) :: lat                 ! latitude (°)
+    real(C_DOUBLE) :: lon                 ! longitude (°)
+    real(C_DOUBLE) :: p                   ! probability (%)
+
+    real :: x, y, dx, dy, dp
+    integer :: ip, ix, iy, i
+    real, dimension(2) :: L
+
+    x = max(0., min(180., (90.-lat)))/1.125
+    y = modulo(lon, 360.)/1.125
+    ix = max(0, min(size(p840ap, 2)-2, int(floor(x))))     ! x = 180 will use dx = 1.
+    iy = max(0, min(size(p840ap, 3)-2, int(floor(y))))     ! y = 360 will use dy = 1.
+    dx = x-ix
+    dy = y-iy
+
+    if (p<0.1 .or. p>99.) then
+       stop 106
+    end if
+
+    do ip=2, size(p840p, 1)
+       if (p<=p840p(ip)) then
+          exit
+       end if
+    end do
+
+    do i=1, 2
+       L(i) = &
+            + p840ap(ip+i-2, ix+1, iy+1)*(1-dx)*(1-dy) &
+            + p840ap(ip+i-2, ix+2, iy+1)*dx*(1-dy) &
+            + p840ap(ip+i-2, ix+1, iy+2)*(1-dx)*dy &
+            + p840ap(ip+i-2, ix+2, iy+2)*dx*dy
+    end do
+
+    dp = (log(p) - log(p840p(ip-1))) / (log(p840p(ip)) - log(p840p(ip-1)))
+    Lred = L(1)*(1.-dp) + L(2)*dp
+
+  end function p840_Lred
 
 end module prop

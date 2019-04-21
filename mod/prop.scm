@@ -5,7 +5,7 @@
 (import (srfi :1)  (srfi :8) (srfi :26) (srfi :71)
         (system foreign) (ice-9 match) (rnrs bytevectors))
 
-(define (pointer-to a i)
+(define (pto a i)
   (bytevector->pointer a (* i (sizeof (match (array-type a)
                                         ('f64 double)
                                         ('s32 int32))))))
@@ -18,13 +18,18 @@
 (define libatmospheres (dynamic-link "../build/libatmospheres"))
 (define libprop (dynamic-link "../build/libprop"))
 
+(define __prop_init
+  (pointer->procedure int32 (dynamic-func "__prop_init" libprop) '()))
+(define (prop-init)
+  (__prop_init))
+
 (define __p676_vapor_pressure
   (pointer->procedure double (dynamic-func "__p676_vapor_pressure" libprop) '(* *)))
 (define (p676-vapor-pressure rho T)
   (let ((args (f64vector rho T)))
     (__p676_vapor_pressure
-     (pointer-to args 0)
-     (pointer-to args 1))))
+     (pto args 0)
+     (pto args 1))))
 
 (define __p676_gas_specific
   (pointer->procedure void (dynamic-func "__p676_gas_specific" libprop) '(* * * * * * *)))
@@ -32,13 +37,13 @@
   (let* ((short (s32vector (if short? 1 0)))
          (args (f64vector fghz p e T 0 0)))
     (__p676_gas_specific
-     (pointer-to short 0)
-     (pointer-to args 0)
-     (pointer-to args 1)
-     (pointer-to args 2)
-     (pointer-to args 3)
-     (pointer-to args 4)
-     (pointer-to args 5))
+     (pto short 0)
+     (pto args 0)
+     (pto args 1)
+     (pto args 2)
+     (pto args 3)
+     (pto args 4)
+     (pto args 5))
     (values (array-ref args 4) (array-ref args 5))))
 
 (define __p835_ref
@@ -47,33 +52,28 @@
   (let* ((args (f64vector h 0 0 0))
          (ec (make-s32vector 1 0)))
     (__p835_ref
-     (pointer-to args 0)
-     (pointer-to args 1)
-     (pointer-to args 2)
-     (pointer-to args 3)
+     (pto args 0)
+     (pto args 1)
+     (pto args 2)
+     (pto args 3)
      (bytevector->pointer ec))
     (values (f64vector-ref args 1) (f64vector-ref args 2) (f64vector-ref args 3) (s32vector-ref ec 0))))
-
-(define __prop_init
-  (pointer->procedure int32 (dynamic-func "__prop_init" libprop) '()))
-(define (prop-init)
-  (__prop_init))
 
 (define __p839_rain_height
   (pointer->procedure double (dynamic-func "__p839_rain_height" libprop) '(* *)))
 (define (p839-rain-height lat lon)
   (let ((args (f64vector lat lon)))
     (__p839_rain_height
-     (pointer-to args 0)
-     (pointer-to args 1))))
+     (pto args 0)
+     (pto args 1))))
 
 (define __p837_rainfall_rate
   (pointer->procedure double (dynamic-func "__p837_rainfall_rate" libprop) '(* *)))
 (define (p837-rainfall-rate lat lon)
   (let ((args (f64vector lat lon)))
     (__p837_rainfall_rate
-     (pointer-to args 0)
-     (pointer-to args 1))))
+     (pto args 0)
+     (pto args 1))))
 
 (define __p838_coeffs
   (pointer->procedure void (dynamic-func "__p838_coeffs" libprop) '(* * * * *)))
@@ -82,10 +82,10 @@
         (args (make-f64vector 4 0)))
     (__p838_coeffs
      (bytevector->pointer fghz)
-     (pointer-to args 0)
-     (pointer-to args 1)
-     (pointer-to args 2)
-     (pointer-to args 3))
+     (pto args 0)
+     (pto args 1)
+     (pto args 2)
+     (pto args 3))
     args))
 
 (define __p618_rain
@@ -93,15 +93,25 @@
 (define (p618-rain latdeg londeg hs fghz eldeg taudeg p r001_)
   (let* ((args (f64vector latdeg londeg hs fghz eldeg taudeg p r001_))
          (attp (__p618_rain
-                (pointer-to args 0)
-                (pointer-to args 1)
-                (pointer-to args 2)
-                (pointer-to args 3)
-                (pointer-to args 4)
-                (pointer-to args 5)
-                (pointer-to args 6)
-                (pointer-to args 7))))
+                (pto args 0)
+                (pto args 1)
+                (pto args 2)
+                (pto args 3)
+                (pto args 4)
+                (pto args 5)
+                (pto args 6)
+                (pto args 7))))
     (values attp (array-ref args 7))))
+
+(define __p840_Lred
+  (pointer->procedure double (dynamic-func "__p840_Lred" libprop) '(* * * *)))
+(define (p840-Lred latdeg londeg p)
+  (let* ((args (f64vector latdeg londeg p))
+         (val (__p840_Lred
+               (pto args 0)
+               (pto args 1)
+               (pto args 2))))
+    (values val (array-ref ip 0))))
 
 
 ; -----------------------------------------
