@@ -1,6 +1,12 @@
 ! (test.f95) -*- coding: utf-8; mode: f90-mode -*-
-! 2019-04
 ! tests for prop.f95, atmospheres.f95
+! 2019-04
+
+! (c) lloda@sarc.name
+! This library is free software; you can redistribute it and/or modify it under
+! the terms of the GNU Lesser General Public License as published by the Free
+! Software Foundation; either version 3 of the License, or (at your option) any
+! later version.
 
 program test0
   use prop

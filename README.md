@@ -1,11 +1,15 @@
 
-## Propagation models for Earth-space telecommuncations systems
+# prop-618
 
-This is a translation into code of [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The implementations I could find were all in Matlabese (from ITU & national offices) or don't seem to give the source [(e.g. CNES)](https://logiciels.cnes.fr/fr/content/propa).
+## Propagation models for Earth-space telecommunications systems
+
+This is a translation into code of [P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The implementations I could find were all in Matlabese (from ITU itself or national offices), which I couldn't use, or don't seem to give the source [(like this one)](https://logiciels.cnes.fr/fr/content/propa).
+
+You probably need to be familiar with the relevant ITU-R papers to use this at all.
 
 The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI.
 
-To build and test, do `cd build && cmake .. && make && make test`.
+To build and test, do `cd build && cmake .. && make && make test`. There is no installation procedure, and both the libraries and the tests require access to the data folder in `../data` — I'll fix that eventually.
 
 ## Conventions
 
@@ -14,9 +18,9 @@ To build and test, do `cd build && cmake .. && make && make test`.
 
 ## Outlook
 
-This is the first time I write Fortran. I've read that `.f95` is customary for Fortran >95 code, including later Fortran versions, so the Fortran files have that extension. There will be a C/C++ header and Python bindings at some point.
+The library is about 30% complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented.
 
-The library is about 30% complete. Look at the tests `src/test0.f95` to see what's implemented. My priority is to have useful functionality before working on the documentation or the bindings. Probably want to autogenerate those in some way.
+This is the first time I write anything in Fortran. For the time being I'm not regretting the choice. I'm using gfortran 8.2 and 8.3. My usual tools are C++ and Guile, so there will be a C/C++ header at some point, plus Guile and Python bindings. There is a Guile sandbox at [mod/prop.scm](mod/prop.scm). My priority is to have useful functionality before working on the documentation or the bindings.
 
 ## Random links
 

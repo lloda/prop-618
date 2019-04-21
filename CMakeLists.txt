@@ -1,12 +1,19 @@
 # -*- mode: cmake; coding: utf-8 -*-
+# global CMakeLists.txt
+# 2019-04
+
+# (c) lloda@sarc.name
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option) any
+# later version.
 
 # -------------------
 # readme
 # -------------------
 
-# cd build FFLAGS=-O3 cmake ..
-# VERBOSE=1 make -j7
-# VERBOSE=1 make -j7 test
+# cd build && FFLAGS=-O3 cmake ..
+# VERBOSE=1 make && make test
 
 # -------------------
 # prologue
@@ -19,7 +26,7 @@ include_directories(".")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 
 # -------------------
-# the meat
+# body
 # -------------------
 
 set (BASE_FFLAGS " \

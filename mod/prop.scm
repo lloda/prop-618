@@ -1,6 +1,12 @@
-; (prop.scm) -*- coding: utf-8; mode: scheme-mode -*-
-; sandbox for Guile bindings
-; 2019-04
+;; (prop.scm) -*- coding: utf-8; mode: scheme-mode -*-
+;; sandbox for Guile bindings
+;; 2019-04
+
+;; (c) lloda@sarc.name
+;; This library is free software; you can redistribute it and/or modify it under
+;; the terms of the GNU Lesser General Public License as published by the Free
+;; Software Foundation; either version 3 of the License, or (at your option) any
+;; later version.
 
 (import (srfi :1)  (srfi :8) (srfi :26) (srfi :71)
         (system foreign) (ice-9 match) (rnrs bytevectors))
@@ -143,7 +149,7 @@
 
 
 ; -----------------------------------------
-; ek only... FIXME give something portable.
+; uses private libraries... FIXME give something portable.
 ; -----------------------------------------
 
 (import (yak yak))
