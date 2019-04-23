@@ -52,6 +52,19 @@
      (pto args 5))
     (values (array-ref args 4) (array-ref args 5))))
 
+(define __p676_gas
+  (pointer->procedure void (dynamic-func "__p676_gas" libprop) '(* * * * * * *)))
+(define* (p676-gas eldeg fghz p e temp Vt hs)
+  (let ((args (f64vector eldeg fghz p e temp Vt hs)))
+    (__p676_gas_specific
+     (pto args 0)
+     (pto args 1)
+     (pto args 2)
+     (pto args 3)
+     (pto args 4)
+     (pto args 5)
+     (pto args 6))))
+
 (define __p835_ref
   (pointer->procedure void (dynamic-func "__p835_ref" libatmospheres) '(* * * * *)))
 (define (p835-ref h)
@@ -78,6 +91,14 @@
 (define (p837-rainfall-rate lat lon)
   (let ((args (f64vector lat lon)))
     (__p837_rainfall_rate
+     (pto args 0)
+     (pto args 1))))
+
+(define __p1510_temp
+  (pointer->procedure double (dynamic-func "__p1510_temp" libprop) '(* *)))
+(define (p1510-temp lat lon)
+  (let ((args (f64vector lat lon)))
+    (__p1510_temp
      (pto args 0)
      (pto args 1))))
 
@@ -127,6 +148,26 @@
                (pto args 1)
                (pto args 2))))
 
+(define __p453_Nwet
+  (pointer->procedure double (dynamic-func "__p453_Nwet" libprop) '(* * *)))
+(define (p453-Nwet latdeg londeg p)
+  (let ((args (f64vector latdeg londeg p)))
+    (__p453_Nwet
+               (pto args 0)
+               (pto args 1)
+               (pto args 2))))
+
+(define __p618_scint
+  (pointer->procedure double (dynamic-func "__p618_scint" libprop) '(* * * * *)))
+(define (p618-scint fghz eldeg Deff p Nwet)
+  (let ((args (f64vector fghz eldeg Deff p Nwet)))
+    (__p618_scint
+               (pto args 0)
+               (pto args 1)
+               (pto args 2)
+               (pto args 3)
+               (pto args 4))))
+
 
 ; -----------------------------------------
 ; spot checks
@@ -135,8 +176,28 @@
 (prop-init)
 (p839-rain-height 0 0)
 (p837-rainfall-rate 0 0)
+(p1510-temp 51.5 -0.14) ; 283.61087556
 (p835-ref 11.)
 (p840-clouds 14.25 31.07694309 (p840-Lred 51.50 -0.14 1)) ; 0.455170459072589
+(p453-Nwet 51.5 -0.14 50) ; 50.3892622222222 validation table shows (and P.618 §2.4 requires) median values.
+(p618-scint 14.25 31.07694309 (sqrt 0.65) 1 (p453-Nwet 51.5 -0.14 50))
+
+(let* ((latdeg 51.5)
+       (londeg -0.14)
+       (eldeg 31.07694309)
+       (deff (sqrt 0.65))
+       (taudeg 0)
+       (fghz 14.25)
+       (p% 1)
+       (hs 0.06916422)
+       (temp (p1510-temp latdeg londeg))
+       ((values P rho T error) (p835-ref hs)))
+  (+ (pk 'As (p618-scint fghz eldeg deff p% (p453-Nwet latdeg londeg 50)))
+     (pk 'Ar (p618-rain latdeg londeg hs fghz eldeg taudeg p% -1))
+     (pk 'Ac (p840-clouds fghz eldeg (p840-Lred latdeg londeg p%)))
+     (pk 'Ag 0 ;; (p676-gas eldeg fghz P e temp Vt hs) ; e <- from P, Vt <- P836,
+         )
+     ))
 
 
 ; -----------------------------------------

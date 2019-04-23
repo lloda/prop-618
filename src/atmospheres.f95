@@ -22,7 +22,8 @@ contains
     h = (6356.766 * hp)/(6356.766 - hp)                           ! (1b)
   end function h_geom
 
-  subroutine p835_ref(h, P, rho, T, error) bind(c, name='__p835_ref')
+  subroutine p835_ref(h, P, rho, T, error) &
+       bind(c, name='__p835_ref')
 
     ! Mean annual global reference atmosphere (‘standard’).
     ! Equation & table numbers from ITU-R P.835-6.

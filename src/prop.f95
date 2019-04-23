@@ -13,18 +13,160 @@ module prop
   use iso_c_binding
   real, allocatable, save :: p839h0(:, :)
   real, allocatable, save :: p837R001(:, :)
+  real, allocatable, save :: p1510Ta(:, :)
+
+  ! these are used both for p840ap and for p453Nwet.
   real, parameter, dimension(18) :: p840p = (/ 0.1, 0.2, 0.3, 0.5, 1., 2., 3., 5., &
        10., 20., 30., 50., 60., 70., 80., 90., 95., 99. /)
+
   real, allocatable, save :: p840ap(:, :, :)
+  real, allocatable, save :: p453Nwet(:, :, :)
+  real, allocatable, save :: p836rho(:, :, :)
+  real, allocatable, save :: p836V(:, :, :)
+  real, allocatable, save :: p836vsch(:, :, :)
 
 contains
 
-  integer(C_INT32_T) function init() bind(c, name='__prop_init') &
-    result(ierror)
+  integer function load_lat_lon(path, m, n, a) &
+       result(ierror)
 
-    real, allocatable :: x(:, :)
-    logical, save :: done = .false.
+    character(len=*), intent(in) :: path
+    integer, intent(in) :: m, n
+    real, allocatable, dimension(:, :), intent(out) :: a
+
     character(256) :: iomsg
+    real, allocatable, dimension(:, :) :: x
+
+    allocate(x(n, m), STAT=ierror)
+    open(1, file=path, action='read', iostat=ierror, iomsg=iomsg)
+    if (ierror/=0) then
+       write(*, *) 'cannot open [' // path // '] ... ', trim(iomsg)
+       return
+    end if
+    read(1, *) x
+    allocate(a(m, n), STAT=ierror)
+    a = transpose(x)
+    deallocate(x)
+
+  end function load_lat_lon
+
+  integer function load_p_lat_lon(path1, path2, p, m, n, a) &
+       result(ierror)
+
+    character(len=*), intent(in) :: path1, path2
+    real, intent(in), dimension(:) :: p
+    integer, intent(in) :: m, n
+    real, allocatable, dimension(:, :, :), intent(out) :: a
+
+    character(256) :: iomsg
+    real, allocatable, dimension(:, :) :: x
+
+    block
+      integer :: i
+      character(64) :: fname
+
+      allocate(x(n, m), STAT=ierror)
+      allocate(a(size(p, 1), m, n), STAT=ierror)
+      if (ierror/=0) then
+         write(*, *) 'cannot allocate array for [' // path1 // '***' // path2 // ']'
+         return
+      end if
+      do i=1, size(p, 1)
+         if (p(i)>=1.) then
+            write(fname, '(I2)') int(p(i))
+         else
+            write(fname, '(A, I1)') '0', int(p(i)*10)
+         end if
+         open(1, file=(path1 // trim(adjustl(fname)) // path2), action='read', iostat=ierror, iomsg=iomsg)
+         if (ierror/=0) then
+            write(*, *) 'cannot open [' // (path1 // trim(adjustl(fname)) // path2) // '] ... ' // trim(iomsg)
+            return
+         end if
+         read(1, *) x
+         a(i, :, :) = transpose(x)
+      end do
+    end block
+    deallocate(x)
+
+  end function load_p_lat_lon
+
+
+  ! Bilinear interpolate in x, y table. x and y are indices in the sizes of the table
+  ! [0 ... n], so the steps of x and y are accounted for in the caller.
+
+  real function lookup_xy(x, y, table) &
+       result(z)
+
+    real, intent(in) :: x, y
+    real, intent(in), dimension(:, :) :: table
+
+    real :: dx, dy
+    integer :: ix, iy
+
+    ix = max(0, min(size(table, 1)-2, int(floor(x))))     ! x = end-of-table will use dx = 1.
+    iy = max(0, min(size(table, 2)-2, int(floor(y))))     ! y = end-of-table will use dy = 1.
+    dx = x-ix
+    dy = y-iy
+
+    z =  &
+         + table(ix+1, iy+1)*(1-dx)*(1-dy) &
+         + table(ix+2, iy+1)*dx*(1-dy) &
+         + table(ix+1, iy+2)*(1-dx)*dy &
+         + table(ix+2, iy+2)*dx*dy
+
+  end function lookup_xy
+
+
+  ! Interpolate in p, x, y table, as described in P453-13 §2.2 and P.840-7 §3.1.
+  ! Interpolation is bilinear in x, y then linear in the result and in the log of p.
+  ! x and y are indices in the sizes of the table [0 ... n], so the steps of x and y are
+  ! accounted for in the caller.
+
+  real function lookup_pxy(p, x, y, plist, table) &
+       result(z)
+
+    real, intent(in) :: p, x, y
+    real, intent(in), dimension(:) :: plist
+    real, intent(in), dimension(:, :, :) :: table
+
+    real :: dx, dy, dp
+    integer :: ip, ix, iy, i
+    real, dimension(2) :: zz
+
+    ix = max(0, min(size(table, 2)-2, int(floor(x))))     ! x = end-of-table will use dx = 1.
+    iy = max(0, min(size(table, 3)-2, int(floor(y))))     ! y = end-of-table will use dy = 1.
+    dx = x-ix
+    dy = y-iy
+
+    if (p<plist(lbound(plist, 1)) .or. p>plist(ubound(plist, 1))) then
+       stop 106
+    end if
+
+    do ip=2, size(plist, 1)
+       if (p<=plist(ip)) then
+          exit
+       end if
+    end do
+
+    do i=1, 2
+       zz(i) = &
+            + table(ip+i-2, ix+1, iy+1)*(1-dx)*(1-dy) &
+            + table(ip+i-2, ix+2, iy+1)*dx*(1-dy) &
+            + table(ip+i-2, ix+1, iy+2)*(1-dx)*dy &
+            + table(ip+i-2, ix+2, iy+2)*dx*dy
+    end do
+
+    dp = (log(p) - log(plist(ip-1))) / (log(plist(ip)) - log(plist(ip-1)))
+    z = zz(1)*(1.-dp) + zz(2)*dp
+
+  end function lookup_pxy
+
+
+  integer(C_INT32_T) function init() &
+       bind(c, name='__prop_init') &
+       result(ierror)
+
+    logical, save :: done = .false.
     ierror = 1
 
     if (.not. done) then
@@ -32,64 +174,63 @@ contains
        ! according to ITU-R P.839-4, lat +90:-1.5:-90 (or th 0:1.5:180) and lon 0:1.5:360.
        ! used by p839_rain_height.
 
-       allocate(x(241, 121), STAT=ierror)
-       open(1, file='../data/P839/h0.txt', &   ! FIXME install path
-            action='read', iostat=ierror, iomsg=iomsg)
+       ierror = load_lat_lon('../data/P839/h0.txt', 121, 241, p839h0)
        if (ierror/=0) then
-          write(*, *) 'cannot open ', '../data/P839/h0.txt', trim(iomsg)
           return
        end if
-       read(1, *) x
-       allocate(p839h0(121, 241), STAT=ierror)
-       p839h0 = transpose(x)
-       deallocate(x)
 
        ! according to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
        ! used by p837_rainfall_rate.
 
-       allocate(x(2881, 1441), STAT=ierror)
-       open(1, file='../data/P837/R001.txt', &  ! FIXME install path
-            action='read', iostat=ierror, iomsg=iomsg)
+       ierror = load_lat_lon('../data/P837/R001.txt', 1441, 2881, p837R001)
        if (ierror/=0) then
-          write(*, *) 'cannot open ', '../data/P837/R001.txt', trim(iomsg)
           return
        end if
-       read(1, *) x
-       allocate(p837R001(1441, 2881), STAT=ierror)
-       p837R001 = transpose(x)
-       deallocate(x)
 
        ! according to ITU-R P.840-7, lat +90:1.125:-90 (or th: -90:1.125:+90) and lon 0:1.125:+360.
        ! used by p840_Lred.
 
-       block
-         integer :: i
-         character(32) :: fname
+       ierror = load_p_lat_lon('../data/P840/Lred Annual Maps/Lred_', '_v4.txt', p840p, 161, 321, p840ap)
+       if (ierror/=0) then
+          return
+       end if
 
-         allocate(x(321, 161), STAT=ierror)
-         allocate(p840ap(size(p840p, 1), 161, 321), STAT=ierror)
-         if (ierror/=0) then
-            write(*, *) 'cannot allocate p840ap'
-            return
-         end if
+       ! according to ITU-R P.453-13 §2.2, lat -90:0.75:+90 and lon -180:0.75:+180
+       ! used by p453_Nwet.
 
-         do i=1, size(p840p, 1)
-            if (p840p(i)>=1.) then
-               write(fname, '(I2)') int(p840p(i))
-            else
-               write(fname, '(A, I1)') '0', int(p840p(i)*10)
-            end if
-            open(1, file=('../data/P840/Lred Annual Maps/Lred_' // trim(adjustl(fname)) // '_v4.txt'), &  ! FIXME install path
-                 action='read', iostat=ierror, iomsg=iomsg)
-            if (ierror/=0) then
-               write(*, *) 'cannot open ' // fname, trim(iomsg)
-               return
-            end if
-            read(1, *) x
-            p840ap(i, :, :) = transpose(x)
-         end do
-       end block
-       deallocate(x)
+       ierror = load_p_lat_lon('../data/P453/P.453_NWET_Maps_Annual/NWET_Annual_', '.TXT', p840p, 241, 481, p453Nwet)
+       if (ierror/=0) then
+          return
+       end if
+
+       ! according to ITU-R P.1510-1 Annex 1, lat -90:0.75:+90 and lon -180:0.75:+180
+       ! used by p1510_temp.
+
+       ierror = load_lat_lon('../data/P1510/T_Annual.TXT', 241, 481, p1510Ta)
+       if (ierror/=0) then
+          return
+       end if
+
+       ! according to ITU-R P.836-6 Anexes 1 and 2, lat 90:-1.125:-90 and lon 0:+1.125:360
+       ! used by p1510_temp.
+
+       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Surface Water Vapor Density/RHO Annual Maps/RHO_', &
+            '_v4.txt', p840p, 161, 321, p836rho)
+       if (ierror/=0) then
+          return
+       end if
+
+       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Total Columnar Water Content/V Annual Maps/V_', &
+            '_v4.txt', p840p, 161, 321, p836V)
+       if (ierror/=0) then
+          return
+       end if
+
+       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Total Columnar Water Content/VSCH Annual Maps/VSCH_', &
+            '_v4.txt', p840p, 161, 321, p836vsch)
+       if (ierror/=0) then
+          return
+       end if
 
        done = .true.
     end if
@@ -117,61 +258,56 @@ contains
 
   ! According to ITU-R P.839-4, lat +90:-1.5:-90 lon 0:1.5:360
 
-  real(C_DOUBLE) function p839_rain_height(lat, lon) bind(c, name='__p839_rain_height') &
+  real(C_DOUBLE) function p839_rain_height(lat, lon) &
+       bind(c, name='__p839_rain_height') &
        result(h)
 
     real(C_DOUBLE) :: lat, lon
-    real :: x, y, dx, dy
-    integer :: ix, iy
 
-    x = max(0., min(180., (90.-lat)))/1.5
-    y = modulo(lon, 360.)/1.5
-    ix = max(0, min(size(p839h0, 1)-2, int(floor(x))))     ! x = 180 will use dx = 1.
-    iy = max(0, min(size(p839h0, 2)-2, int(floor(y))))     ! y = 360 will use dy = 1.
-    dx = x-ix
-    dy = y-iy
-
-    h = 0.36 &
-         + p839h0(ix+1, iy+1)*(1-dx)*(1-dy) &
-         + p839h0(ix+2, iy+1)*dx*(1-dy) &
-         + p839h0(ix+1, iy+2)*(1-dx)*dy &
-         + p839h0(ix+2, iy+2)*dx*dy
+    h = 0.36 + lookup_xy(max(0., min(180., (90.-lat)))/1.5, modulo(lon, 360.)/1.5, p839h0)
 
   end function p839_rain_height
 
 
   ! According to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
 
-  real(C_DOUBLE) function p837_rainfall_rate(lat, lon) bind(c, name='__p837_rainfall_rate') &
+  real(C_DOUBLE) function p837_rainfall_rate(lat, lon) &
+       bind(c, name='__p837_rainfall_rate') &
        result(R001)
 
     real(C_DOUBLE) :: lat, lon
-    real :: x, y, dx, dy
-    integer :: ix, iy
 
-    x = max(0., min(180., lat+90.))/0.125
-    y = modulo(lon+180., 360.)/0.125
-    ix = max(0, min(size(p837R001, 1)-2, int(floor(x))))     ! x = 180 will use dx = 1.
-    iy = max(0, min(size(p837R001, 2)-2, int(floor(y))))     ! y = 360 will use dy = 1.
-    dx = x-ix
-    dy = y-iy
-
-    R001 = p837R001(ix+1, iy+1)*(1-dx)*(1-dy) &
-         + p837R001(ix+2, iy+1)*dx*(1-dy) &
-         + p837R001(ix+1, iy+2)*(1-dx)*dy &
-         + p837R001(ix+2, iy+2)*dx*dy
+    R001 = lookup_xy(max(0., min(180., lat+90.))/0.125, modulo(lon+180., 360.)/0.125, p837R001)
 
   end function p837_rainfall_rate
 
 
-  real function p838_coeff(logf, a, b, c, m, x) result(coeff)
+  ! According to ITU-R P.1510-1, lat -90:0.75:+90 and lon -180:0.75:+180
+
+  real(C_DOUBLE) function p1510_temp(lat, lon) &
+       bind(c, name='__p1510_temp') &
+       result(h)
+
+    real(C_DOUBLE) :: lat, lon
+
+    h = lookup_xy(max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p1510Ta)
+
+  end function p1510_temp
+
+
+  real function p838_coeff(logf, a, b, c, m, x) &
+       result(coeff)
+
     real, intent(in), dimension(:) :: a, b, c
     real, intent(in) :: logf, m, x
+
     coeff = sum(a * exp(-(((logf-b)/c)**2))) + m * logf + x
+
   end function p838_coeff
 
 
-  subroutine p838_coeffs(freq, kh, ah, kv, av) bind(c, name='__p838_coeffs')
+  subroutine p838_coeffs(freq, kh, ah, kv, av) &
+       bind(c, name='__p838_coeffs')
 
     real(C_DOUBLE), intent(in) :: freq
     real(C_DOUBLE), intent(out) :: kv, kh, av, ah
@@ -330,7 +466,8 @@ contains
   end function p618_rain
 
 
-  real(C_DOUBLE) function vapor_pressure(rho, temp) bind(c, name='__p676_vapor_pressure') &
+  real(C_DOUBLE) function vapor_pressure(rho, temp) &
+       bind(c, name='__p676_vapor_pressure') &
        result(e)
 
     real(C_DOUBLE), intent(in) :: rho   ! water vapor density (g/m³)
@@ -343,11 +480,12 @@ contains
 
   ! Equation & table numbers from ITU-R P.676-11.
 
-  subroutine p676_gas_specific(short, f, p, e, temp, go, gw) bind(c, name='__p676_gas_specific')
+  subroutine p676_gas_specific(short, f, P, e, temp, go, gw) &
+       bind(c, name='__p676_gas_specific')
 
     integer(C_INT32_T), intent(in) :: short  ! use Annex 1 (20) if 0, else use Annex 2 (22-23)
     real(C_DOUBLE), intent(in) :: f          ! frequency (GHz)
-    real(C_DOUBLE), intent(in) :: p          ! dry air pressure (hPa)
+    real(C_DOUBLE), intent(in) :: P          ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e          ! vapor part. pressure e(P) (hPa) (4)
     real(C_DOUBLE), intent(in) :: temp       ! temperature (K)
     real(C_DOUBLE), intent(out) :: go        ! Specific attenuation for dry air, γₒ (dB/km)
@@ -418,8 +556,8 @@ contains
       a5 = dry(:, 5)
       a6 = dry(:, 6)
 
-      si = a1 * 1e-7 * p * th**3 * exp(a2*(1.0 - th))               ! (3)
-      df = a3 * 1e-4 * (p * th**(0.8-a4) + 1.1*e*th)                ! (6a)
+      si = a1 * 1e-7 * P * th**3 * exp(a2*(1.0 - th))               ! (3)
+      df = a3 * 1e-4 * (P * th**(0.8-a4) + 1.1*e*th)                ! (6a)
 
       ! cf P676-11 Annex 2.1
 
@@ -427,15 +565,15 @@ contains
          df = sqrt(df*df + 2.25e-6)                                 ! (6b)
       end if
 
-      delta = (a5 + a6 * th) * 1e-4 * (p + e) * th**(0.8)           ! (7)
+      delta = (a5 + a6 * th) * 1e-4 * (P + e) * th**(0.8)           ! (7)
 
       ffi = f/fi * ((df - delta * (fi-f))/((fi-f)**2 + df**2) + &
            (df - delta * (fi+f))/((fi+f)**2 + df**2))               ! (5)
 
-      d = 5.6e-4 * (p + e) * th**(0.8)                              ! (9)
+      d = 5.6e-4 * (P + e) * th**(0.8)                              ! (9)
 
-      ndf = f * p * th**2 * (6.14e-5/(d * (1 + (f/d)**2)) + &
-           1.4e-12 * p * th**(1.5) / (1 + 1.9e-5 * f**(1.5)))       ! (8)
+      ndf = f * P * th**2 * (6.14e-5/(d * (1 + (f/d)**2)) + &
+           1.4e-12 * P * th**(1.5) / (1 + 1.9e-5 * f**(1.5)))       ! (8)
 
       go = 0.182 * f * (sum(si*ffi) + ndf)                          ! (1-2) or (22)
     end block
@@ -493,7 +631,7 @@ contains
       b6 = vapor(:, 6)
 
       si = b1 * 1e-1 * e * th**3.5 *exp(b2 * (1.0 - th))            ! (3)
-      df = b3 * 1e-4 * (p * th**(b4) + b5 * e * th**b6)             ! (6a)
+      df = b3 * 1e-4 * (P * th**(b4) + b5 * e * th**b6)             ! (6a)
 
       ! cf P676-11 Annex 2.1
 
@@ -518,11 +656,12 @@ contains
   end subroutine p676_gas_specific
 
 
-  subroutine p676_eq_height(f, e, p, ho, hw) bind(c, name='__p676_eq_height')
+  subroutine p676_eq_height(f, e, P, ho, hw) &
+       bind(c, name='__p676_eq_height')
 
     real(C_DOUBLE) :: f       ! frequency (GHz)
     real(C_DOUBLE) :: e       ! vapor part. pressure e(P) (hPa) (4)
-    real(C_DOUBLE) :: p       ! pressure at height hₛ (hPa)
+    real(C_DOUBLE) :: P       ! pressure at height hₛ (hPa)
     real(C_DOUBLE) :: ho      ! equivalent height for dry air
     real(C_DOUBLE) :: hw      ! equivalent height for vapor
 
@@ -533,7 +672,7 @@ contains
 
       ! after (26b)
 
-      rp = (p+e) / 1013.25
+      rp = (P+e) / 1013.25
 
       ! (25)
 
@@ -568,12 +707,13 @@ contains
   ! FIXME have to pick p-dry from hs (P835-6). Otherwise att dry is independent of hs!
   ! one way is, make p optional, and in that case compute it from P835-6.
 
-  real(C_DOUBLE) function p676_gas(eldeg, freq, p, e, temp, Vt, hs) bind(c, name='__p676_gas') &
+  real(C_DOUBLE) function p676_gas(eldeg, freq, P, e, temp, Vt, hs) &
+       bind(c, name='__p676_gas') &
        result(att)
 
     real(C_DOUBLE), intent(in) :: eldeg  ! elevation angle (°)
     real(C_DOUBLE), intent(in) :: freq   ! frequency (GHz)
-    real(C_DOUBLE), intent(in) :: p      ! dry air pressure (hPa)
+    real(C_DOUBLE), intent(in) :: P      ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e      ! vapor part. pressure e(P) (hPa)
     real(C_DOUBLE), intent(in) :: temp   ! temperature (K)
     real(C_DOUBLE), intent(in), optional :: Vt  ! temperature (K)
@@ -581,8 +721,8 @@ contains
 
     real :: go, gw, ho, hw, attw
 
-    call p676_gas_specific(1, freq, p, e, temp, go, gw) ! (2a-2b)
-    call p676_eq_height(freq, e, p, ho, hw)             ! (25-26)
+    call p676_gas_specific(1, freq, P, e, temp, go, gw) ! (2a-2b)
+    call p676_eq_height(freq, e, P, ho, hw)             ! (25-26)
 
     if (.not. present(Vt)) then
        attw = hw*gw
@@ -665,55 +805,44 @@ contains
 
   ! Annual averages of total columnar content of liquid water reduced to a temperature
   ! of 273.15 K, Lred (kg/m²), from the dataset in R-REC-P.840-7-Maps.zip. As described
-  ! in ITU-R P.840-7 §3.1.
-  ! Equation numbers from ITU-R P.840-7 except where indicated.
+  ! in ITU-R P.840-7 §3.1, lat:+90..-90 and lon:0..360.
 
-  real(C_DOUBLE) function p840_Lred(lat, lon, p) bind(c, name='__p840_Lred') &
+  real(C_DOUBLE) function p840_Lred(lat, lon, p) &
+       bind(c, name='__p840_Lred') &
        result(Lred)
 
     real(C_DOUBLE) :: lat                 ! latitude (°)
     real(C_DOUBLE) :: lon                 ! longitude (°)
     real(C_DOUBLE) :: p                   ! probability (%)
 
-    real :: x, y, dx, dy, dp
-    integer :: ip, ix, iy, i
-    real, dimension(2) :: L
-
-    x = max(0., min(180., (90.-lat)))/1.125
-    y = modulo(lon, 360.)/1.125
-    ix = max(0, min(size(p840ap, 2)-2, int(floor(x))))     ! x = 180 will use dx = 1.
-    iy = max(0, min(size(p840ap, 3)-2, int(floor(y))))     ! y = 360 will use dy = 1.
-    dx = x-ix
-    dy = y-iy
-
-    if (p<0.1 .or. p>99.) then
-       stop 106
-    end if
-
-    do ip=2, size(p840p, 1)
-       if (p<=p840p(ip)) then
-          exit
-       end if
-    end do
-
-    do i=1, 2
-       L(i) = &
-            + p840ap(ip+i-2, ix+1, iy+1)*(1-dx)*(1-dy) &
-            + p840ap(ip+i-2, ix+2, iy+1)*dx*(1-dy) &
-            + p840ap(ip+i-2, ix+1, iy+2)*(1-dx)*dy &
-            + p840ap(ip+i-2, ix+2, iy+2)*dx*dy
-    end do
-
-    dp = (log(p) - log(p840p(ip-1))) / (log(p840p(ip)) - log(p840p(ip-1)))
-    Lred = L(1)*(1.-dp) + L(2)*dp
+    Lred = lookup_pxy(p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840ap)
 
   end function p840_Lred
+
+
+  ! Annual value of the wet term of the surface refractivity Nwet (ppm) exceeded
+  ! for p(%) of an average year, as described in ITU-R P.453-13 §2.2, from the
+  ! dataset P.453_NWET_Maps_Annual.zip in R-REC-P.453-13-201712-I!!ZIP-E.zip.
+  ! As described there, lat:-90...90 and lon:-180..+180.
+
+  real(C_DOUBLE) function p453_Nwet(lat, lon, p) &
+       bind(c, name='__p453_Nwet') &
+       result(Nwet)
+
+    real(C_DOUBLE) :: lat                 ! latitude (°)
+    real(C_DOUBLE) :: lon                 ! longitude (°)
+    real(C_DOUBLE) :: p                   ! probability (%)
+
+    Nwet = lookup_pxy(p, max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p840p, p453Nwet)
+
+  end function p453_Nwet
 
 
   ! Attenuation by clouds (dB), after ITU-R P.840-7.
   ! Equation numbers from ITU-R P.840-7 except where indicated.
 
-  real(C_DOUBLE) function p840_clouds(freq, eldeg, Lred) bind(c, name='__p840_clouds') &
+  real(C_DOUBLE) function p840_clouds(freq, eldeg, Lred) &
+       bind(c, name='__p840_clouds') &
        result(Ac)
 
     real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
@@ -751,5 +880,49 @@ contains
     ! write(*, *) 'Kl', Kl
 
   end function p840_clouds
+
+
+  ! Attenuation due to scintillation, after ITU-R P.618-13 §2.4.1
+  ! Equation numbers from ITU-R P.618-13 except where indicated.
+
+  real(C_DOUBLE) function p618_scint(freq, eldeg, Deff, p, Nwet) &
+       bind(c, name='__p618_scint') &
+       result(As)
+
+    real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
+    real(C_DOUBLE), intent(in) :: eldeg     ! elevation (deg)
+    real(C_DOUBLE), intent(in) :: Deff      ! effective antenna diameter (m) ~ D√η
+    real(C_DOUBLE), intent(in) :: p         ! probability (%)
+    real(C_DOUBLE), intent(in) :: Nwet      ! Median value of wet term of surface refractivity (ppm), cf ITU-R P.453-13 §2.2
+
+    real, parameter :: hL = 1000            ! (m) (41)
+    real :: sinel, sigmaref, L, x, g, sigma
+
+    ! FIXME 0 or what for freq>20. ? P.618 says 20., but the validation has 29...
+
+    if (freq<4. .or. freq>40.) then
+       stop 109
+    end if
+    if (eldeg<5.) then
+       stop 110
+    end if
+
+    sinel = sin(deg2rad(eldeg))
+    sigmaref = 3.6e-3 + 1e-4 * Nwet                ! (40) (dB)
+    L = 2.*hL / (sinel + sqrt(sinel**2 + 2.35e-4)) ! (41) (m)
+    x = 1.22 * (Deff**2) * (freq/L)                ! (43a)
+    g = sqrt(3.86 * ((x**2 + 1)**(11./12.)) * sin((11./6.) * atan(1./x)) - 7.08*(x**(5./6.))) ! (43)
+    sigma = sigmaref * (freq**(7./12.)) * g / (sinel**1.2) ! (44)
+    As = sigma * (-0.061 * (log10(p)**3) + 0.072 * (log10(p)**2) - 1.71*(log10(p)) + 3.0) ! (46)
+
+    ! ! debug intermediate values
+    ! write(*, *) 'σref', sigmaref
+    ! write(*, *) 'L', L
+    ! write(*, *) 'x', x
+    ! write(*, *) 'g', g
+    ! write(*, *) 'σ', sigma
+
+  end function p618_scint
+
 
 end module prop
