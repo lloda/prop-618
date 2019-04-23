@@ -3,22 +3,27 @@
 help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip checkbox [C-ct] flip TODO
 
 * TODO
-  - [-] gas & water vapor, P676 [4/7]
+  - [-] gas & water vapor, P676 [5/8]
     + [X] specific attenuation
     + [X] tests from validation table (P676-11 SpAtt 1-9)
     + [X] tests from validation table (P676-11 SpAtt 22-23)
     + [X] e2s propagation, simpler P676-11 Annex 2 method
+    + [X] tests from validation table (P676-11 A_Gas)
+    + [ ] Vt for P676-11 (37) from P.836-6
     + [ ] slant propagation, simpler P676-11 Annex 2 method
-    + [ ] tests from validation table (P676-11 A_Gas)
-    + [ ] any path propagation, layer gral P676-11 Annex 1 method
+    + [ ] any path propagation, layer gral P676-11 Annex 1 method / P619 §C2ss
   - [X] rain, P618 [2/2]
     + [X] model
     + [X] tests from validation table (P618-13 A_Rain)
   - [X] clouds, P840 [2/2]
     + [X] model
     + [X] clouds (P840-7 A_Clouds)
-  - [ ] scintillation loss (P.618-13 2.4)
+  - [X] scintillation loss (P.618-13 2.4)
   - [ ] total loss (P.618-13)
+  - [ ] aeronautical mobile specifics (P682)
+  - [ ] lower elevation angle effects (<5°) P676, P619, P682
+  - [ ] effects <10 GHz (ionospheric scintillation, Faraday rotation, etc.)
+  - [ ] Earth to space interference (P619)
   - [-] atmospheres.f95, P835 [1/7]
     + [X] reference
     + [ ] low latitude (annual)
@@ -27,9 +32,8 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
     + [ ] high latitude (summer)
     + [ ] high latitude (winter)
     + [ ] experimental atmospheres
-  - [ ] other ITU datasets
-    + [ ] heights from P.1511
-    + [ ] Vt for P676-11 (37) from P.836-6
+  - [X] other ITU datasets
+    + [X] heights from P.1511
   - [ ] frequency scaling procedure from P.618-13 2.2.1.3
   - [ ] dress up
     + [ ] acceptable documentation

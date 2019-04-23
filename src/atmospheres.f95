@@ -27,6 +27,7 @@ contains
 
     ! Mean annual global reference atmosphere (‘standard’).
     ! Equation & table numbers from ITU-R P.835-6.
+    ! An alternative description is given in P.691-3 §C.6.
 
     real(C_DOUBLE), intent(in) :: h                   ! geometric height (km)
     real(C_DOUBLE), intent(out) :: P                  ! dry air pressure (hPa)

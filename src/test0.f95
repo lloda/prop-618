@@ -24,6 +24,7 @@ program test0
   n = n + test_p840_Lred()
   n = n + test_p840_clouds()
   n = n + test_p618_scint()
+  n = n + test_p1511_topoh()
 
   write(*, *) achar(10), n, ' errors.'
   stop n
@@ -35,6 +36,8 @@ contains
     real :: a, b
     if (a==b) then
        e = 0
+    else if (a==0.) then
+       e = b
     else
        e = 2.*abs(a-b)/(abs(a)+abs(b))
     end if
@@ -65,7 +68,7 @@ contains
     if (present(rspec)) then
        block
          real :: err
-         err = rel_error(actual, expected)
+         err = rel_error(expected, actual)
          if (err<=rspec) then
             write(*, '(A, A, ES12.6, A, ES12.6, A, ES8.2, A, ES8.2, A)') &
                  legend, ' = ', actual, ' (exp ', expected, ') rerror ', err, ' ≤ ', rspec, ''
@@ -220,7 +223,7 @@ contains
     c = transpose(x)
 
     ne = 0
-    write(*, *) achar(10), 'p618_rain, ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain)'
+    write(*, *) achar(10), 'p618_rain, CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain'
     do i=1, size(c, 1)
        ne = ne + test_p618_rain_ref(i+22, c(i, 9), c(i, 1), c(i, 2), c(i, 3), &
             c(i, 4), c(i, 5), c(i, 6), c(i, 7), c(i, 8))
@@ -256,7 +259,7 @@ contains
     ne = ne + num_test('g₀', 0.0105877535759878, go, rspec=5e-15)
     ne = ne + num_test('gw', 0.0867126146205278, gw, rspec=5e-15)
 
-    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 SpAtt eq. 1 to 9)'
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 SpAtt eq. 1 to 9'
     block
       real, dimension(5) :: fghz = (/ 12, 20, 60, 90, 130 /)
       real, dimension(5) :: got = (/ 0.0086982640687736, 0.0118835504778076, 14.6234747964861000, &
@@ -272,7 +275,7 @@ contains
       end do
     end block
 
-    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 SpAtt eq. 22-23)'
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 SpAtt eq. 22-23'
     block
       real, dimension(5) :: fghz = (/ 12, 20, 60, 90, 130 /)
       real, dimension(5) :: got = (/ 0.0086982632089130, 0.0118835474853413, 14.6234770052713000, &
@@ -297,41 +300,56 @@ contains
   integer function test_p676_gas() &
        result(ne)
 
+    integer :: ierror, i
+    character(256) :: iomsg
+    character(len=200) :: line
+    real, allocatable :: c(:, :), x(:, :)
+
     ne = 0
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas'
 
-    block
-      integer :: ierror, i
-      character(256) :: iomsg
-      character(len=200) :: line
-      real, allocatable :: c(:, :), x(:, :)
+    open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
+    allocate(x(31, 64), STAT=ierror)
+    allocate(c(64, 31), STAT=ierror)
+    read(1, *)
+    read(1, *)
+    read(1, *, iostat=ierror, iomsg=iomsg) x
+    c = transpose(x)
+    if (ierror/=0) then
+       write(*, *) 'cannot open ' // '../data/P676/P676-11A_Gas.csv' // trim(iomsg)
+       return
+    end if
 
-      write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas)'
+    do i=1, 64
+       write(line, '(I2, A)') i+21, ' A_gas'
+       ne = ne + num_test(trim(line), c(i, 31), &
+            p676_gas(c(i, 7), c(i, 8), c(i, 11), c(i, 10), c(i, 9), c(i, 18), c(i, 3)), &
+            rspec=5e-15)
+    end do
 
-      open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
-      allocate(x(31, 64), STAT=ierror)
-      allocate(c(64, 31), STAT=ierror)
-      read(1, *)
-      read(1, *)
-      read(1, *, iostat=ierror, iomsg=iomsg) x
-      c = transpose(x)
-      if (ierror/=0) then
-         write(*, *) 'cannot open ' // '../data/P676/P676-11A_Gas.csv' // trim(iomsg)
-         return
-      end if
-
-      do i=1, 64
-         write(line, '(I2, A)') i+21, ' A_gas'
-         ne = ne + num_test(trim(line), c(i, 31), &
-              p676_gas(c(i, 7), c(i, 8), c(i, 11), c(i, 10), c(i, 9), c(i, 18), c(i, 3)), &
-              rspec=5e-15)
-      end do
-
-      deallocate(c)
-      deallocate(x)
-    end block
+    deallocate(c)
+    deallocate(x)
 
   end function test_p676_gas
 
+
+  integer function test_p1511_topoh() &
+       result(ne)
+
+    integer :: i
+    character(len=200) :: line
+    real, dimension(4) :: lat = (/ 51.5, 41.9, 33.94, 25.78 /)
+    real, dimension(4) :: lon = (/ -0.14, 12.49, 18.43, -80.22 /)
+    real, dimension(4) :: hs = (/ 0.0691642239999998, 0.0567010449919997, 0., 0.0000751071354880102 /)
+
+    ne = 0
+    write(*, *) achar(10), 'Values for P1511 from CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 Att_Tot'
+    do i=1, 4
+       write(line, '(A, F7.3, A, F7.3, A)') 'lat ', lat(i), ' lon ', lon(i), ' hₛ'
+       ne = ne + num_test(trim(line), hs(i), p1511_topoh(lat(i), lon(i)), rspec=5e-15)
+    end do
+
+  end function test_p1511_topoh
 
   ! ---------------------
   ! p840_Lred
@@ -361,7 +379,7 @@ contains
          1.90329848661728, 1.8038036039028,  1.64128907698765, 1.59372131785357 /)
 
     ne = 0
-    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P840-7 Lred annual avg)'
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P840-7 Lred annual avg'
     do i=1,size(Lred, 1)
        write(line, '(A, F7.3, A, F7.3, A, F5.2, A)') &
             'lat ', lat(i), ' lon ', lon(i), ' p ', p(i), ' Lred '
@@ -422,7 +440,7 @@ contains
     real :: Lred
 
     ne = 0
-    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P840-7 A_Clouds)'
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P840-7 A_Clouds'
     do i=1, size(freq, 1)
        Lred = p840_Lred(lat(i), lon(i), p(i))
        write(line, '(I2, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A, F5.2, A)') &
@@ -482,7 +500,7 @@ contains
     real :: Nwet
 
     ne = 0
-    write(*, *) achar(10), 'ITU-e2s-val (CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Scint)'
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Scint'
     do i=1, size(freq, 1)
        Nwet = p453_Nwet(lat(i), lon(i), 50.)
        write(line, '(I2, A, F8.4, A, F8.4, A, F8.4, A, F8.4, A, F5.2, A, F8.4, A)') &
@@ -491,7 +509,6 @@ contains
     end do
 
   end function test_p618_scint
-
 
 
 end program test0

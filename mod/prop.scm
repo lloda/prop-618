@@ -102,6 +102,14 @@
      (pto args 0)
      (pto args 1))))
 
+(define __p1511_topoh
+  (pointer->procedure double (dynamic-func "__p1511_topoh" libprop) '(* *)))
+(define (p1511-topoh lat lon)
+  (let ((args (f64vector lat lon)))
+    (__p1511_topoh
+     (pto args 0)
+     (pto args 1))))
+
 (define __p838_coeffs
   (pointer->procedure void (dynamic-func "__p838_coeffs" libprop) '(* * * * *)))
 (define (p838-coeffs fghz)

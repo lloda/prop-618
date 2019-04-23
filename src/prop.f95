@@ -14,16 +14,17 @@ module prop
   real, allocatable, save :: p839h0(:, :)
   real, allocatable, save :: p837R001(:, :)
   real, allocatable, save :: p1510Ta(:, :)
+  real, allocatable, save :: p1511topo(:, :)
 
   ! these are used both for p840ap and for p453Nwet.
   real, parameter, dimension(18) :: p840p = (/ 0.1, 0.2, 0.3, 0.5, 1., 2., 3., 5., &
        10., 20., 30., 50., 60., 70., 80., 90., 95., 99. /)
 
-  real, allocatable, save :: p840ap(:, :, :)
-  real, allocatable, save :: p453Nwet(:, :, :)
-  real, allocatable, save :: p836rho(:, :, :)
-  real, allocatable, save :: p836V(:, :, :)
-  real, allocatable, save :: p836vsch(:, :, :)
+  real, allocatable, save :: p840Lred(:, :, :)  ! total columnar content of cloud liquied water reduced to 273.15 K
+  real, allocatable, save :: p453Nwet(:, :, :)  ! wet term of surface refractivity
+  real, allocatable, save :: p836rho(:, :, :)   ! surface water vapor density
+  real, allocatable, save :: p836V(:, :, :)     ! total columnar water vapor content
+  real, allocatable, save :: p836vsch(:, :, :)  ! water vapor scale height
 
 contains
 
@@ -190,7 +191,7 @@ contains
        ! according to ITU-R P.840-7, lat +90:1.125:-90 (or th: -90:1.125:+90) and lon 0:1.125:+360.
        ! used by p840_Lred.
 
-       ierror = load_p_lat_lon('../data/P840/Lred Annual Maps/Lred_', '_v4.txt', p840p, 161, 321, p840ap)
+       ierror = load_p_lat_lon('../data/P840/Lred Annual Maps/Lred_', '_v4.txt', p840p, 161, 321, p840Lred)
        if (ierror/=0) then
           return
        end if
@@ -211,8 +212,16 @@ contains
           return
        end if
 
-       ! according to ITU-R P.836-6 Anexes 1 and 2, lat 90:-1.125:-90 and lon 0:+1.125:360
-       ! used by p1510_temp.
+       ! according to ITU-R P.1511-1 Annex 1 and included in P.836-6 data package
+       ! lat +90.5:-0.5:-90.5 and lon -0.5:0.5:360.5 for bicubic interpolation.
+
+       ierror = load_lat_lon('../data/P836/TOPO_0DOT5.txt', 363, 723, p1511topo)
+       if (ierror/=0) then
+          return
+       end if
+
+       ! according to ITU-R P.836-6 Anexes 1 and 2
+       ! lat 90:-1.125:-90 and lon 0:+1.125:360
 
        ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Surface Water Vapor Density/RHO Annual Maps/RHO_', &
             '_v4.txt', p840p, 161, 321, p836rho)
@@ -815,7 +824,7 @@ contains
     real(C_DOUBLE) :: lon                 ! longitude (°)
     real(C_DOUBLE) :: p                   ! probability (%)
 
-    Lred = lookup_pxy(p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840ap)
+    Lred = lookup_pxy(p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840Lred)
 
   end function p840_Lred
 
@@ -924,5 +933,64 @@ contains
 
   end function p618_scint
 
+
+  ! Topographic altitude from ITU-R P.1511-1 Annex 1 and included in P.836-6 data package (km).
+  ! Uses bicubic interpolation as described in ITU-R P.1144 Annex 1.2.
+
+  real(C_DOUBLE) function p1511_topoh(lat, lon) &
+       bind(c, name="__p1511_topoh") &
+       result(h)
+
+    real(C_DOUBLE), intent(in) :: lat, lon
+
+    real :: x, y, dx, dy, d, r
+    integer :: ix, iy, i, k
+    real, parameter :: a = -0.5
+
+    x = (90.5 - max(-90., min(+90., lat)))/0.5
+    y = (modulo(lon, 360.)+0.5)/0.5
+
+    ! x=180 (y=360.). will use dx=1 (dy=1)
+    ix = max(1, min(size(p1511topo, 1)-3, int(floor(x))))
+    iy = max(1, min(size(p1511topo, 2)-3, int(floor(y))))
+
+    ! dx, dy at interp points is 0 1 2 3
+    dx = x-ix+1.
+    dy = y-iy+1.
+
+    h = 0
+    do k=0, 3
+       r = 0.
+       do i=0, 3
+          d = abs(dy-i)
+          if (d<=1) then
+             r = r + p1511topo(ix+k, iy+i) * ((a+2)*(d**3) - (a+3)*(d**2) + 1)
+          else if (d<=2) then
+             r = r + p1511topo(ix+k, iy+i) * (a*(d**3) -5*a*(d**2) + 8*a*d - 4*a)
+          end if
+       end do
+
+       d = abs(dx-k)
+       if (d<=1) then
+          h = h + r * ((a+2)*(d**3) - (a+3)*(d**2) + 1)
+       else if (d<=2) then
+          h = h + r * (a*(d**3) -5*a*(d**2) + 8*a*d - 4*a)
+       end if
+    end do
+
+  end function p1511_topoh
+
+  ! ! Total vaper vapor content,a fter ITU-R P.836-6 Annex 2
+
+  ! real(C_DOUBLE) function p836_V(lat, lon, p, h) &
+  !      bind(c, name="__p836_V") &
+  !      result(Vt)
+
+  !   real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+  !   real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
+  !   real(C_DOUBLE), intent(in) :: p    ! probability (%)
+  !   real(C_DOUBLE), intent(in) :: h    ! altitude (m)
+
+  ! end function p836_V
 
 end module prop
