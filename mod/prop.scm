@@ -176,6 +176,16 @@
                (pto args 3)
                (pto args 4))))
 
+(define __p836_V
+  (pointer->procedure double (dynamic-func "__p836_V" libprop) '(* * * *)))
+(define (p836-V latdeg londeg p h)
+  (let ((args (f64vector latdeg londeg p h)))
+    (__p836_V
+     (pto args 0)
+     (pto args 1)
+     (pto args 2)
+     (pto args 3))))
+
 
 ; -----------------------------------------
 ; spot checks
@@ -189,6 +199,7 @@
 (p840-clouds 14.25 31.07694309 (p840-Lred 51.50 -0.14 1)) ; 0.455170459072589
 (p453-Nwet 51.5 -0.14 50) ; 50.3892622222222 validation table shows (and P.618 §2.4 requires) median values.
 (p618-scint 14.25 31.07694309 (sqrt 0.65) 1 (p453-Nwet 51.5 -0.14 50))
+(p836-V 51.5 -0.14 1.0 (p1511-topoh 51.5 -0.14)) ; 33.3205520527569
 
 (let* ((latdeg 51.5)
        (londeg -0.14)

@@ -118,6 +118,35 @@ contains
   end function lookup_xy
 
 
+  ! Helper function for lookup_pxy - find the indices/deltas, but don't interpolate.
+
+  subroutine lookup_pxy_find(plist, m, n, p, x, y, ip, ix, iy, dp, dx, dy)
+
+    real, intent(in) :: p, x, y
+    real, intent(in), dimension(:) :: plist
+    integer, intent(in) :: m, n
+    integer, intent(out) :: ip, ix, iy
+    real, intent(out) :: dp, dx, dy
+
+    ix = max(0, min(m-2, int(floor(x))))     ! x = end-of-table will use dx = 1.
+    iy = max(0, min(n-2, int(floor(y))))     ! y = end-of-table will use dy = 1.
+    dx = x-ix
+    dy = y-iy
+
+    if (p<plist(lbound(plist, 1)) .or. p>plist(ubound(plist, 1))) then
+       write(*, *) 'p', p, 'plist', plist
+       stop 106
+    end if
+    do ip=2, size(plist, 1)
+       if (p<=plist(ip)) then
+          exit
+       end if
+    end do
+    dp = (log(p) - log(plist(ip-1))) / (log(plist(ip)) - log(plist(ip-1)))
+
+  end subroutine lookup_pxy_find
+
+
   ! Interpolate in p, x, y table, as described in P453-13 §2.2 and P.840-7 §3.1.
   ! Interpolation is bilinear in x, y then linear in the result and in the log of p.
   ! x and y are indices in the sizes of the table [0 ... n], so the steps of x and y are
@@ -134,21 +163,7 @@ contains
     integer :: ip, ix, iy, i
     real, dimension(2) :: zz
 
-    ix = max(0, min(size(table, 2)-2, int(floor(x))))     ! x = end-of-table will use dx = 1.
-    iy = max(0, min(size(table, 3)-2, int(floor(y))))     ! y = end-of-table will use dy = 1.
-    dx = x-ix
-    dy = y-iy
-
-    if (p<plist(lbound(plist, 1)) .or. p>plist(ubound(plist, 1))) then
-       stop 106
-    end if
-
-    do ip=2, size(plist, 1)
-       if (p<=plist(ip)) then
-          exit
-       end if
-    end do
-
+    call lookup_pxy_find(plist, size(table, 2), size(table, 3), p, x, y, ip, ix, iy, dp, dx, dy)
     do i=1, 2
        zz(i) = &
             + table(ip+i-2, ix+1, iy+1)*(1-dx)*(1-dy) &
@@ -156,8 +171,6 @@ contains
             + table(ip+i-2, ix+1, iy+2)*(1-dx)*dy &
             + table(ip+i-2, ix+2, iy+2)*dx*dy
     end do
-
-    dp = (log(p) - log(plist(ip-1))) / (log(plist(ip)) - log(plist(ip-1)))
     z = zz(1)*(1.-dp) + zz(2)*dp
 
   end function lookup_pxy
@@ -221,7 +234,7 @@ contains
        end if
 
        ! according to ITU-R P.836-6 Anexes 1 and 2
-       ! lat 90:-1.125:-90 and lon 0:+1.125:360
+       ! lat +90:-1.125:-90 and lon 0:+1.125:360
 
        ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Surface Water Vapor Density/RHO Annual Maps/RHO_', &
             '_v4.txt', p840p, 161, 321, p836rho)
@@ -720,12 +733,12 @@ contains
        bind(c, name='__p676_gas') &
        result(att)
 
-    real(C_DOUBLE), intent(in) :: eldeg  ! elevation angle (°)
-    real(C_DOUBLE), intent(in) :: freq   ! frequency (GHz)
-    real(C_DOUBLE), intent(in) :: P      ! dry air pressure (hPa)
-    real(C_DOUBLE), intent(in) :: e      ! vapor part. pressure e(P) (hPa)
-    real(C_DOUBLE), intent(in) :: temp   ! temperature (K)
-    real(C_DOUBLE), intent(in), optional :: Vt  ! temperature (K)
+    real(C_DOUBLE), intent(in) :: eldeg      ! elevation angle (°)
+    real(C_DOUBLE), intent(in) :: freq       ! frequency (GHz)
+    real(C_DOUBLE), intent(in) :: P          ! dry air pressure (hPa)
+    real(C_DOUBLE), intent(in) :: e          ! vapor part. pressure e(P) (hPa)
+    real(C_DOUBLE), intent(in) :: temp       ! temperature (K)
+    real(C_DOUBLE), intent(in), optional :: Vt  ! total vaper vapor content (kg/m^2), cf p836_V()
     real(C_DOUBLE), intent(in), optional :: hs  ! station height above mean sea level (km)
 
     real :: go, gw, ho, hw, attw
@@ -792,7 +805,7 @@ contains
        end block
     end if
 
-    if (eldeg>=5 .and. eldeg<=90.) then
+    if (eldeg>=10. .and. eldeg<=90.) then ! §2.2.1
 
        ! ! debug intermediate values
        ! write(*, *) 'ho', ho
@@ -804,7 +817,7 @@ contains
        ! write(*, *) 'Aw', hw*gw
        ! write(*, *) 'Aw/sinθ', hw*gw / sin(deg2rad(eldeg))
 
-       att = (ho*go + attw) / sin(deg2rad(eldeg))  ! (28)
+       att = (ho*go + attw) / sin(deg2rad(eldeg))  ! (29)
     else
        stop 105
     end if
@@ -980,17 +993,50 @@ contains
 
   end function p1511_topoh
 
-  ! ! Total vaper vapor content,a fter ITU-R P.836-6 Annex 2
 
-  ! real(C_DOUBLE) function p836_V(lat, lon, p, h) &
-  !      bind(c, name="__p836_V") &
-  !      result(Vt)
+  ! Total vaper vapor content, after ITU-R P.836-6 Annex 2.
 
-  !   real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
-  !   real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
-  !   real(C_DOUBLE), intent(in) :: p    ! probability (%)
-  !   real(C_DOUBLE), intent(in) :: h    ! altitude (m)
+  real(C_DOUBLE) function p836_V(lat, lon, p, h) &
+       bind(c, name="__p836_V") &
+       result(Vt)
 
-  ! end function p836_V
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
+    real(C_DOUBLE), intent(in) :: p    ! probability (%)
+    real(C_DOUBLE), intent(in) :: h    ! altitude (km)
+
+    real :: dp, dx, dy
+    integer :: ip, ix, iy
+
+    real, dimension(2, 2, 2) :: vi
+    real, dimension(2, 2, 2) :: vschi
+    real, dimension(2, 2, 2) :: hi
+
+    call lookup_pxy_find(p840p, size(p836V, 2), size(p836V, 3), &
+         p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, &
+         ip, ix, iy, &
+         dp, dx, dy)
+
+    vi = p836V(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
+    vschi = p836vsch(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
+    hi = reshape( spread( (/ &
+         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+0)*1.125), &
+         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+0)*1.125), &
+         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+1)*1.125), &
+         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+1)*1.125) /), &
+         dim=2, ncopies=2), (/ 2, 2, 2 /), order=(/ 2, 3, 1 /))
+    vi = vi * exp(-(h-hi)/vschi)
+
+    Vt = &
+         + vi(1, 1, 1)*(1-dp)*(1-dx)*(1-dy) &
+         + vi(1, 1, 2)*(1-dp)*(1-dx)*dy &
+         + vi(1, 2, 1)*(1-dp)*dx*(1-dy) &
+         + vi(1, 2, 2)*(1-dp)*dx*dy &
+         + vi(2, 1, 1)*dp*(1-dx)*(1-dy) &
+         + vi(2, 1, 2)*dp*(1-dx)*dy &
+         + vi(2, 2, 1)*dp*dx*(1-dy) &
+         + vi(2, 2, 2)*dp*dx*dy
+
+  end function p836_V
 
 end module prop

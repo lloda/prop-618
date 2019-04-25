@@ -305,12 +305,12 @@ contains
     character(len=200) :: line
     real, allocatable :: c(:, :), x(:, :)
 
-    ne = 0
     write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas'
 
     open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
     allocate(x(31, 64), STAT=ierror)
     allocate(c(64, 31), STAT=ierror)
+    ne = ierror
     read(1, *)
     read(1, *)
     read(1, *, iostat=ierror, iomsg=iomsg) x
@@ -320,6 +320,13 @@ contains
        return
     end if
 
+    do i=1, 64
+       write(line, '(I2, A)') i+21, ' Vt'
+       ne = ne + num_test(trim(line), c(i, 18), &
+            p836_V(c(i, 1), c(i, 2), c(i, 5), c(i, 3)), &
+            rspec=5e-15)
+    end do
+    write(*, *) achar(10)
     do i=1, 64
        write(line, '(I2, A)') i+21, ' A_gas'
        ne = ne + num_test(trim(line), c(i, 31), &
