@@ -951,7 +951,7 @@ contains
   ! Uses bicubic interpolation as described in ITU-R P.1144 Annex 1.2.
 
   real(C_DOUBLE) function p1511_topoh(lat, lon) &
-       bind(c, name="__p1511_topoh") &
+       bind(c, name='__p1511_topoh') &
        result(h)
 
     real(C_DOUBLE), intent(in) :: lat, lon
@@ -997,7 +997,7 @@ contains
   ! Total vaper vapor content, after ITU-R P.836-6 Annex 2.
 
   real(C_DOUBLE) function p836_V(lat, lon, p, h) &
-       bind(c, name="__p836_V") &
+       bind(c, name='__p836_V') &
        result(Vt)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)

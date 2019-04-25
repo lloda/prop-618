@@ -229,7 +229,8 @@
 
 
 ; -----------------------------------------
-; uses private libraries... FIXME give something portable.
+; sample figures
+; FIXME uses private libraries... give something portable.
 ; -----------------------------------------
 
 (import (yak yak))
