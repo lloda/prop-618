@@ -51,8 +51,14 @@
                       (((fortran-type (c-type) stuff ...) (vars ...))
                        (when (list-index (cut eq? <> 'dimension) stuff)
                          (throw 'dimension-not-supported i line))
-                       (loop (+ 1 i)
-                             (fold (lambda (var dict) (assq-set! dict var c-type)) dict vars)))
+                       (let* ((iinout (list-index (cut eq? <> 'intent) stuff))
+                              (inout (if iinout
+                                       (match (drop stuff iinout)
+                                         (('intent (inout) . x) inout)
+                                         (x (throw 'bad-inout-clause x)))
+                                       'inout)))
+                         (loop (+ 1 i)
+                               (fold (lambda (var dict) (assq-set! dict var (list c-type inout))) dict vars))))
                       (x (throw 'some-args-types-missing-before-this-line i line))))
                    (else
                     (loop (+ 1 i) dict))))))))
@@ -122,11 +128,18 @@
       (format o "#pragma once\n\n")
       (format o "#include <stdint.h>\n\n")
       (for-each (match-lambda
-                  ((c-type bind-name ((aname . atype) ...))
-                   (format o "~a ~a(~{~{~a~^ ~}~^, ~});\n\n"
+                  ((c-type bind-name ((aname atype inout . x) ...))
+                   (format o "~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n\n"
                            (type c-type)
                            bind-name
-                           (zip (map type atype) aname))))
+                           (zip (map type atype)
+                                (map (match-lambda
+                                       ('in 'const)
+                                       ('out "")
+                                       ('inout "/* inout */")
+                                       (x (throw 'bad-inout-tag x)))
+                                  inout)
+                                aname))))
                 xpts))))
 
 (write-bindings

@@ -284,7 +284,8 @@ contains
        bind(c, name='__p839_rain_height') &
        result(h)
 
-    real(C_DOUBLE) :: lat, lon
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
 
     h = 0.36 + lookup_xy(max(0., min(180., (90.-lat)))/1.5, modulo(lon, 360.)/1.5, p839h0)
 
@@ -297,7 +298,8 @@ contains
        bind(c, name='__p837_rainfall_rate') &
        result(R001)
 
-    real(C_DOUBLE) :: lat, lon
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
 
     R001 = lookup_xy(max(0., min(180., lat+90.))/0.125, modulo(lon+180., 360.)/0.125, p837R001)
 
@@ -310,7 +312,8 @@ contains
        bind(c, name='__p1510_temp') &
        result(h)
 
-    real(C_DOUBLE) :: lat, lon
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
 
     h = lookup_xy(max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p1510Ta)
 
@@ -681,11 +684,11 @@ contains
   subroutine p676_eq_height(f, e, P, ho, hw) &
        bind(c, name='__p676_eq_height')
 
-    real(C_DOUBLE) :: f       ! frequency (GHz)
-    real(C_DOUBLE) :: e       ! vapor part. pressure e(P) (hPa) (4)
-    real(C_DOUBLE) :: P       ! pressure at height hₛ (hPa)
-    real(C_DOUBLE) :: ho      ! equivalent height for dry air
-    real(C_DOUBLE) :: hw      ! equivalent height for vapor
+    real(C_DOUBLE), intent(in) :: f       ! frequency (GHz)
+    real(C_DOUBLE), intent(in) :: e       ! vapor part. pressure e(P) (hPa) (4)
+    real(C_DOUBLE), intent(in) :: P       ! pressure at height hₛ (hPa)
+    real(C_DOUBLE), intent(out) :: ho     ! equivalent height for dry air
+    real(C_DOUBLE), intent(out) :: hw     ! equivalent height for vapor
 
     real :: rp
 
@@ -833,9 +836,9 @@ contains
        bind(c, name='__p840_Lred') &
        result(Lred)
 
-    real(C_DOUBLE) :: lat                 ! latitude (°)
-    real(C_DOUBLE) :: lon                 ! longitude (°)
-    real(C_DOUBLE) :: p                   ! probability (%)
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
+    real(C_DOUBLE), intent(in) :: p    ! probability (%)
 
     Lred = lookup_pxy(p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840Lred)
 
@@ -851,9 +854,9 @@ contains
        bind(c, name='__p453_Nwet') &
        result(Nwet)
 
-    real(C_DOUBLE) :: lat                 ! latitude (°)
-    real(C_DOUBLE) :: lon                 ! longitude (°)
-    real(C_DOUBLE) :: p                   ! probability (%)
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
+    real(C_DOUBLE), intent(in) :: p    ! probability (%)
 
     Nwet = lookup_pxy(p, max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p840p, p453Nwet)
 
