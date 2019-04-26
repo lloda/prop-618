@@ -30,14 +30,16 @@ contains
     ! An alternative description is given in P.691-3 §C.6.
 
     real(C_DOUBLE), intent(in) :: h                   ! geometric height (km)
-    real(C_DOUBLE), intent(out) :: P                  ! dry air pressure (hPa)
+    real(C_DOUBLE), intent(out) :: P                  ! dry air partial pressure (hPa)
     real(C_DOUBLE), intent(out) :: rho                ! water vapor density (g/m³)
     real(C_DOUBLE), intent(out) :: T                  ! temperature (K)
     integer(C_INT32_T), intent(out):: error           ! error - 0 means none
 
-    real, dimension(8) :: hh = (/ 0., 11., 20., 32., 47., 51., 71., 84.852 /)
-    real, dimension(8) :: Th = (/ 288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65, 186.946 /)
-    real, dimension(8) :: Ph = (/ 1013.25, 226.3226, 54.74980, 8.680422, 1.109106, 6.694167e-1, 3.956649e-2, 3.73405025e-3 /)
+    real, parameter, dimension(8) :: hh = (/ 0., 11., 20., 32., 47., 51., 71., 84.852 /)
+    real, parameter, dimension(8) :: Th = (/ 288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65, 186.946 /)
+    real, parameter, dimension(8) :: Ph = (/ 1013.25, 226.3226, 54.74980, 8.680422, 1.109106, 6.694167e-1, 3.956649e-2, &
+         3.734050254431527e-3 /)
+    real, parameter, dimension(7) :: kh = (log(Th(2:8))-log(Th(1:7))) / (log(Ph(2:8))-log(Ph(1:7)))
 
     ! check invalid input
 
@@ -63,29 +65,31 @@ contains
       if (hp <= 84.852) then
          block
            integer :: i
-           real :: a, b, del
+           real :: x! , k
            ! FIXME hh is sorted, so we could do better
            i = max(2, minloc(hh, DIM=1, MASK=(hp<=hh)))
-           a = (hh(i)-hp)
-           b = (hp-hh(i-1))
-           del = (hh(i)-hh(i-1))
-           T = (Th(i-1)*a + Th(i)*b) / del                            ! (2)
-           P = exp((log(Ph(i-1))*a + log(Ph(i))*b) / del)             ! (3)
+           x = (hp-hh(i-1)) / (hh(i)-hh(i-1))
+           T = Th(i-1)*(1-x) + Th(i)*x                        ! (2)
+           if (kh(i-1)==0) then
+              P = exp(log(Ph(i-1))*(1-x) - log(Ph(i))*x)      ! P619-3 §C.6 (61)
+           else
+              P = exp(log(Ph(i-1)) - (log(Th(i-1)) - log(T))/kh(i-1))
+           end if
          end block
       else
          block
            real :: a0=95.571899, a1=-4.011801, a2=6.424731e-2, a3=-4.789660e-4, a4=1.340543e-6
            if (h<=91) then
-              T = 186.8673                                            ! (4a)
+              T = 186.8673                                    ! (4a)
            else
               T = 263.1905 - 76.3232 * sqrt(1 - ((h-91)/19.9429)**2)  ! (4b)
            end if
-           P = exp(a0 + h*(a1 + h*(a2 + h*(a3 + h*a4))))              ! (5)
+           P = exp(a0 + h*(a1 + h*(a2 + h*(a3 + h*a4))))      ! (5)
          end block
       end if
     end block
 
-    rho = 7.5*exp(-h/2)                                               ! (6)
+    rho = 7.5*exp(-h/2)                                       ! (6)
 
   end subroutine p835_ref
 

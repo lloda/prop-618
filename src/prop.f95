@@ -736,11 +736,11 @@ contains
        bind(c, name='__p676_gas') &
        result(att)
 
-    real(C_DOUBLE), intent(in) :: eldeg      ! elevation angle (°)
-    real(C_DOUBLE), intent(in) :: freq       ! frequency (GHz)
-    real(C_DOUBLE), intent(in) :: P          ! dry air pressure (hPa)
-    real(C_DOUBLE), intent(in) :: e          ! vapor part. pressure e(P) (hPa)
-    real(C_DOUBLE), intent(in) :: temp       ! temperature (K)
+    real(C_DOUBLE), intent(in) :: eldeg         ! elevation angle (°)
+    real(C_DOUBLE), intent(in) :: freq          ! frequency (GHz)
+    real(C_DOUBLE), intent(in) :: P             ! dry air pressure (hPa)
+    real(C_DOUBLE), intent(in) :: e             ! vapor part. pressure e(P) (hPa)
+    real(C_DOUBLE), intent(in) :: temp          ! temperature (K)
     real(C_DOUBLE), intent(in), optional :: Vt  ! total vaper vapor content (kg/m^2), cf p836_V()
     real(C_DOUBLE), intent(in), optional :: hs  ! station height above mean sea level (km)
 

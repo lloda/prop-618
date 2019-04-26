@@ -123,8 +123,8 @@
 
   (call-with-output-file fname
     (lambda (o)
-      (format o "\n// generated from ~a by protos.scm ~a\n\n"
-              tag (date->string (current-date) "~5"))
+      (format o "\n// ~a generated from ~a by protos.scm ~a\n\n"
+              fname tag (date->string (current-date) "~5"))
       (format o "#pragma once\n\n")
       (format o "#include <stdint.h>\n\n")
       (for-each (match-lambda
@@ -140,7 +140,8 @@
                                        (x (throw 'bad-inout-tag x)))
                                   inout)
                                 aname))))
-                xpts))))
+        xpts)
+      (format o "// end of ~a\n\n" fname))))
 
 (write-bindings
  (find-foreign-protos "../src/prop.f95")

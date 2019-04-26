@@ -19,11 +19,11 @@
 # prologue
 # -------------------
 
-project(e2s-prop-models)
-enable_language(Fortran)
+project (prop-618)
+enable_language (Fortran)
 cmake_minimum_required (VERSION 3.5)
-include_directories(".")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
+include_directories (".")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 
 # -------------------
 # body
@@ -44,7 +44,7 @@ foreach (target test0)
 endforeach ()
 
 # used to generate bindings
-include(config/FindGuile.cmake)
+include (config/FindGuile.cmake)
 
 # include(config/UseLATEX.cmake)
 # set (LATEX_OUTPUT_PATH build)

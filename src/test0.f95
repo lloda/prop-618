@@ -99,7 +99,7 @@ contains
     else
        ne = 0
     end if
-    write(hgs, '(A, F8.3)') 'hg = ', hg
+    write(hgs, '(A, F9.4)') 'hg = ', hg
     ne = ne + num_test(trim(hgs) // ' P', Pspec, P, rspec=1e-4)
     ne = ne + num_test(trim(hgs) // ' ρ', rhospec, rho, rspec=1e-4)
     ne = ne + num_test(trim(hgs) // ' T', Tspec, T, rspec=1e-4)
@@ -320,13 +320,30 @@ contains
        return
     end if
 
+    ! Not many decimals in p835 (the segments don't even match in the end), so and I haven't
+    ! programmed it the same way (cf P.619 §C.6). Just rspec to 1e-6.
+    do i=1, 64
+       write(line, '(I2, A, F10.7, A)') i+21, ' hₛ ', c(i, 3), ' Pdry'
+       block
+         real :: P, rho, T
+         integer :: error
+         call p835_ref(c(i, 3), P, rho, T, error)
+         ne = ne + num_test(trim(line), c(i, 11), P, &
+              rspec=5e-6)
+       end block
+    end do
+
+    write(*, *) achar(10)
+
     do i=1, 64
        write(line, '(I2, A)') i+21, ' Vt'
        ne = ne + num_test(trim(line), c(i, 18), &
             p836_V(c(i, 1), c(i, 2), c(i, 5), c(i, 3)), &
             rspec=5e-15)
     end do
+
     write(*, *) achar(10)
+
     do i=1, 64
        write(line, '(I2, A)') i+21, ' A_gas'
        ne = ne + num_test(trim(line), c(i, 31), &
