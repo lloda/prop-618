@@ -113,7 +113,7 @@
 ; FIXME Generate Python bindings (cffi?)
 ; FIXME Generate Guile bindings, replacing prop.scm
 
-(define (write-bindings xpts tag fname)
+(define (write-bindings xpts tag source)
 
   (define (type c-type)
     (match c-type
@@ -121,12 +121,15 @@
       ('C_DOUBLE 'double)
       ('C_INT32_T 'int32_t)))
 
-  (call-with-output-file fname
+  (call-with-output-file source
     (lambda (o)
       (format o "\n// ~a generated from ~a by protos.scm ~a\n\n"
-              fname tag (date->string (current-date) "~5"))
+              (basename source) tag (date->string (current-date) "~5"))
       (format o "#pragma once\n\n")
       (format o "#include <stdint.h>\n\n")
+      (format o "#ifdef __cplusplus\n")
+      (format o "extern \"C\" {\n")
+      (format o "#endif\n\n")
       (for-each (match-lambda
                   ((c-type bind-name ((aname atype inout . x) ...))
                    (format o "~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n\n"
@@ -140,13 +143,14 @@
                                        (x (throw 'bad-inout-tag x)))
                                   inout)
                                 aname))))
-        xpts)
-      (format o "// end of ~a\n\n" fname))))
+                xpts)
+      (format o "#ifdef __cplusplus\n")
+      (format o "} // extern \"C\"\n")
+      (format o "#endif\n\n")
+      (format o "// end of ~a\n\n" source))))
 
-(write-bindings
- (find-foreign-protos "../src/prop.f95")
- "prop.f95" "prop.h")
-
-(write-bindings
- (find-foreign-protos "../src/atmospheres.f95")
- "atmospheres.f95" "atmospheres.h")
+(match (program-arguments)
+  ((me source dest . rest)
+   (write-bindings (find-foreign-protos source)
+                   (basename source) dest))
+  (x (throw 'expected-arguments-1-source-2-dest)))

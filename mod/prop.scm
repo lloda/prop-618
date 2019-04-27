@@ -25,12 +25,12 @@
 (define libprop (dynamic-link "../build/libprop"))
 
 (define __prop_init
-  (pointer->procedure int32 (dynamic-func "__prop_init" libprop) '()))
+  (pointer->procedure int32 (dynamic-func "prop_init" libprop) '()))
 (define (prop-init)
   (__prop_init))
 
 (define __p676_vapor_pressure
-  (pointer->procedure double (dynamic-func "__p676_vapor_pressure" libprop) '(* *)))
+  (pointer->procedure double (dynamic-func "p676_vapor_pressure" libprop) '(* *)))
 (define (p676-vapor-pressure rho T)
   (let ((args (f64vector rho T)))
     (__p676_vapor_pressure
@@ -38,7 +38,7 @@
      (pto args 1))))
 
 (define __p676_gas_specific
-  (pointer->procedure void (dynamic-func "__p676_gas_specific" libprop) '(* * * * * * *)))
+  (pointer->procedure void (dynamic-func "p676_gas_specific" libprop) '(* * * * * * *)))
 (define* (p676-gas-specific fghz p e T #:key short?)
   (let* ((short (s32vector (if short? 1 0)))
          (args (f64vector fghz p e T 0 0)))
@@ -53,7 +53,7 @@
     (values (array-ref args 4) (array-ref args 5))))
 
 (define __p676_gas
-  (pointer->procedure void (dynamic-func "__p676_gas" libprop) '(* * * * * * *)))
+  (pointer->procedure void (dynamic-func "p676_gas" libprop) '(* * * * * * *)))
 (define* (p676-gas eldeg fghz p e temp Vt hs)
   (let ((args (f64vector eldeg fghz p e temp Vt hs)))
     (__p676_gas_specific
@@ -66,7 +66,7 @@
      (pto args 6))))
 
 (define __p835_ref
-  (pointer->procedure void (dynamic-func "__p835_ref" libatmospheres) '(* * * * *)))
+  (pointer->procedure void (dynamic-func "p835_ref" libatmospheres) '(* * * * *)))
 (define (p835-ref h)
   (let* ((args (f64vector h 0 0 0))
          (ec (make-s32vector 1 0)))
@@ -79,7 +79,7 @@
     (values (f64vector-ref args 1) (f64vector-ref args 2) (f64vector-ref args 3) (s32vector-ref ec 0))))
 
 (define __p839_rain_height
-  (pointer->procedure double (dynamic-func "__p839_rain_height" libprop) '(* *)))
+  (pointer->procedure double (dynamic-func "p839_rain_height" libprop) '(* *)))
 (define (p839-rain-height lat lon)
   (let ((args (f64vector lat lon)))
     (__p839_rain_height
@@ -87,7 +87,7 @@
      (pto args 1))))
 
 (define __p837_rainfall_rate
-  (pointer->procedure double (dynamic-func "__p837_rainfall_rate" libprop) '(* *)))
+  (pointer->procedure double (dynamic-func "p837_rainfall_rate" libprop) '(* *)))
 (define (p837-rainfall-rate lat lon)
   (let ((args (f64vector lat lon)))
     (__p837_rainfall_rate
@@ -95,7 +95,7 @@
      (pto args 1))))
 
 (define __p1510_temp
-  (pointer->procedure double (dynamic-func "__p1510_temp" libprop) '(* *)))
+  (pointer->procedure double (dynamic-func "p1510_temp" libprop) '(* *)))
 (define (p1510-temp lat lon)
   (let ((args (f64vector lat lon)))
     (__p1510_temp
@@ -103,7 +103,7 @@
      (pto args 1))))
 
 (define __p1511_topoh
-  (pointer->procedure double (dynamic-func "__p1511_topoh" libprop) '(* *)))
+  (pointer->procedure double (dynamic-func "p1511_topoh" libprop) '(* *)))
 (define (p1511-topoh lat lon)
   (let ((args (f64vector lat lon)))
     (__p1511_topoh
@@ -111,7 +111,7 @@
      (pto args 1))))
 
 (define __p838_coeffs
-  (pointer->procedure void (dynamic-func "__p838_coeffs" libprop) '(* * * * *)))
+  (pointer->procedure void (dynamic-func "p838_coeffs" libprop) '(* * * * *)))
 (define (p838-coeffs fghz)
   (let ((fghz (make-f64vector 1 fghz))
         (args (make-f64vector 4 0)))
@@ -124,7 +124,7 @@
     args))
 
 (define __p618_rain
-  (pointer->procedure double (dynamic-func "__p618_rain" libprop) '(* * * * * * * *)))
+  (pointer->procedure double (dynamic-func "p618_rain" libprop) '(* * * * * * * *)))
 (define (p618-rain latdeg londeg hs fghz eldeg taudeg p r001_)
   (let* ((args (f64vector latdeg londeg hs fghz eldeg taudeg p r001_))
          (attp (__p618_rain
@@ -139,7 +139,7 @@
     (values attp (array-ref args 7))))
 
 (define __p840_Lred
-  (pointer->procedure double (dynamic-func "__p840_Lred" libprop) '(* * *)))
+  (pointer->procedure double (dynamic-func "p840_Lred" libprop) '(* * *)))
 (define (p840-Lred latdeg londeg p)
   (let ((args (f64vector latdeg londeg p)))
     (__p840_Lred
@@ -148,7 +148,7 @@
                (pto args 2))))
 
 (define __p840_clouds
-  (pointer->procedure double (dynamic-func "__p840_clouds" libprop) '(* * *)))
+  (pointer->procedure double (dynamic-func "p840_clouds" libprop) '(* * *)))
 (define (p840-clouds fghz eldeg Lred)
   (let ((args (f64vector fghz eldeg Lred)))
     (__p840_clouds
@@ -157,7 +157,7 @@
                (pto args 2))))
 
 (define __p453_Nwet
-  (pointer->procedure double (dynamic-func "__p453_Nwet" libprop) '(* * *)))
+  (pointer->procedure double (dynamic-func "p453_Nwet" libprop) '(* * *)))
 (define (p453-Nwet latdeg londeg p)
   (let ((args (f64vector latdeg londeg p)))
     (__p453_Nwet
@@ -166,7 +166,7 @@
                (pto args 2))))
 
 (define __p618_scint
-  (pointer->procedure double (dynamic-func "__p618_scint" libprop) '(* * * * *)))
+  (pointer->procedure double (dynamic-func "p618_scint" libprop) '(* * * * *)))
 (define (p618-scint fghz eldeg Deff p Nwet)
   (let ((args (f64vector fghz eldeg Deff p Nwet)))
     (__p618_scint
@@ -177,7 +177,7 @@
                (pto args 4))))
 
 (define __p836_V
-  (pointer->procedure double (dynamic-func "__p836_V" libprop) '(* * * *)))
+  (pointer->procedure double (dynamic-func "p836_V" libprop) '(* * * *)))
 (define (p836-V latdeg londeg p h)
   (let ((args (f64vector latdeg londeg p h)))
     (__p836_V

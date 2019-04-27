@@ -23,7 +23,7 @@ contains
   end function h_geom
 
   subroutine p835_ref(h, P, rho, T, error) &
-       bind(c, name='__p835_ref')
+       bind(c, name='p835_ref')
 
     ! Mean annual global reference atmosphere (‘standard’).
     ! Equation & table numbers from ITU-R P.835-6.
@@ -69,27 +69,28 @@ contains
            ! FIXME hh is sorted, so we could do better
            i = max(2, minloc(hh, DIM=1, MASK=(hp<=hh)))
            x = (hp-hh(i-1)) / (hh(i)-hh(i-1))
-           T = Th(i-1)*(1-x) + Th(i)*x                        ! (2)
-           if (kh(i-1)==0) then
-              P = exp(log(Ph(i-1))*(1-x) - log(Ph(i))*x)      ! P619-3 §C.6 (61)
+           T = Th(i-1)*(1-x) + Th(i)*x                     ! (2)
+           if (Th(i-1)==Th(i)) then
+              P = (Ph(i-1)**(1-x)) / (Ph(i)**x)            ! P619-3 §C.6 (61)
            else
-              P = exp(log(Ph(i-1)) - (log(Th(i-1)) - log(T))/kh(i-1))
+              ! gfortran doesn't let me initialize kh with maybe-inf (!!)
+              P = Ph(i-1) * (T/Th(i-1))**(1/kh(i-1))
            end if
          end block
       else
          block
            real :: a0=95.571899, a1=-4.011801, a2=6.424731e-2, a3=-4.789660e-4, a4=1.340543e-6
            if (h<=91) then
-              T = 186.8673                                    ! (4a)
+              T = 186.8673                                 ! (4a)
            else
               T = 263.1905 - 76.3232 * sqrt(1 - ((h-91)/19.9429)**2)  ! (4b)
            end if
-           P = exp(a0 + h*(a1 + h*(a2 + h*(a3 + h*a4))))      ! (5)
+           P = exp(a0 + h*(a1 + h*(a2 + h*(a3 + h*a4))))   ! (5)
          end block
       end if
     end block
 
-    rho = 7.5*exp(-h/2)                                       ! (6)
+    rho = 7.5*exp(-h/2)                                    ! (6)
 
   end subroutine p835_ref
 

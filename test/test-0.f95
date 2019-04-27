@@ -1,4 +1,4 @@
-! (test.f95) -*- coding: utf-8; mode: f90-mode -*-
+! (test-0.f95) -*- coding: utf-8; mode: f90-mode -*-
 ! tests for prop.f95, atmospheres.f95
 ! 2019-04
 
@@ -320,8 +320,9 @@ contains
        return
     end if
 
-    ! Not many decimals in p835 (the segments don't even match in the end), so and I haven't
-    ! programmed it the same way (cf P.619 §C.6). Just rspec to 1e-6.
+    ! Not many decimals in p835 (the segments of the interpolation don't even
+    ! match) and I haven't programmed it the same way (cf P.619 §C.6), so just
+    ! rspec to 1e-6.
     do i=1, 64
        write(line, '(I2, A, F10.7, A)') i+21, ' hₛ ', c(i, 3), ' Pdry'
        block

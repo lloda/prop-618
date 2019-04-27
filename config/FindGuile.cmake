@@ -18,7 +18,6 @@ if (NOT "$ENV{GUILE}" STREQUAL "")
   get_filename_component(GUILE_ROOT "$ENV{GUILE}" DIRECTORY)
   set(GUILE_INCLUDE_DIR_HINT "${GUILE_ROOT}/../include")
   set(GUILE_LIB_DIR_HINT "${GUILE_ROOT}/../lib")
-  message("From $GUILE GUILE_ROOT = ${GUILE_ROOT}")
 endif()
 
 # Look for guile-3.0 first, then 2.2, 2.0, 1.8
