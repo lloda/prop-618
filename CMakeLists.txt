@@ -50,7 +50,7 @@ if (GUILE_EXECUTABLE)
     set (source "${CMAKE_SOURCE_DIR}/src/${module}.f95")
     set (generator "${CMAKE_SOURCE_DIR}/config/protos.scm")
     add_custom_command (
-      OUTPUT ${header} DEPENDS ${source}
+      OUTPUT ${header} DEPENDS ${source} ${generator}
       COMMAND ${GUILE_EXECUTABLE} -s ${generator} ${source} ${header}
       COMMENT "Generating C header ${header}"
       VERBATIM)

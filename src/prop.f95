@@ -386,7 +386,7 @@ contains
     real(C_DOUBLE), intent(in) :: lon      ! longitude (°)
     real(C_DOUBLE), intent(in) :: eldeg    ! elevation angle (°)
     real(C_DOUBLE), intent(in) :: p        ! probability (%)
-    real(C_DOUBLE), intent(inout) :: r001  ! point rainfall rate for 0.01% of average year (mm/h)
+    real(C_DOUBLE), intent(in) :: r001     ! point rainfall rate for 0.01% of average year (mm/h)
 
     real :: hr, ls, lg, lr, gr, el, horiz001, nu001, le, beta, att001
     real, parameter :: Re = 8500           ! effective Earth radius (8500 km)
@@ -430,10 +430,6 @@ contains
       call p838_coeffs(freq, kh, ah, kv, av)
       k = (kh + kv + (kh-kv)*(cos(el)**2.)*cos(2.*tau)) / 2.
       a = (kh*ah + kv*av + (kh*ah - kv*av)*(cos(el)**2.)*cos(2.*tau)) / (2.*k)
-
-      if (r001<0) then
-         r001 = p837_rainfall_rate(lat, lon)
-      end if
       gr = k * (r001 ** a)
     end block
 

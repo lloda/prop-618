@@ -1,5 +1,5 @@
 
-// atmospheres.h generated from atmospheres.f95 by protos.scm 2019-04-27T06:47:08
+// atmospheres.h generated from atmospheres.f95 by protos.scm 2019-04-28T14:30:27
 
 #pragma once
 
@@ -17,5 +17,5 @@ p835_ref
 } // extern "C"
 #endif
 
-// end of /Users/danielo/Prog/prop-618/mod/atmospheres.h
+// end of atmospheres.h
 

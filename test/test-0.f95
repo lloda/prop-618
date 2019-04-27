@@ -200,20 +200,19 @@ contains
        result(ne)
 
     integer :: id
-    real :: attpt, fghz, taudeg, lat, lon, hs, el, p, r001, r001_
+    real :: attpt, fghz, taudeg, lat, lon, hs, el, p, r001
     character(len=200) :: line
     write(line, '(I2, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A, F7.3, A)') &
          id, ' f ', fghz, ' τ ', taudeg, ' lat ', lat, ' lon ', lon, &
          ' hₛ ', hs, ' el ', el, ' p ', p, ' R₀₀₁ ', r001, ' -> Ap '
     ne = 0
-    r001_ = -1.
     ne = ne + num_test(trim(line), attpt, p618_rain(lat, lon, hs, fghz, el, taudeg, p, r001), rspec=5e-15)
-    ne = ne + num_test(trim(line), attpt, p618_rain(lat, lon, hs, fghz, el, taudeg, p, r001_), rspec=5e-4)
   end function test_p618_rain_ref
 
   integer function test_p618_rain() &
        result(ne)
 
+    character(len=200) :: line
     integer ierror, i
     real, allocatable :: x(:, :), c(:, :)
     open(1, file='../data/P618/P618-13A_Rain.txt', action='read')   ! FIXME install path
@@ -223,6 +222,23 @@ contains
     c = transpose(x)
 
     ne = 0
+
+    write(*, *) achar(10), 'p618_rain, CG-3M3J-13-ValEx-Rev4_2.xlsx / R001 from P618-13 A_Rain'
+    do i=1, size(c, 1)
+       block
+         real lat, lon, r001
+         lat = c(i, 1)
+         lon = c(i, 2)
+         r001 = c(i, 8)
+         write(line, '(I2, A, F7.3, A, F7.3, A)') i+22, ' lat ', lat, ' lon ', lon, ' r001 '
+
+         ! FIXME p837_rainfall_rate isn't the same method used for R₀₀₁ column
+         ! (see comment in validation table)
+
+         ne = ne + num_test(trim(line), r001, p837_rainfall_rate(lat, lon), rspec=5e-4)
+       end block
+    end do
+
     write(*, *) achar(10), 'p618_rain, CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 A_Rain'
     do i=1, size(c, 1)
        ne = ne + test_p618_rain_ref(i+22, c(i, 9), c(i, 1), c(i, 2), c(i, 3), &

@@ -125,8 +125,8 @@
 
 (define __p618_rain
   (pointer->procedure double (dynamic-func "p618_rain" libprop) '(* * * * * * * *)))
-(define (p618-rain latdeg londeg hs fghz eldeg taudeg p r001_)
-  (let* ((args (f64vector latdeg londeg hs fghz eldeg taudeg p r001_))
+(define (p618-rain latdeg londeg hs fghz eldeg taudeg p r001)
+  (let* ((args (f64vector latdeg londeg hs fghz eldeg taudeg p r001))
          (attp (__p618_rain
                 (pto args 0)
                 (pto args 1)
@@ -136,7 +136,7 @@
                 (pto args 5)
                 (pto args 6)
                 (pto args 7))))
-    (values attp (array-ref args 7))))
+    attp))
 
 (define __p840_Lred
   (pointer->procedure double (dynamic-func "p840_Lred" libprop) '(* * *)))
@@ -212,7 +212,7 @@
        (temp (p1510-temp latdeg londeg))
        ((values P rho T error) (p835-ref hs)))
   (+ (pk 'As (p618-scint fghz eldeg deff p% (p453-Nwet latdeg londeg 50)))
-     (pk 'Ar (p618-rain latdeg londeg hs fghz eldeg taudeg p% -1))
+     (pk 'Ar (p618-rain latdeg londeg hs fghz eldeg taudeg p% (p837-rainfall-rate latdeg londeg)))
      (pk 'Ac (p840-clouds fghz eldeg (p840-Lred latdeg londeg p%)))
      (pk 'Ag 0 ;; (p676-gas eldeg fghz P e temp Vt hs) ; e <- from P, Vt <- P836,
          )
@@ -224,7 +224,7 @@
 ; -----------------------------------------
 
 (p618-rain 51.5 -0.14 0.0691642239999998 14.25 31.0769430897284 0 1 26.48052)
-(p618-rain 51.5 -0.14 0.0691642239999998 14.25 31.0769430897284 0 1 -1)
+(p618-rain 51.5 -0.14 0.0691642239999998 14.25 31.0769430897284 0 1 (p837-rainfall-rate 51.5 -0.14))
 (p618-rain 22.9 -43.23 0 14.25 22.2783346840557 0 0.1 50.639304) ;  8.27164743807979
 
 

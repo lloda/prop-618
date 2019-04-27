@@ -147,7 +147,7 @@
       (format o "#ifdef __cplusplus\n")
       (format o "} // extern \"C\"\n")
       (format o "#endif\n\n")
-      (format o "// end of ~a\n\n" source))))
+      (format o "// end of ~a\n\n" (basename source)))))
 
 (match (program-arguments)
   ((me source dest . rest)

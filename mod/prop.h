@@ -1,5 +1,5 @@
 
-// prop.h generated from prop.f95 by protos.scm 2019-04-27T06:47:08
+// prop.h generated from prop.f95 by protos.scm 2019-04-28T14:30:27
 
 #pragma once
 
@@ -31,7 +31,7 @@ p838_coeffs
 
 double
 p618_rain
-(double const * lat, double const * lon, double const * hs, double const * freq, double const * eldeg, double const * taudeg, double const * p, double /* inout */ * r001);
+(double const * lat, double const * lon, double const * hs, double const * freq, double const * eldeg, double const * taudeg, double const * p, double const * r001);
 
 double
 p676_vapor_pressure
@@ -77,5 +77,5 @@ p836_V
 } // extern "C"
 #endif
 
-// end of /Users/danielo/Prog/prop-618/mod/prop.h
+// end of prop.h
 
