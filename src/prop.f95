@@ -1,8 +1,7 @@
 ! (prop.f95) -*- coding: utf-8; mode: f90-mode -*-
 ! propagation functions following ITU models
-! 2019-04
 
-! (c) lloda@sarc.name
+! (c) lloda@sarc.name 2019
 ! This library is free software; you can redistribute it and/or modify it under
 ! the terms of the GNU Lesser General Public License as published by the Free
 ! Software Foundation; either version 3 of the License, or (at your option) any
@@ -176,7 +175,7 @@ contains
   end function lookup_pxy
 
 
-  integer(C_INT32_T) function init() &
+  integer(C_INT32_T) function prop_init() &
        bind(c, name='prop_init') &
        result(ierror)
 
@@ -257,7 +256,7 @@ contains
        done = .true.
     end if
 
-  end function init
+  end function prop_init
 
 
   elemental real function deg2rad(xdeg) &

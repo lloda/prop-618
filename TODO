@@ -25,6 +25,7 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
   - [ ] lower elevation angle effects (<5°) P676, P619, P682
   - [ ] effects <10 GHz (ionospheric scintillation, Faraday rotation, etc.)
   - [ ] Earth to space interference (P619)
+  - [ ] frequency scaling procedure from P.618-13 2.2.1.3
   - [-] atmospheres.f95, P835 [1/7]
     + [X] reference
     + [ ] low latitude (annual)
@@ -33,14 +34,14 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
     + [ ] high latitude (summer)
     + [ ] high latitude (winter)
     + [ ] experimental atmospheres
-  - [X] other ITU datasets
-    + [X] heights from P.1511
-  - [ ] frequency scaling procedure from P.618-13 2.2.1.3
-  - [-] dress up
+  - [-] dress up [2/6]
     + [X] C headers
+    + [X] Python bindings
+    + [ ] Guile bindings (generated)
     + [ ] acceptable documentation
-    + [ ] Python bindings
     + [ ] Guile binding examples shouldn't use ploy/yak
     + [ ] installation procedure (for the data files)
+  - [X] other ITU datasets [1/1]
+    + [X] heights from P.1511
   - [ ] tests
     + [ ] look into pfUnit (https://sourceforge.net/projects/pfunit/files/)

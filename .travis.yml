@@ -1,7 +1,6 @@
 
-dist: trusty
+dist: xenial
 sudo: required
-language: fortran
 
 script:
  - (cd build && cmake .. && make && ctest --output-on-failure)
@@ -14,7 +13,8 @@ matrix:
          sources:
            - ubuntu-toolchain-r-test
          packages:
-           - gcc-8 gfortran-8
+           - gcc-8 gfortran-8 python3
      install:
      before_install:
        - export FC=gfortran-8
+       # - cmake --help-module-list # quite outdated usually :-/

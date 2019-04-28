@@ -1,10 +1,8 @@
 
-// prop.h generated from prop.f95 by protos.scm 2019-04-28T14:30:27
+// prop.h generated from prop.f95 by protos.scm
 
 #pragma once
-
 #include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

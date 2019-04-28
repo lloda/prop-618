@@ -1,8 +1,7 @@
 ! (atmospheres.f95) -*- coding: utf-8; mode: f90-mode -*-
 ! standard atmospheres for ITU propagation models
-! 2019-04
 
-! (c) lloda@sarc.name
+! (c) lloda@sarc.name 2019
 ! This library is free software; you can redistribute it and/or modify it under
 ! the terms of the GNU Lesser General Public License as published by the Free
 ! Software Foundation; either version 3 of the License, or (at your option) any
@@ -12,14 +11,22 @@ module atmospheres
   use iso_c_binding
 contains
 
+  ! Even if we don't do anything here, keep it as a convention for generic bindings.
+
+  integer(C_INT32_T) function atmospheres_init() &
+       bind(c, name='atmospheres_init') &
+       result(ierror)
+    ierror = 0
+  end function atmospheres_init
+
   function h_geop(h) result(hp)
     real :: hp, h
-    hp = (6356.766 * h)/(6356.766 + h)                            ! (1a)
+    hp = (6356.766 * h)/(6356.766 + h)    ! (1a)
   end function h_geop
 
   function h_geom(hp) result(h)
     real :: h, hp
-    h = (6356.766 * hp)/(6356.766 - hp)                           ! (1b)
+    h = (6356.766 * hp)/(6356.766 - hp)   ! (1b)
   end function h_geom
 
   subroutine p835_ref(h, P, rho, T, error) &
@@ -36,9 +43,10 @@ contains
     integer(C_INT32_T), intent(out):: error           ! error - 0 means none
 
     real, parameter, dimension(8) :: hh = (/ 0., 11., 20., 32., 47., 51., 71., 84.852 /)
-    real, parameter, dimension(8) :: Th = (/ 288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65, 186.946 /)
-    real, parameter, dimension(8) :: Ph = (/ 1013.25, 226.3226, 54.74980, 8.680422, 1.109106, 6.694167e-1, 3.956649e-2, &
-         3.734050254431527e-3 /)
+    real, parameter, dimension(8) :: Th = (/ 288.15, 216.65, 216.65, 228.65, 270.65, 270.65, &
+         214.65, 186.946 /)
+    real, parameter, dimension(8) :: Ph = (/ 1013.25, 226.3226, 54.74980, 8.680422, 1.109106, &
+         6.694167e-1, 3.956649e-2, 3.734050254431527e-3 /)
     real, parameter, dimension(7) :: kh = (log(Th(2:8))-log(Th(1:7))) / (log(Ph(2:8))-log(Ph(1:7)))
 
     ! check invalid input

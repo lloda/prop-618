@@ -1,8 +1,7 @@
 ! (test-0.f95) -*- coding: utf-8; mode: f90-mode -*-
 ! tests for prop.f95, atmospheres.f95
-! 2019-04
 
-! (c) lloda@sarc.name
+! (c) lloda@sarc.name 2019
 ! This library is free software; you can redistribute it and/or modify it under
 ! the terms of the GNU Lesser General Public License as published by the Free
 ! Software Foundation; either version 3 of the License, or (at your option) any
@@ -14,7 +13,9 @@ program test0
 
   integer :: n
 
-  n = init()
+  n = 0
+  n = n + prop_init()
+  n = n + atmospheres_init()
   n = n + test_p835()
   n = n + test_p839_rain_height()
   n = n + test_p838_coeffs()

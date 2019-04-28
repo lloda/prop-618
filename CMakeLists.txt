@@ -1,8 +1,7 @@
 # -*- mode: cmake; coding: utf-8 -*-
 # global CMakeLists.txt
-# 2019-04
 
-# (c) lloda@sarc.name
+# (c) lloda@sarc.name 2019
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License as published by the Free
 # Software Foundation; either version 3 of the License, or (at your option) any
@@ -43,25 +42,37 @@ add_library (atmospheres SHARED src/atmospheres.f95)
 
 # If Guile isn't available, will rely on committed bindings in mod/.
 
-include (config/FindGuile.cmake)
+find_package (Guile)
 if (GUILE_EXECUTABLE)
-  foreach (module atmospheres prop)
-    set (header "${CMAKE_SOURCE_DIR}/mod/${module}.h")
-    set (source "${CMAKE_SOURCE_DIR}/src/${module}.f95")
+  add_custom_target (bindings ALL)
+  foreach (libname atmospheres prop)
+    set (source "${CMAKE_SOURCE_DIR}/src/${libname}.f95")
     set (generator "${CMAKE_SOURCE_DIR}/config/protos.scm")
-    add_custom_command (
-      OUTPUT ${header} DEPENDS ${source} ${generator}
-      COMMAND ${GUILE_EXECUTABLE} -s ${generator} ${source} ${header}
-      COMMENT "Generating C header ${header}"
-      VERBATIM)
+    set (bindc "${CMAKE_SOURCE_DIR}/mod/${libname}.h")
+    set (bindpython "${CMAKE_SOURCE_DIR}/mod/${libname}.py")
+    set (bindguile "${CMAKE_SOURCE_DIR}/mod/${libname}.scm")
+    foreach (dest ${bindc} ${bindpython}) # bindguile
+      get_filename_component (dest_as_target ${dest} NAME)
+      add_custom_target (${dest_as_target}
+        DEPENDS ${source} ${generator}
+        COMMAND ${GUILE_EXECUTABLE} -s ${generator} ${libname} ${dest} ${source}
+        BYPRODUCTS ${dest}
+        COMMENT "Generating binding file ${dest}"
+        VERBATIM)
+      add_dependencies (bindings ${dest_as_target})
+    endforeach ()
   endforeach ()
 endif ()
+
+# Fortran tests. The functional tests are all here.
 
 foreach (target test-0)
   add_executable (${target} "test/${target}.f95")
   target_link_libraries (${target} prop atmospheres)
   add_test (${target} ${target})
 endforeach ()
+
+# C tests. These just test the headers.
 
 foreach (target test-1)
   add_executable (${target} "test/${target}.c"
@@ -71,7 +82,18 @@ foreach (target test-1)
   add_test (${target} ${target})
 endforeach ()
 
-# include(config/UseLATEX.cmake)
+# Python tests. These just test the bindings.
+
+find_package (Python3)
+if (Python3_FOUND)
+  foreach (target test-2)
+# FIXME Would like a way to make these depend on mod/*.py
+    add_test (${target} COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/${target}.py")
+    set_tests_properties (${target} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/mod")
+  endforeach ()
+endif ()
+
+# queries(config/UseLATEX.cmake)
 # set (LATEX_OUTPUT_PATH build)
 # add_latex_document (docs/prop-doc.tex
 #   INPUTS docs/paper-prologue.tex docs/margins.tex

@@ -1,13 +1,15 @@
 
-// atmospheres.h generated from atmospheres.f95 by protos.scm 2019-04-28T14:30:27
+// atmospheres.h generated from atmospheres.f95 by protos.scm
 
 #pragma once
-
 #include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int32_t
+atmospheres_init
+();
 
 void
 p835_ref

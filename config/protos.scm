@@ -1,8 +1,7 @@
 ;; (prop.scm) -*- coding: utf-8; mode: scheme-mode -*-
 ;; generate bindings from Fortran module.
-;; 2019-04
 
-;; (c) lloda@sarc.name
+;; (c) lloda@sarc.name 2019
 ;; This library is free software; you can redistribute it and/or modify it under
 ;; the terms of the GNU Lesser General Public License as published by the Free
 ;; Software Foundation; either version 3 of the License, or (at your option) any
@@ -113,44 +112,105 @@
 ; FIXME Generate Python bindings (cffi?)
 ; FIXME Generate Guile bindings, replacing prop.scm
 
-(define (write-bindings xpts tag source)
+(define (write-bindings-c xpts tag libname dest)
 
-  (define (type c-type)
-    (match c-type
+  (define (c-type type)
+    (match type
       ('void 'void)
       ('C_DOUBLE 'double)
       ('C_INT32_T 'int32_t)))
 
-  (call-with-output-file source
+  (call-with-output-file dest
     (lambda (o)
-      (format o "\n// ~a generated from ~a by protos.scm ~a\n\n"
-              (basename source) tag (date->string (current-date) "~5"))
-      (format o "#pragma once\n\n")
-      (format o "#include <stdint.h>\n\n")
-      (format o "#ifdef __cplusplus\n")
-      (format o "extern \"C\" {\n")
-      (format o "#endif\n\n")
-      (for-each (match-lambda
-                  ((c-type bind-name ((aname atype inout . x) ...))
-                   (format o "~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n\n"
-                           (type c-type)
-                           bind-name
-                           (zip (map type atype)
-                                (map (match-lambda
-                                       ('in 'const)
-                                       ('out "")
-                                       ('inout "/* inout */")
-                                       (x (throw 'bad-inout-tag x)))
-                                  inout)
-                                aname))))
-                xpts)
+      (format o "\n// ~a generated from ~a by protos.scm\n" (basename dest) tag)
+      (format o "
+#pragma once
+#include <stdint.h>
+#ifdef __cplusplus
+extern \"C\" {
+#endif
+\n")
+      (for-each
+       (match-lambda
+         ((type bind-name ((aname atype inout . x) ...))
+          (format o "~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n\n"
+                  (c-type type)
+                  bind-name
+                  (zip (map c-type atype)
+                       (map (match-lambda
+                              ('in 'const)
+                              ('out "")
+                              ('inout "/* inout */")
+                              (x (throw 'bad-inout-tag x)))
+                         inout)
+                       aname))))
+       xpts)
       (format o "#ifdef __cplusplus\n")
       (format o "} // extern \"C\"\n")
       (format o "#endif\n\n")
-      (format o "// end of ~a\n\n" (basename source)))))
+      (format o "// end of ~a\n\n" (basename dest)))))
+
+(define (write-bindings-python xpts tag libname dest)
+
+  (define (c-type type)
+    (match type
+      ('void 'void)
+      ('C_DOUBLE 'c_double)
+      ('C_INT32_T 'c_int32)))
+
+  (call-with-output-file dest
+    (lambda (o)
+      (format o "\n# ~a generated from ~a by protos.scm\n" (basename dest) tag)
+      (format o "
+import ctypes
+from ctypes import c_double, c_int32, POINTER
+from ctypes.util import find_library
+liba = ctypes.cdll.LoadLibrary(find_library('~a'))
+liba.~a_init()
+\n"
+              libname libname)
+
+      (for-each
+       (match-lambda
+         ((type bind-name ((aname atype inout . x) ...))
+
+          (format o "def ~a(~{~a~^, ~}):\n"
+                  bind-name
+                  (filter-map
+                      (lambda (aname inout)
+                        (match inout
+                          ((or 'in 'inout) aname)
+                          (x #f)))
+                    aname inout))
+          (for-each
+           (lambda (aname atype inout)
+             (format o "    p_~a = POINTER(~a)(~a(~a))\n"
+                     aname (c-type atype) (c-type atype)
+                     (match inout
+                       ((or 'in 'inout) aname)
+                       (x "0"))))
+           aname atype inout)
+
+          (format o "    liba.~a(~{p_~a~^, ~})\n"
+                  bind-name aname)
+
+          (format o "    return ~{p_~a.contents.value~^, \\\n           ~}\n\n"
+                  (filter-map
+                      (lambda (aname inout)
+                        (match inout
+                          ((or 'out 'inout) aname)
+                          (x #f)))
+                    aname inout))))
+       xpts)
+
+      (format o "# end of ~a\n\n" (basename dest)))))
 
 (match (program-arguments)
-  ((me source dest . rest)
-   (write-bindings (find-foreign-protos source)
-                   (basename source) dest))
+  ((me libname dest source)
+   ((cond ((string-suffix? ".h" dest)
+           write-bindings-c)
+          ((string-suffix? ".py" dest)
+           write-bindings-python)
+          (else (throw 'cannot-write-bindings-to dest)))
+    (find-foreign-protos source) (basename source) libname dest))
   (x (throw 'expected-arguments-1-source-2-dest)))
