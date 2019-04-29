@@ -13,6 +13,10 @@
 # GUILE_EXTENSION_DIR    - extension dir
 # GUILE_ROOT_DIR         - prefix dir
 
+# (lloda) grabbed from https://github.com/stevengj/nlopt/blob/master/cmake/FindGuile.cmake
+# added 3.0 to version list
+# $GUILE in environment overrides the other searches.
+
 if (NOT "$ENV{GUILE}" STREQUAL "")
   set(GUILE "$ENV{GUILE}" CACHE INTERNAL "Copied from environment variable")
   get_filename_component(GUILE_ROOT "$ENV{GUILE}" DIRECTORY)
