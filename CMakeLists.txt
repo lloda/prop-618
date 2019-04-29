@@ -88,7 +88,7 @@ find_package (Python3)
 if (Python3_FOUND)
   foreach (target test-2)
 # FIXME Would like a way to make these depend on mod/*.py
-    add_test (${target} COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/${target}.py")
+    add_test (${target} ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/${target}.py")
     set_tests_properties (${target} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/mod")
   endforeach ()
 endif ()

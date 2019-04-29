@@ -163,7 +163,7 @@ extern \"C\" {
       (format o "\n# ~a generated from ~a by protos.scm\n" (basename dest) tag)
       (format o "
 import ctypes
-from ctypes import c_double, c_int32, POINTER
+from ctypes import c_double, c_int32, POINTER, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('~a'))
 liba.~a_init()
@@ -184,17 +184,17 @@ liba.~a_init()
                     aname inout))
           (for-each
            (lambda (aname atype inout)
-             (format o "    p_~a = POINTER(~a)(~a(~a))\n"
-                     aname (c-type atype) (c-type atype)
+             (format o "    p_~a = ~a(~a)\n"
+                     aname (c-type atype)
                      (match inout
                        ((or 'in 'inout) aname)
                        (x "0"))))
            aname atype inout)
 
-          (format o "    liba.~a(~{p_~a~^, ~})\n"
+          (format o "    liba.~a(~{byref(p_~a)~^, ~})\n"
                   bind-name aname)
 
-          (format o "    return ~{p_~a.contents.value~^, \\\n           ~}\n\n"
+          (format o "    return ~{p_~a.value~^, \\\n           ~}\n\n"
                   (filter-map
                       (lambda (aname inout)
                         (match inout
