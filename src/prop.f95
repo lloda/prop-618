@@ -374,7 +374,7 @@ contains
   ! Specific attenuation exceeded p*100% on an average year, for rain and clouds in Earth to space links.
   ! Equation & table numbers from ITU-R P.618-13 except where indicated.
 
-  real(C_DOUBLE) function p618_rain(lat, lon, hs, freq, eldeg, taudeg, p, r001) &
+  real(C_DOUBLE) function p618_rain(lat, lon, hs, freq, eldeg, taudeg, ppc, r001) &
        bind(c, name='p618_rain') &
        result(att)
 
@@ -384,13 +384,13 @@ contains
     real(C_DOUBLE), intent(in) :: lat      ! latitude (°)
     real(C_DOUBLE), intent(in) :: lon      ! longitude (°)
     real(C_DOUBLE), intent(in) :: eldeg    ! elevation angle (°)
-    real(C_DOUBLE), intent(in) :: p        ! probability (%)
+    real(C_DOUBLE), intent(in) :: ppc      ! probability (%)
     real(C_DOUBLE), intent(in) :: r001     ! point rainfall rate for 0.01% of average year (mm/h)
 
     real :: hr, ls, lg, lr, gr, el, horiz001, nu001, le, beta, att001
     real, parameter :: Re = 8500           ! effective Earth radius (8500 km)
 
-    if (.not. ((.001 <= p) .and. (p <= 5))) then
+    if (.not. ((.001 <= ppc) .and. (ppc <= 5))) then
        stop 100
     end if
 
@@ -458,17 +458,17 @@ contains
 
     att001 = gr * le
 
-    ! step 10 - predicted attenuation for p (%) (0.001 ≤ p ≤ 5)
+    ! step 10 - predicted attenuation for ppc (%) (0.001 ≤ ppc ≤ 5)
 
     block
-      if ((p >= 1.) .or. (abs(lat) >= 36.)) then
+      if ((ppc >= 1.) .or. (abs(lat) >= 36.)) then
          beta = 0.
-      else if ((p < 1.) .and. (abs(lat) < 36.) .and. (eldeg >= 25.)) then
+      else if ((ppc < 1.) .and. (abs(lat) < 36.) .and. (eldeg >= 25.)) then
          beta = -.005*(abs(lat)-36.)
       else
          beta = -.005*(abs(lat)-36.) + 1.8 - 4.25*sin(el)
       end if
-      att = att001 * ((p/.01) ** (-0.655 -0.033*log(p) +0.045*log(att001) +beta*(1-p)*sin(el)))
+      att = att001 * ((ppc/.01) ** (-0.655 -0.033*log(ppc) +0.045*log(att001) +beta*(1-ppc)*sin(el)))
     end block
 
     ! ! debug intermediate values
@@ -827,33 +827,33 @@ contains
   ! of 273.15 K, Lred (kg/m²), from the dataset in R-REC-P.840-7-Maps.zip. As described
   ! in ITU-R P.840-7 §3.1, lat:+90..-90 and lon:0..360.
 
-  real(C_DOUBLE) function p840_Lred(lat, lon, p) &
+  real(C_DOUBLE) function p840_Lred(lat, lon, ppc) &
        bind(c, name='p840_Lred') &
        result(Lred)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
     real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
-    real(C_DOUBLE), intent(in) :: p    ! probability (%)
+    real(C_DOUBLE), intent(in) :: ppc  ! probability (%)
 
-    Lred = lookup_pxy(p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840Lred)
+    Lred = lookup_pxy(ppc, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, p840p, p840Lred)
 
   end function p840_Lred
 
 
   ! Annual value of the wet term of the surface refractivity Nwet (ppm) exceeded
-  ! for p(%) of an average year, as described in ITU-R P.453-13 §2.2, from the
+  ! for ppc (%) of an average year, as described in ITU-R P.453-13 §2.2, from the
   ! dataset P.453_NWET_Maps_Annual.zip in R-REC-P.453-13-201712-I!!ZIP-E.zip.
   ! As described there, lat:-90...90 and lon:-180..+180.
 
-  real(C_DOUBLE) function p453_Nwet(lat, lon, p) &
+  real(C_DOUBLE) function p453_Nwet(lat, lon, ppc) &
        bind(c, name='p453_Nwet') &
        result(Nwet)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
     real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
-    real(C_DOUBLE), intent(in) :: p    ! probability (%)
+    real(C_DOUBLE), intent(in) :: ppc  ! probability (%)
 
-    Nwet = lookup_pxy(p, max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p840p, p453Nwet)
+    Nwet = lookup_pxy(ppc, max(0., min(180., lat+90.))/0.75, modulo(lon+180., 360.)/0.75, p840p, p453Nwet)
 
   end function p453_Nwet
 
@@ -905,14 +905,14 @@ contains
   ! Attenuation due to scintillation, after ITU-R P.618-13 §2.4.1
   ! Equation numbers from ITU-R P.618-13 except where indicated.
 
-  real(C_DOUBLE) function p618_scint(freq, eldeg, Deff, p, Nwet) &
+  real(C_DOUBLE) function p618_scint(freq, eldeg, Deff, ppc, Nwet) &
        bind(c, name='p618_scint') &
        result(As)
 
     real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
     real(C_DOUBLE), intent(in) :: eldeg     ! elevation (deg)
     real(C_DOUBLE), intent(in) :: Deff      ! effective antenna diameter (m) ~ D√η
-    real(C_DOUBLE), intent(in) :: p         ! probability (%)
+    real(C_DOUBLE), intent(in) :: ppc       ! probability (%)
     real(C_DOUBLE), intent(in) :: Nwet      ! Median value of wet term of surface refractivity (ppm), cf ITU-R P.453-13 §2.2
 
     real, parameter :: hL = 1000            ! (m) (41)
@@ -933,7 +933,7 @@ contains
     x = 1.22 * (Deff**2) * (freq/L)                ! (43a)
     g = sqrt(3.86 * ((x**2 + 1)**(11./12.)) * sin((11./6.) * atan(1./x)) - 7.08*(x**(5./6.))) ! (43)
     sigma = sigmaref * (freq**(7./12.)) * g / (sinel**1.2) ! (44)
-    As = sigma * (-0.061 * (log10(p)**3) + 0.072 * (log10(p)**2) - 1.71*(log10(p)) + 3.0) ! (46)
+    As = sigma * (-0.061 * (log10(ppc)**3) + 0.072 * (log10(ppc)**2) - 1.71*(log10(ppc)) + 3.0) ! (46)
 
     ! ! debug intermediate values
     ! write(*, *) 'σref', sigmaref
@@ -994,13 +994,13 @@ contains
 
   ! Total vaper vapor content, after ITU-R P.836-6 Annex 2.
 
-  real(C_DOUBLE) function p836_V(lat, lon, p, h) &
+  real(C_DOUBLE) function p836_V(lat, lon, ppc, h) &
        bind(c, name='p836_V') &
        result(Vt)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
     real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
-    real(C_DOUBLE), intent(in) :: p    ! probability (%)
+    real(C_DOUBLE), intent(in) :: ppc  ! probability (%)
     real(C_DOUBLE), intent(in) :: h    ! altitude (km)
 
     real :: dp, dx, dy
@@ -1011,7 +1011,7 @@ contains
     real, dimension(2, 2, 2) :: hi
 
     call lookup_pxy_find(p840p, size(p836V, 2), size(p836V, 3), &
-         p, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, &
+         ppc, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, &
          ip, ix, iy, &
          dp, dx, dy)
 

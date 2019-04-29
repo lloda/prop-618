@@ -29,7 +29,7 @@ p838_coeffs
 
 double
 p618_rain
-(double const * lat, double const * lon, double const * hs, double const * freq, double const * eldeg, double const * taudeg, double const * p, double const * r001);
+(double const * lat, double const * lon, double const * hs, double const * freq, double const * eldeg, double const * taudeg, double const * ppc, double const * r001);
 
 double
 p676_vapor_pressure
@@ -49,11 +49,11 @@ p676_gas
 
 double
 p840_Lred
-(double const * lat, double const * lon, double const * p);
+(double const * lat, double const * lon, double const * ppc);
 
 double
 p453_Nwet
-(double const * lat, double const * lon, double const * p);
+(double const * lat, double const * lon, double const * ppc);
 
 double
 p840_clouds
@@ -61,7 +61,7 @@ p840_clouds
 
 double
 p618_scint
-(double const * freq, double const * eldeg, double const * Deff, double const * p, double const * Nwet);
+(double const * freq, double const * eldeg, double const * Deff, double const * ppc, double const * Nwet);
 
 double
 p1511_topoh
@@ -69,7 +69,7 @@ p1511_topoh
 
 double
 p836_V
-(double const * lat, double const * lon, double const * p, double const * h);
+(double const * lat, double const * lon, double const * ppc, double const * h);
 
 #ifdef __cplusplus
 } // extern "C"

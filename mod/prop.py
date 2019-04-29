@@ -41,16 +41,16 @@ def p838_coeffs(freq):
            p_kv.contents.value, \
            p_av.contents.value
 
-def p618_rain(lat, lon, hs, freq, eldeg, taudeg, p, r001):
+def p618_rain(lat, lon, hs, freq, eldeg, taudeg, ppc, r001):
     p_lat = POINTER(c_double)(c_double(lat))
     p_lon = POINTER(c_double)(c_double(lon))
     p_hs = POINTER(c_double)(c_double(hs))
     p_freq = POINTER(c_double)(c_double(freq))
     p_eldeg = POINTER(c_double)(c_double(eldeg))
     p_taudeg = POINTER(c_double)(c_double(taudeg))
-    p_p = POINTER(c_double)(c_double(p))
+    p_ppc = POINTER(c_double)(c_double(ppc))
     p_r001 = POINTER(c_double)(c_double(r001))
-    liba.p618_rain(p_lat, p_lon, p_hs, p_freq, p_eldeg, p_taudeg, p_p, p_r001)
+    liba.p618_rain(p_lat, p_lon, p_hs, p_freq, p_eldeg, p_taudeg, p_ppc, p_r001)
     return 
 
 def p676_vapor_pressure(rho, temp):
@@ -92,18 +92,18 @@ def p676_gas(eldeg, freq, P, e, temp, Vt, hs):
     liba.p676_gas(p_eldeg, p_freq, p_P, p_e, p_temp, p_Vt, p_hs)
     return 
 
-def p840_Lred(lat, lon, p):
+def p840_Lred(lat, lon, ppc):
     p_lat = POINTER(c_double)(c_double(lat))
     p_lon = POINTER(c_double)(c_double(lon))
-    p_p = POINTER(c_double)(c_double(p))
-    liba.p840_Lred(p_lat, p_lon, p_p)
+    p_ppc = POINTER(c_double)(c_double(ppc))
+    liba.p840_Lred(p_lat, p_lon, p_ppc)
     return 
 
-def p453_Nwet(lat, lon, p):
+def p453_Nwet(lat, lon, ppc):
     p_lat = POINTER(c_double)(c_double(lat))
     p_lon = POINTER(c_double)(c_double(lon))
-    p_p = POINTER(c_double)(c_double(p))
-    liba.p453_Nwet(p_lat, p_lon, p_p)
+    p_ppc = POINTER(c_double)(c_double(ppc))
+    liba.p453_Nwet(p_lat, p_lon, p_ppc)
     return 
 
 def p840_clouds(freq, eldeg, Lred):
@@ -113,13 +113,13 @@ def p840_clouds(freq, eldeg, Lred):
     liba.p840_clouds(p_freq, p_eldeg, p_Lred)
     return 
 
-def p618_scint(freq, eldeg, Deff, p, Nwet):
+def p618_scint(freq, eldeg, Deff, ppc, Nwet):
     p_freq = POINTER(c_double)(c_double(freq))
     p_eldeg = POINTER(c_double)(c_double(eldeg))
     p_Deff = POINTER(c_double)(c_double(Deff))
-    p_p = POINTER(c_double)(c_double(p))
+    p_ppc = POINTER(c_double)(c_double(ppc))
     p_Nwet = POINTER(c_double)(c_double(Nwet))
-    liba.p618_scint(p_freq, p_eldeg, p_Deff, p_p, p_Nwet)
+    liba.p618_scint(p_freq, p_eldeg, p_Deff, p_ppc, p_Nwet)
     return 
 
 def p1511_topoh(lat, lon):
@@ -128,12 +128,12 @@ def p1511_topoh(lat, lon):
     liba.p1511_topoh(p_lat, p_lon)
     return 
 
-def p836_V(lat, lon, p, h):
+def p836_V(lat, lon, ppc, h):
     p_lat = POINTER(c_double)(c_double(lat))
     p_lon = POINTER(c_double)(c_double(lon))
-    p_p = POINTER(c_double)(c_double(p))
+    p_ppc = POINTER(c_double)(c_double(ppc))
     p_h = POINTER(c_double)(c_double(h))
-    liba.p836_V(p_lat, p_lon, p_p, p_h)
+    liba.p836_V(p_lat, p_lon, p_ppc, p_h)
     return 
 
 # end of prop.py
