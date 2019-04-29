@@ -7,27 +7,31 @@ from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('prop'))
 liba.prop_init()
 
-def prop_init():
-    liba.prop_init()
-    return 
+def init():
+    liba.prop_init.restype = c_int32
+    result_ = liba.prop_init()
+    return result_
 
 def p839_rain_height(lat, lon):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
-    liba.p839_rain_height(byref(p_lat), byref(p_lon))
-    return 
+    liba.p839_rain_height.restype = c_double
+    result_ = liba.p839_rain_height(byref(p_lat), byref(p_lon))
+    return result_
 
 def p837_rainfall_rate(lat, lon):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
-    liba.p837_rainfall_rate(byref(p_lat), byref(p_lon))
-    return 
+    liba.p837_rainfall_rate.restype = c_double
+    result_ = liba.p837_rainfall_rate(byref(p_lat), byref(p_lon))
+    return result_
 
 def p1510_temp(lat, lon):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
-    liba.p1510_temp(byref(p_lat), byref(p_lon))
-    return 
+    liba.p1510_temp.restype = c_double
+    result_ = liba.p1510_temp(byref(p_lat), byref(p_lon))
+    return result_
 
 def p838_coeffs(freq):
     p_freq = c_double(freq)
@@ -50,14 +54,16 @@ def p618_rain(lat, lon, hs, freq, eldeg, taudeg, ppc, r001):
     p_taudeg = c_double(taudeg)
     p_ppc = c_double(ppc)
     p_r001 = c_double(r001)
-    liba.p618_rain(byref(p_lat), byref(p_lon), byref(p_hs), byref(p_freq), byref(p_eldeg), byref(p_taudeg), byref(p_ppc), byref(p_r001))
-    return 
+    liba.p618_rain.restype = c_double
+    result_ = liba.p618_rain(byref(p_lat), byref(p_lon), byref(p_hs), byref(p_freq), byref(p_eldeg), byref(p_taudeg), byref(p_ppc), byref(p_r001))
+    return result_
 
 def p676_vapor_pressure(rho, temp):
     p_rho = c_double(rho)
     p_temp = c_double(temp)
-    liba.p676_vapor_pressure(byref(p_rho), byref(p_temp))
-    return 
+    liba.p676_vapor_pressure.restype = c_double
+    result_ = liba.p676_vapor_pressure(byref(p_rho), byref(p_temp))
+    return result_
 
 def p676_gas_specific(scut, f, P, e, temp):
     p_scut = c_int32(scut)
@@ -89,29 +95,33 @@ def p676_gas(eldeg, freq, P, e, temp, Vt, hs):
     p_temp = c_double(temp)
     p_Vt = c_double(Vt)
     p_hs = c_double(hs)
-    liba.p676_gas(byref(p_eldeg), byref(p_freq), byref(p_P), byref(p_e), byref(p_temp), byref(p_Vt), byref(p_hs))
-    return 
+    liba.p676_gas.restype = c_double
+    result_ = liba.p676_gas(byref(p_eldeg), byref(p_freq), byref(p_P), byref(p_e), byref(p_temp), byref(p_Vt), byref(p_hs))
+    return result_
 
 def p840_Lred(lat, lon, ppc):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
     p_ppc = c_double(ppc)
-    liba.p840_Lred(byref(p_lat), byref(p_lon), byref(p_ppc))
-    return 
+    liba.p840_Lred.restype = c_double
+    result_ = liba.p840_Lred(byref(p_lat), byref(p_lon), byref(p_ppc))
+    return result_
 
 def p453_Nwet(lat, lon, ppc):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
     p_ppc = c_double(ppc)
-    liba.p453_Nwet(byref(p_lat), byref(p_lon), byref(p_ppc))
-    return 
+    liba.p453_Nwet.restype = c_double
+    result_ = liba.p453_Nwet(byref(p_lat), byref(p_lon), byref(p_ppc))
+    return result_
 
 def p840_clouds(freq, eldeg, Lred):
     p_freq = c_double(freq)
     p_eldeg = c_double(eldeg)
     p_Lred = c_double(Lred)
-    liba.p840_clouds(byref(p_freq), byref(p_eldeg), byref(p_Lred))
-    return 
+    liba.p840_clouds.restype = c_double
+    result_ = liba.p840_clouds(byref(p_freq), byref(p_eldeg), byref(p_Lred))
+    return result_
 
 def p618_scint(freq, eldeg, Deff, ppc, Nwet):
     p_freq = c_double(freq)
@@ -119,22 +129,25 @@ def p618_scint(freq, eldeg, Deff, ppc, Nwet):
     p_Deff = c_double(Deff)
     p_ppc = c_double(ppc)
     p_Nwet = c_double(Nwet)
-    liba.p618_scint(byref(p_freq), byref(p_eldeg), byref(p_Deff), byref(p_ppc), byref(p_Nwet))
-    return 
+    liba.p618_scint.restype = c_double
+    result_ = liba.p618_scint(byref(p_freq), byref(p_eldeg), byref(p_Deff), byref(p_ppc), byref(p_Nwet))
+    return result_
 
 def p1511_topoh(lat, lon):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
-    liba.p1511_topoh(byref(p_lat), byref(p_lon))
-    return 
+    liba.p1511_topoh.restype = c_double
+    result_ = liba.p1511_topoh(byref(p_lat), byref(p_lon))
+    return result_
 
 def p836_V(lat, lon, ppc, h):
     p_lat = c_double(lat)
     p_lon = c_double(lon)
     p_ppc = c_double(ppc)
     p_h = c_double(h)
-    liba.p836_V(byref(p_lat), byref(p_lon), byref(p_ppc), byref(p_h))
-    return 
+    liba.p836_V.restype = c_double
+    result_ = liba.p836_V(byref(p_lat), byref(p_lon), byref(p_ppc), byref(p_h))
+    return result_
 
 # end of prop.py
 

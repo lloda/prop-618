@@ -154,7 +154,7 @@ extern \"C\" {
 
   (define (c-type type)
     (match type
-      ('void 'void)
+      ('void 'None)
       ('C_DOUBLE 'c_double)
       ('C_INT32_T 'c_int32)))
 
@@ -172,10 +172,13 @@ liba.~a_init()
 
       (for-each
        (match-lambda
-         ((type bind-name ((aname atype inout . x) ...))
+         ((rtype bind-name ((aname atype inout . x) ...))
 
           (format o "def ~a(~{~a~^, ~}):\n"
-                  bind-name
+; special case for module init function
+                  (if (string=? bind-name (format #f "~a_init" libname))
+                    "init"
+                    bind-name)
                   (filter-map
                       (lambda (aname inout)
                         (match inout
@@ -191,16 +194,26 @@ liba.~a_init()
                        (x "0"))))
            aname atype inout)
 
-          (format o "    liba.~a(~{byref(p_~a)~^, ~})\n"
-                  bind-name aname)
-
-          (format o "    return ~{p_~a.value~^, \\\n           ~}\n\n"
-                  (filter-map
-                      (lambda (aname inout)
-                        (match inout
-                          ((or 'out 'inout) aname)
-                          (x #f)))
-                    aname inout))))
+          (let* ((rtype (c-type rtype))
+                 (inreturn
+                  (match rtype
+                    ('None
+                     (format o "    liba.~a(~{byref(p_~a)~^, ~})\n"
+                             bind-name aname)
+                     '())
+                    (rtype
+                     (format o "    liba.~a.restype = ~a\n" bind-name rtype)
+                     (format o "    result_ = liba.~a(~{byref(p_~a)~^, ~})\n"
+                             bind-name aname)
+                     '(result_)))))
+            (format o "    return ~{~a~^, \\\n           ~}\n\n"
+                    (append inreturn
+                            (filter-map
+                                (lambda (aname inout)
+                                  (match inout
+                                    ((or 'out 'inout) (format #f "p_~a.value" aname))
+                                    (x #f)))
+                              aname inout))))))
        xpts)
 
       (format o "# end of ~a\n\n" (basename dest)))))

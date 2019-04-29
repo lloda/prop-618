@@ -7,9 +7,10 @@ from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('atmospheres'))
 liba.atmospheres_init()
 
-def atmospheres_init():
-    liba.atmospheres_init()
-    return 
+def init():
+    liba.atmospheres_init.restype = c_int32
+    result_ = liba.atmospheres_init()
+    return result_
 
 def p835_ref(h):
     p_h = c_double(h)
