@@ -1,4 +1,4 @@
-// (test-1.c) -*- coding: utf-8; mode: c-mode -*-
+// (test-1.c) -*- coding: utf-8; mode: c -*-
 // test the generated C headers.
 
 // (c) lloda@sarc.name 2019

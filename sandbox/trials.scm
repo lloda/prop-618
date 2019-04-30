@@ -1,4 +1,4 @@
-;; (prop.scm) -*- coding: utf-8; mode: scheme-mode -*-
+;; (prop.scm) -*- coding: utf-8; mode: scheme -*-
 ;; sandbox for Guile bindings
 
 ;; (c) lloda@sarc.name 2019
@@ -7,190 +7,21 @@
 ;; Software Foundation; either version 3 of the License, or (at your option) any
 ;; later version.
 
-(import (srfi :1)  (srfi :8) (srfi :26) (srfi :71)
-        (system foreign) (ice-9 match) (rnrs bytevectors))
+(import (srfi :1)  (srfi :8) (srfi :26) (srfi :71))
 
-(define (pto a i)
-  (bytevector->pointer a (* i (sizeof (match (array-type a)
-                                        ('f64 double)
-                                        ('s32 int32))))))
 
 
 ; -----------------------------------------
 ; bindings
 ; -----------------------------------------
 
-(define libatmospheres (dynamic-link "../build/libatmospheres"))
-(define libprop (dynamic-link "../build/libprop"))
-
-(define __prop_init
-  (pointer->procedure int32 (dynamic-func "prop_init" libprop) '()))
-(define (prop-init)
-  (__prop_init))
-
-(define __p676_vapor_pressure
-  (pointer->procedure double (dynamic-func "p676_vapor_pressure" libprop) '(* *)))
-(define (p676-vapor-pressure rho T)
-  (let ((args (f64vector rho T)))
-    (__p676_vapor_pressure
-     (pto args 0)
-     (pto args 1))))
-
-(define __p676_gas_specific
-  (pointer->procedure void (dynamic-func "p676_gas_specific" libprop) '(* * * * * * *)))
-(define* (p676-gas-specific fghz p e T #:key short?)
-  (let* ((short (s32vector (if short? 1 0)))
-         (args (f64vector fghz p e T 0 0)))
-    (__p676_gas_specific
-     (pto short 0)
-     (pto args 0)
-     (pto args 1)
-     (pto args 2)
-     (pto args 3)
-     (pto args 4)
-     (pto args 5))
-    (values (array-ref args 4) (array-ref args 5))))
-
-(define __p676_gas
-  (pointer->procedure void (dynamic-func "p676_gas" libprop) '(* * * * * * *)))
-(define* (p676-gas eldeg fghz p e temp Vt hs)
-  (let ((args (f64vector eldeg fghz p e temp Vt hs)))
-    (__p676_gas_specific
-     (pto args 0)
-     (pto args 1)
-     (pto args 2)
-     (pto args 3)
-     (pto args 4)
-     (pto args 5)
-     (pto args 6))))
-
-(define __p835_ref
-  (pointer->procedure void (dynamic-func "p835_ref" libatmospheres) '(* * * * *)))
-(define (p835-ref h)
-  (let* ((args (f64vector h 0 0 0))
-         (ec (make-s32vector 1 0)))
-    (__p835_ref
-     (pto args 0)
-     (pto args 1)
-     (pto args 2)
-     (pto args 3)
-     (bytevector->pointer ec))
-    (values (f64vector-ref args 1) (f64vector-ref args 2) (f64vector-ref args 3) (s32vector-ref ec 0))))
-
-(define __p839_rain_height
-  (pointer->procedure double (dynamic-func "p839_rain_height" libprop) '(* *)))
-(define (p839-rain-height lat lon)
-  (let ((args (f64vector lat lon)))
-    (__p839_rain_height
-     (pto args 0)
-     (pto args 1))))
-
-(define __p837_rainfall_rate
-  (pointer->procedure double (dynamic-func "p837_rainfall_rate" libprop) '(* *)))
-(define (p837-rainfall-rate lat lon)
-  (let ((args (f64vector lat lon)))
-    (__p837_rainfall_rate
-     (pto args 0)
-     (pto args 1))))
-
-(define __p1510_temp
-  (pointer->procedure double (dynamic-func "p1510_temp" libprop) '(* *)))
-(define (p1510-temp lat lon)
-  (let ((args (f64vector lat lon)))
-    (__p1510_temp
-     (pto args 0)
-     (pto args 1))))
-
-(define __p1511_topoh
-  (pointer->procedure double (dynamic-func "p1511_topoh" libprop) '(* *)))
-(define (p1511-topoh lat lon)
-  (let ((args (f64vector lat lon)))
-    (__p1511_topoh
-     (pto args 0)
-     (pto args 1))))
-
-(define __p838_coeffs
-  (pointer->procedure void (dynamic-func "p838_coeffs" libprop) '(* * * * *)))
-(define (p838-coeffs fghz)
-  (let ((fghz (make-f64vector 1 fghz))
-        (args (make-f64vector 4 0)))
-    (__p838_coeffs
-     (bytevector->pointer fghz)
-     (pto args 0)
-     (pto args 1)
-     (pto args 2)
-     (pto args 3))
-    args))
-
-(define __p618_rain
-  (pointer->procedure double (dynamic-func "p618_rain" libprop) '(* * * * * * * *)))
-(define (p618-rain latdeg londeg hs fghz eldeg taudeg p r001)
-  (let* ((args (f64vector latdeg londeg hs fghz eldeg taudeg p r001))
-         (attp (__p618_rain
-                (pto args 0)
-                (pto args 1)
-                (pto args 2)
-                (pto args 3)
-                (pto args 4)
-                (pto args 5)
-                (pto args 6)
-                (pto args 7))))
-    attp))
-
-(define __p840_Lred
-  (pointer->procedure double (dynamic-func "p840_Lred" libprop) '(* * *)))
-(define (p840-Lred latdeg londeg p)
-  (let ((args (f64vector latdeg londeg p)))
-    (__p840_Lred
-               (pto args 0)
-               (pto args 1)
-               (pto args 2))))
-
-(define __p840_clouds
-  (pointer->procedure double (dynamic-func "p840_clouds" libprop) '(* * *)))
-(define (p840-clouds fghz eldeg Lred)
-  (let ((args (f64vector fghz eldeg Lred)))
-    (__p840_clouds
-               (pto args 0)
-               (pto args 1)
-               (pto args 2))))
-
-(define __p453_Nwet
-  (pointer->procedure double (dynamic-func "p453_Nwet" libprop) '(* * *)))
-(define (p453-Nwet latdeg londeg p)
-  (let ((args (f64vector latdeg londeg p)))
-    (__p453_Nwet
-               (pto args 0)
-               (pto args 1)
-               (pto args 2))))
-
-(define __p618_scint
-  (pointer->procedure double (dynamic-func "p618_scint" libprop) '(* * * * *)))
-(define (p618-scint fghz eldeg Deff p Nwet)
-  (let ((args (f64vector fghz eldeg Deff p Nwet)))
-    (__p618_scint
-               (pto args 0)
-               (pto args 1)
-               (pto args 2)
-               (pto args 3)
-               (pto args 4))))
-
-(define __p836_V
-  (pointer->procedure double (dynamic-func "p836_V" libprop) '(* * * *)))
-(define (p836-V latdeg londeg p h)
-  (let ((args (f64vector latdeg londeg p h)))
-    (__p836_V
-     (pto args 0)
-     (pto args 1)
-     (pto args 2)
-     (pto args 3))))
+(import (prop) (atmospheres)) ; need to fix LD_LIBRARY_PATH && GUILEPATH until install
 
 
 ; -----------------------------------------
 ; spot checks
 ; -----------------------------------------
 
-(prop-init)
 (p839-rain-height 0 0)
 (p837-rainfall-rate 0 0)
 (p1510-temp 51.5 -0.14) ; 283.61087556
@@ -277,7 +108,7 @@
 (let* ((fghz (linspace. 1 350 10000))
        (T (+ 273.15 15))
        (e (p676-vapor-pressure 7.5 T))
-       (gas (ply (lambda (fghz) (call-with-values (lambda () (p676-gas-specific fghz 1013.25 e T)) vector)) fghz))
+       (gas (ply (lambda (fghz) (call-with-values (lambda () (p676-gas-specific 0 fghz 1013.25 e T)) vector)) fghz))
        (loglinesx (array->list (ply log10 (ravel (out * #(2 3 4 5 6 7 8 9) #(1e0 1e1 1e2 1e3))))))
        (loglinesy (array->list (ply log10 (ravel (out * #(2 3 4 5 6 7 8 9) #(1e-5 1e-4 1e-3 1e-2 1e-1 1e0 1e1)))))))
   ((yak-graph "p676-11-fig5.pdf" #:line-width .007 #:width 1000 #:height 1300 #:subgrid 'lines #:scale 1.4 #:place-legend '(1 0)

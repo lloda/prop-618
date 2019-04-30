@@ -1,4 +1,4 @@
-# (test-2.py) -*- coding: utf-8; mode: python-mode -*-
+# (test-2.py) -*- coding: utf-8; mode: python -*-
 # test the generated Python bindings.
 
 # (c) lloda@sarc.name 2019

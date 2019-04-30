@@ -1,4 +1,4 @@
-;; (prop.scm) -*- coding: utf-8; mode: scheme-mode -*-
+;; (prop.scm) -*- coding: utf-8; mode: scheme -*-
 ;; generate bindings from Fortran module.
 
 ;; (c) lloda@sarc.name 2019
@@ -12,7 +12,8 @@
 ;; declarations are not missed and can be fixed.
 
 (import (srfi :1) (srfi :2) (srfi :8) (srfi :26) (srfi :71) (srfi :19)
-        (ice-9 rdelim) (ice-9 format) (system foreign) (ice-9 match) (rnrs bytevectors))
+        (ice-9 rdelim) (ice-9 format) (system foreign) (ice-9 match)
+        (rnrs bytevectors) (ice-9 pretty-print))
 
 (define (read-line-w/o-comment o)
   (let ((line (read-delimited "\n" o)))
@@ -129,26 +130,30 @@
 #ifdef __cplusplus
 extern \"C\" {
 #endif
-\n")
+")
       (for-each
-       (match-lambda
-         ((type bind-name ((aname atype inout . x) ...))
-          (format o "~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n\n"
-                  (c-type type)
-                  bind-name
-                  (zip (map c-type atype)
-                       (map (match-lambda
-                              ('in 'const)
-                              ('out "")
-                              ('inout "/* inout */")
-                              (x (throw 'bad-inout-tag x)))
-                         inout)
-                       aname))))
-       xpts)
-      (format o "#ifdef __cplusplus\n")
-      (format o "} // extern \"C\"\n")
-      (format o "#endif\n\n")
-      (format o "// end of ~a\n\n" (basename dest)))))
+          (match-lambda
+            ((type bind-name ((aname atype inout . x) ...))
+             (format o "\n~a\n~a\n(~{~{~a ~a * ~a~}~^, ~});\n"
+                     (c-type type)
+                     bind-name
+                     (zip (map c-type atype)
+                          (map (match-lambda
+                                 ('in 'const)
+                                 ('out "")
+                                 ('inout "/* inout */")
+                                 (x (throw 'bad-inout-tag x)))
+                            inout)
+                          aname))))
+        xpts)
+      (format o "
+#ifdef __cplusplus
+} // extern \"C\"
+#endif
+
+// end of ~a
+
+" (basename dest)))))
 
 (define (write-bindings-python xpts tag libname dest)
 
@@ -163,7 +168,7 @@ extern \"C\" {
       (format o "\n# ~a generated from ~a by protos.scm\n" (basename dest) tag)
       (format o "
 import ctypes
-from ctypes import c_double, c_int32, POINTER, byref
+from ctypes import c_int32, c_double, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('~a'))
 liba.~a_init()
@@ -171,52 +176,142 @@ liba.~a_init()
               libname libname)
 
       (for-each
-       (match-lambda
-         ((rtype bind-name ((aname atype inout . x) ...))
+          (match-lambda
+            ((rtype bind-name ((aname atype inout . x) ...))
 
-          (format o "def ~a(~{~a~^, ~}):\n"
-; special case for module init function
-                  (if (string=? bind-name (format #f "~a_init" libname))
-                    "init"
-                    bind-name)
-                  (filter-map
-                      (lambda (aname inout)
-                        (match inout
-                          ((or 'in 'inout) aname)
-                          (x #f)))
-                    aname inout))
-          (for-each
-           (lambda (aname atype inout)
-             (format o "    p_~a = ~a(~a)\n"
-                     aname (c-type atype)
-                     (match inout
-                       ((or 'in 'inout) aname)
-                       (x "0"))))
-           aname atype inout)
+             (format o "def ~a(~{~a~^, ~}):\n"
+                                        ; special case for module init function
+                     (if (string=? bind-name (format #f "~a_init" libname))
+                       "init"
+                       bind-name)
+                     (filter-map
+                         (lambda (aname inout)
+                           (match inout
+                             ((or 'in 'inout) aname)
+                             (x #f)))
+                       aname inout))
+             (for-each
+                 (lambda (aname atype inout)
+                   (format o "    p_~a = ~a(~a)\n"
+                           aname (c-type atype)
+                           (match inout
+                             ((or 'in 'inout) aname)
+                             (x "0"))))
+               aname atype inout)
 
-          (let* ((rtype (c-type rtype))
-                 (inreturn
-                  (match rtype
-                    ('None
-                     (format o "    liba.~a(~{byref(p_~a)~^, ~})\n"
-                             bind-name aname)
-                     '())
-                    (rtype
-                     (format o "    liba.~a.restype = ~a\n" bind-name rtype)
-                     (format o "    result_ = liba.~a(~{byref(p_~a)~^, ~})\n"
-                             bind-name aname)
-                     '(result_)))))
-            (format o "    return ~{~a~^, \\\n           ~}\n\n"
-                    (append inreturn
-                            (filter-map
-                                (lambda (aname inout)
-                                  (match inout
-                                    ((or 'out 'inout) (format #f "p_~a.value" aname))
-                                    (x #f)))
-                              aname inout))))))
-       xpts)
+             (let* ((rtype (c-type rtype))
+                    (inreturn
+                     (match rtype
+                       ('None
+                        (format o "    liba.~a(~{byref(p_~a)~^, ~})\n"
+                                bind-name aname)
+                        '())
+                       (rtype
+                        (format o "    liba.~a.restype = ~a\n" bind-name rtype)
+                        (format o "    result_ = liba.~a(~{byref(p_~a)~^, ~})\n"
+                                bind-name aname)
+                        '(result_)))))
+               (format o "    return ~{~a~^, \\\n           ~}\n\n"
+                       (append inreturn
+                               (filter-map
+                                   (lambda (aname inout)
+                                     (match inout
+                                       ((or 'out 'inout) (format #f "p_~a.value" aname))
+                                       (x #f)))
+                                 aname inout))))))
+        xpts)
 
       (format o "# end of ~a\n\n" (basename dest)))))
+
+(define (write-bindings-guile xpts tag libname dest)
+
+  (define (c-type type)
+    (match type
+      ('void 'void)
+      ('C_DOUBLE 'double)
+      ('C_INT32_T 'int32)))
+
+  (define (v-type type)
+    (match type
+      ('C_DOUBLE 'f64vector)
+      ('C_INT32_T 's32vector)))
+
+  (define (make-pname aname)
+    (string->symbol (format #f "p_~a" aname)))
+
+  (define (make-sname bind-name)
+    (string->symbol (string-map (lambda (c) (if (char=? c #\_) #\- c)) bind-name)))
+
+  (define (make-iname bind-name)
+    (string->symbol (format #f "__~a" bind-name)))
+
+  (call-with-output-file dest
+    (lambda (o)
+      (format o "\n;;; ~a generated from ~a by protos.scm\n\n" (basename dest) tag)
+      (for-each (lambda (e) (pretty-print e o))
+; FIXME fix module name and library path at install
+        `((define-module (,(string->symbol libname))
+            #:export ,(match xpts
+                        (((rtype bind-name x ...) ...)
+                         (append (map make-sname bind-name)
+                                 (map make-iname bind-name)))))
+          (import (srfi :1)  (srfi :8) (srfi :26) (srfi :71)
+                  (system foreign) (rnrs bytevectors))
+          (define liba (dynamic-link ,(format #f "lib~a" libname)))))
+      (newline o)
+      (for-each (match-lambda
+                  ((internal external)
+                   (write internal o) (newline o)
+                   (pretty-print external o) (newline o)))
+        (map
+         (match-lambda
+           ((rtype bind-name ((aname atype inout . x) ...))
+            (let ((direct-name (make-iname bind-name))
+                  (pname (map make-pname aname)))
+              `((define ,direct-name
+                  (pointer->procedure
+                   ,(c-type rtype)
+                   (dynamic-func ,bind-name liba)
+                   (quote ,(make-list (length aname) '*))))
+                (define (,(if (string=? bind-name (format #f "~a_init" libname))
+                            'init
+                            (make-sname bind-name))
+                         ,@(filter-map (lambda (aname inout)
+                                         (match inout
+                                           ((or 'in 'inout) aname)
+                                           (x #f)))
+                             aname inout))
+                  (let ,(map (lambda (pname aname atype inout)
+                               `(,pname
+                                 (,(v-type atype)
+                                  ,(match inout
+                                     ((or 'in 'inout) aname)
+                                     (x 0)))))
+                          pname aname atype inout)
+                    ,(let* ((fcall `(,direct-name
+                                     ,@(map (lambda (pname) `(bytevector->pointer ,pname 0))
+                                         pname)))
+                            (results (append
+                                      (if (eq? rtype 'void) '() '(result))
+                                      (filter-map (lambda (pname aname inout)
+                                                    (match inout
+                                                      ((or 'out 'inout) `(array-ref ,pname 0))
+                                                      (x #f)))
+                                        pname aname inout)))
+                            (nresults (length results)))
+                       (cond ((zero? nresults)
+                              (pk 'not-sure-this-is-right bind-name)
+                              fcall)
+                             ((= 1 nresults)
+                              (if (eq? rtype 'void)
+                                `(begin ,fcall ,(first results))
+                                fcall))
+                             ((eq? rtype 'void)
+                              `(begin fcall (values ,@results))
+                              `(let ((result ,fcall)) (values ,@results)))))))))))
+         xpts))
+      (write '(init) o) (newline o)
+      (format o "\n; end of ~a\n\n" (basename dest)))))
 
 (match (program-arguments)
   ((me libname dest source)
@@ -224,6 +319,8 @@ liba.~a_init()
            write-bindings-c)
           ((string-suffix? ".py" dest)
            write-bindings-python)
+          ((string-suffix? ".scm" dest)
+           write-bindings-guile)
           (else (throw 'cannot-write-bindings-to dest)))
     (find-foreign-protos source) (basename source) libname dest))
   (x (throw 'expected-arguments-1-source-2-dest)))

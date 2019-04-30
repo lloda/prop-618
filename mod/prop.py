@@ -2,7 +2,7 @@
 # prop.py generated from prop.f95 by protos.scm
 
 import ctypes
-from ctypes import c_double, c_int32, POINTER, byref
+from ctypes import c_int32, c_double, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('prop'))
 liba.prop_init()

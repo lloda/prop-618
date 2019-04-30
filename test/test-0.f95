@@ -1,4 +1,4 @@
-! (test-0.f95) -*- coding: utf-8; mode: f90-mode -*-
+! (test-0.f95) -*- coding: utf-8; mode: f90 -*-
 ! tests for prop.f95, atmospheres.f95
 
 ! (c) lloda@sarc.name 2019

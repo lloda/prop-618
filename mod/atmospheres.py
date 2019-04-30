@@ -2,7 +2,7 @@
 # atmospheres.py generated from atmospheres.f95 by protos.scm
 
 import ctypes
-from ctypes import c_double, c_int32, POINTER, byref
+from ctypes import c_int32, c_double, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('atmospheres'))
 liba.atmospheres_init()

@@ -1,4 +1,4 @@
-# ! (TODO) -*- coding: utf-8; mode: org-mode -*-
+# ! (TODO) -*- coding: utf-8; mode: org -*-
 
 help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip checkbox [C-ct] flip TODO
 
@@ -34,13 +34,13 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
     + [ ] high latitude (summer)
     + [ ] high latitude (winter)
     + [ ] experimental atmospheres
-  - [-] dress up [2/6]
+  - [-] dress up [3/6]
     + [X] C headers
     + [X] Python bindings
-    + [ ] Guile bindings (generated)
+    + [X] Guile bindings (generated)
     + [ ] acceptable documentation
     + [ ] Guile binding examples shouldn't use ploy/yak
-    + [ ] installation procedure (for the data files)
+    + [ ] installation procedure (for the data files & the dlib imports)
   - [X] other ITU datasets [1/1]
     + [X] heights from P.1511
   - [ ] tests

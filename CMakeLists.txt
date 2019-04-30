@@ -1,4 +1,4 @@
-# -*- mode: cmake; coding: utf-8 -*-
+# -*- coding: utf-8; mode: cmake -*-
 # global CMakeLists.txt
 
 # (c) lloda@sarc.name 2019
@@ -51,7 +51,7 @@ if (GUILE_EXECUTABLE)
     set (bindc "${CMAKE_SOURCE_DIR}/mod/${libname}.h")
     set (bindpython "${CMAKE_SOURCE_DIR}/mod/${libname}.py")
     set (bindguile "${CMAKE_SOURCE_DIR}/mod/${libname}.scm")
-    foreach (dest ${bindc} ${bindpython}) # bindguile
+    foreach (dest ${bindc} ${bindpython} ${bindguile})
       get_filename_component (dest_as_target ${dest} NAME)
       add_custom_target (${dest_as_target}
         DEPENDS ${source} ${generator}
@@ -90,6 +90,15 @@ if (Python3_FOUND)
 # FIXME Would like a way to make these depend on mod/*.py
     add_test (${target} ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/${target}.py")
     set_tests_properties (${target} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/mod")
+  endforeach ()
+endif ()
+
+# Guile tests. These just test the bindings.
+
+if (GUILE_EXECUTABLE)
+  foreach (target test-3)
+# FIXME Would like a way to make these depend on mod/*.py
+    add_test (${target} ${GUILE_EXECUTABLE} -q -L "${CMAKE_SOURCE_DIR}/mod" "${CMAKE_SOURCE_DIR}/test/${target}.scm")
   endforeach ()
 endif ()
 

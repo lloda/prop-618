@@ -1,4 +1,4 @@
-! (atmospheres.f95) -*- coding: utf-8; mode: f90-mode -*-
+! (atmospheres.f95) -*- coding: utf-8; mode: f90 -*-
 ! standard atmospheres for ITU propagation models
 
 ! (c) lloda@sarc.name 2019
