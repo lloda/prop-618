@@ -17,4 +17,5 @@ matrix:
      install:
      before_install:
        - export FC=gfortran-8
+       - echo $LD_LIBRARY_PATH
        # - cmake --help-module-list # quite outdated usually :-/
