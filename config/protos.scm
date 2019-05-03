@@ -250,7 +250,7 @@ liba.~a_init()
       (format o "\n;;; ~a generated from ~a by protos.scm\n\n" (basename dest) tag)
       (for-each (lambda (e) (pretty-print e o))
 ; FIXME fix module name and library path at install
-        `((define-module (,(string->symbol libname))
+        `((define-module (prop-618 ,(string->symbol libname))
             #:export ,(match xpts
                         (((rtype bind-name x ...) ...)
                          (append (map make-sname bind-name)

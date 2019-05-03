@@ -11,8 +11,7 @@
 # readme
 # -------------------
 
-# cd build && FFLAGS=-O3 cmake ..
-# VERBOSE=1 make && make test
+# cd build && FFLAGS=-O3 cmake .. && VERBOSE=1 make && make test
 
 # -------------------
 # prologue
@@ -40,6 +39,10 @@ set (LINK_FLAGS "-fopenmp $ENV{LINKFLAGS}")
 add_library (prop SHARED src/prop.f95)
 add_library (atmospheres SHARED src/atmospheres.f95)
 
+# -------------------
+# bindings
+# -------------------
+
 # If Guile isn't available, will rely on committed bindings in mod/.
 
 find_package (Guile)
@@ -50,7 +53,7 @@ if (GUILE_EXECUTABLE)
     set (generator "${CMAKE_SOURCE_DIR}/config/protos.scm")
     set (bindc "${CMAKE_SOURCE_DIR}/mod/${libname}.h")
     set (bindpython "${CMAKE_SOURCE_DIR}/mod/${libname}.py")
-    set (bindguile "${CMAKE_SOURCE_DIR}/mod/${libname}.scm")
+    set (bindguile "${CMAKE_SOURCE_DIR}/mod/prop-618/${libname}.scm")
     foreach (dest ${bindc} ${bindpython} ${bindguile})
       get_filename_component (dest_as_target ${dest} NAME)
       add_custom_target (${dest_as_target}
@@ -64,7 +67,11 @@ if (GUILE_EXECUTABLE)
   endforeach ()
 endif ()
 
-# Fortran tests. The functional tests are all here.
+# -------------------
+# tests
+# -------------------
+
+# Fortran, this has the functional tests.
 
 foreach (target test-0)
   add_executable (${target} "test/${target}.f95")
@@ -72,7 +79,7 @@ foreach (target test-0)
   add_test (${target} ${target})
 endforeach ()
 
-# C tests. These just test the headers.
+# C, just the headers.
 
 foreach (target test-1)
   add_executable (${target} "test/${target}.c"
@@ -82,7 +89,7 @@ foreach (target test-1)
   add_test (${target} ${target})
 endforeach ()
 
-# Python tests. These just test the bindings.
+# Python, just the bindings.
 
 find_package (Python3)
 if (Python3_FOUND)
@@ -93,14 +100,18 @@ if (Python3_FOUND)
   endforeach ()
 endif ()
 
-# Guile tests. These just test the bindings.
+# Guile, just test the bindings.
 
-if (GUILE_EXECUTABLE)
+if (GUILE_FOUND)
   foreach (target test-3)
 # FIXME Would like a way to make these depend on mod/*.py
     add_test (${target} ${GUILE_EXECUTABLE} -q -L "${CMAKE_SOURCE_DIR}/mod" "${CMAKE_SOURCE_DIR}/test/${target}.scm")
   endforeach ()
 endif ()
+
+# -------------------
+# documentation
+# -------------------
 
 # queries(config/UseLATEX.cmake)
 # set (LATEX_OUTPUT_PATH build)
@@ -111,6 +122,10 @@ endif ()
 #   # USE_INDEX
 #   # USE_GLOSSARY
 #   )
+
+# -------------------
+# epilogue
+# -------------------
 
 enable_testing ()
 
@@ -124,3 +139,4 @@ message ("* Fortran compiler is: ${CMAKE_Fortran_COMPILER}")
 message ("* Fortran_FLAGS are: ${CMAKE_Fortran_FLAGS}")
 message ("* Current build dir is: ${CMAKE_BUILD_DIR}")
 message ("* Current binary dir is: ${CMAKE_BINARY_DIR}")
+message ("* Install prefix is: ${CMAKE_INSTALL_PREFIX}")

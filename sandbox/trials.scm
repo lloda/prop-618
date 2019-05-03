@@ -15,7 +15,8 @@
 ; bindings
 ; -----------------------------------------
 
-(import (prop) (atmospheres)) ; need to fix LD_LIBRARY_PATH && GUILEPATH until install
+; need to fix LD_LIBRARY_PATH && GUILEPATH until install
+(import (prop-618 prop) (prop-618 atmospheres))
 
 
 ; -----------------------------------------

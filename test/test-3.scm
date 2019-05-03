@@ -7,7 +7,7 @@
 ; Software Foundation; either version 3 of the License, or (at your option) any
 ; later version.
 
-(import (prop) (atmospheres) (srfi :64))
+(import (prop-618 prop) (prop-618 atmospheres) (srfi :64))
 
 (test-begin "prop-618")
 

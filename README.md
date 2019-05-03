@@ -20,7 +20,7 @@ To build and test, do `cd build && cmake .. && make && make test`. There is no i
 
 The library is about 30% complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented.
 
-This is the first time I write anything in Fortran. I'm using gfortran 8.2 and 8.3. There is a header for C and bindings for Python, which are automatically generated. There is also a Guile sandbox at [mod/prop.scm](mod/prop.scm). My priority is to have useful functionality before working on the documentation or the bindings.
+This is the first time I write anything in Fortran. I'm using gfortran 8.2 and 8.3. There is a header for C and bindings for Python, which are automatically generated. There is also a Guile sandbox at [mod/prop.scm](mod/prop.scm).
 
 ## Random links
 
