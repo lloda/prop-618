@@ -5,7 +5,9 @@ import ctypes
 from ctypes import c_int32, c_double, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('atmospheres'))
-liba.atmospheres_init()
+ec = liba.atmospheres_init()
+if ec!=0:
+    raise RuntimeError('prop-618 could not be initialized (error: {})'.format(ec))
 
 def init():
     liba.atmospheres_init.restype = c_int32

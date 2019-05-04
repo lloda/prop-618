@@ -171,7 +171,9 @@ import ctypes
 from ctypes import c_int32, c_double, byref
 from ctypes.util import find_library
 liba = ctypes.cdll.LoadLibrary(find_library('~a'))
-liba.~a_init()
+ec = liba.~a_init()
+if ec!=0:
+    raise RuntimeError('prop-618 could not be initialized (error: {})'.format(ec))
 \n"
               libname libname)
 
@@ -314,7 +316,8 @@ liba.~a_init()
                               (else
                                `((let ((result ,fcall)) (%valuesp ,@results))))))))))))
          xpts))
-      (write '(init) o) (newline o)
+      (pretty-print '(let ((ec (init))) (unless (zero? ec) (throw 'prop-618-couldnt-be-initialized ec))) o)
+      (newline o)
       (format o "\n; end of ~a\n\n" (basename dest)))))
 
 (match (program-arguments)

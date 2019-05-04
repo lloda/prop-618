@@ -7,7 +7,8 @@
 # Software Foundation; either version 3 of the License, or (at your option) any
 # later version.
 
-import sys, atmospheres, prop
+import sys
+from prop_618 import atmospheres, prop
 
 def rel_error(a, b):
     if (a==b):

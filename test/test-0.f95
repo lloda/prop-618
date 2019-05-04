@@ -8,6 +8,8 @@
 ! later version.
 
 program test0
+
+  use config
   use prop
   use atmospheres
 
@@ -214,18 +216,23 @@ contains
   integer function test_p618_rain() &
        result(ne)
 
-    character(len=200) :: line
+    character(256) :: iomsg
     integer ierror, i
+    character(len=200) :: line
     real, allocatable :: x(:, :), c(:, :)
-    open(1, file='../data/P618/P618-13A_Rain.txt', action='read')   ! FIXME install path
-    allocate(x(9, 64), STAT=ierror)
-    allocate(c(64, 9), STAT=ierror)
-    read(1, *) x
+
+    write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / R001 from P618-13 A_Rain'
+    open(1, file=(test_datadir // 'P618/P618-13A_Rain.txt'), action='read', iostat=ierror)
+    ne = ierror
+    allocate(x(9, 64))
+    allocate(c(64, 9))
+    read(1, *, iostat=ierror, iomsg=iomsg) x
     c = transpose(x)
+    if (ierror/=0) then
+       write(*, *) 'cannot open ' // test_datadir // 'P618/P618-13A_Rain.txt ... ' // trim(iomsg)
+       return
+    end if
 
-    ne = 0
-
-    write(*, *) achar(10), 'p618_rain, CG-3M3J-13-ValEx-Rev4_2.xlsx / R001 from P618-13 A_Rain'
     do i=1, size(c, 1)
        block
          real lat, lon, r001
@@ -318,23 +325,22 @@ contains
   integer function test_p676_gas() &
        result(ne)
 
-    integer :: ierror, i
     character(256) :: iomsg
+    integer :: ierror, i
     character(len=200) :: line
     real, allocatable :: c(:, :), x(:, :)
 
     write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P676-11 A_Gas'
-
-    open(1, file='../data/P676/P676-11A_Gas.csv', action='read') ! FIXME install path
-    allocate(x(31, 64), STAT=ierror)
-    allocate(c(64, 31), STAT=ierror)
+    open(1, file=(test_datadir // 'P676/P676-11A_Gas.csv'), action='read', iostat=ierror)
     ne = ierror
+    allocate(x(31, 64))
+    allocate(c(64, 31))
     read(1, *)
     read(1, *)
     read(1, *, iostat=ierror, iomsg=iomsg) x
     c = transpose(x)
     if (ierror/=0) then
-       write(*, *) 'cannot open ' // '../data/P676/P676-11A_Gas.csv' // trim(iomsg)
+       write(*, *) 'cannot open ' // test_datadir // 'P676/P676-11A_Gas.csv ... ' // trim(iomsg)
        return
     end if
 

@@ -11,7 +11,7 @@
 # readme
 # -------------------
 
-# cd build && FFLAGS=-O3 cmake .. && VERBOSE=1 make && make test
+# cd build && FFLAGS=-O3 cmake -DCMAKE_INSTALL_PREFIX=./install .. && VERBOSE=1 make && make test && cmake
 
 # -------------------
 # prologue
@@ -36,8 +36,12 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${BASE_CFLAGS} $ENV{CFLAGS}")
 
 set (LINK_FLAGS "-fopenmp $ENV{LINKFLAGS}")
 
-add_library (prop SHARED src/prop.f95)
-add_library (atmospheres SHARED src/atmospheres.f95)
+include (GNUInstallDirs)
+set (PROP_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/prop-618/")
+set (PROP_TEST_DATADIR "${CMAKE_SOURCE_DIR}/data/")
+configure_file (src/config.f95.in config.f95)
+add_library (prop SHARED src/prop.f95 config.f95)
+add_library (atmospheres SHARED src/atmospheres.f95 config.f95)
 
 # -------------------
 # bindings
@@ -52,7 +56,7 @@ if (GUILE_EXECUTABLE)
     set (source "${CMAKE_SOURCE_DIR}/src/${libname}.f95")
     set (generator "${CMAKE_SOURCE_DIR}/config/protos.scm")
     set (bindc "${CMAKE_SOURCE_DIR}/mod/${libname}.h")
-    set (bindpython "${CMAKE_SOURCE_DIR}/mod/${libname}.py")
+    set (bindpython "${CMAKE_SOURCE_DIR}/mod/prop_618/${libname}.py")
     set (bindguile "${CMAKE_SOURCE_DIR}/mod/prop-618/${libname}.scm")
     foreach (dest ${bindc} ${bindpython} ${bindguile})
       get_filename_component (dest_as_target ${dest} NAME)
@@ -124,6 +128,44 @@ endif ()
 #   )
 
 # -------------------
+# install
+# -------------------
+
+install (DIRECTORY "${CMAKE_SOURCE_DIR}/data/"
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/prop-618")
+
+foreach (module prop atmospheres)
+  install (TARGETS ${module}
+    DESTINATION lib)
+  install (FILES "${CMAKE_CURRENT_BINARY_DIR}/${module}.mod"
+    DESTINATION include)
+  install (FILES "${CMAKE_SOURCE_DIR}/mod/${module}.h"
+    DESTINATION include)
+endforeach ()
+
+if (GUILE_FOUND)
+  foreach (module prop atmospheres)
+    install (FILES "${CMAKE_SOURCE_DIR}/mod/prop-618/${module}.scm"
+      DESTINATION "${CMAKE_INSTALL_DATADIR}/guile/site/prop-618")
+  endforeach ()
+endif ()
+
+if (Python3_FOUND)
+  execute_process(
+    COMMAND "${Python3_EXECUTABLE}" -c "if True:
+    from distutils import sysconfig as sc
+    print(sc.get_python_lib(prefix='', plat_specific=True))"
+    OUTPUT_VARIABLE Python3_SITE
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  message ("* Python3 install site: ${Python3_SITE}")
+  foreach (module prop atmospheres)
+    install(FILES "${CMAKE_SOURCE_DIR}/mod/prop_618/${module}.py"
+      DESTINATION "${Python3_SITE}/prop_618") # FIXME maybe I should just change this
+  endforeach ()
+endif ()
+
+# -------------------
 # epilogue
 # -------------------
 
@@ -137,6 +179,5 @@ message ("* C++ compiler is: ${CMAKE_CXX_COMPILER}")
 message ("* C++ flags are: ${CMAKE_CXX_FLAGS}")
 message ("* Fortran compiler is: ${CMAKE_Fortran_COMPILER}")
 message ("* Fortran_FLAGS are: ${CMAKE_Fortran_FLAGS}")
-message ("* Current build dir is: ${CMAKE_BUILD_DIR}")
 message ("* Current binary dir is: ${CMAKE_BINARY_DIR}")
 message ("* Install prefix is: ${CMAKE_INSTALL_PREFIX}")

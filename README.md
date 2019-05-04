@@ -7,20 +7,29 @@ This is a translation into code of [ITU-R P.618](https://www.itu.int/dms_pubrec/
 
 You probably need to be familiar with the relevant ITU-R papers to use this at all.
 
-The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI.
+The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI. C headers are included, plus bindings for Python and Guile.
 
-To build and test, do `cd build && cmake .. && make && make test`. There is no installation procedure, and both the libraries and the tests require access to the data folder in `../data` — I'll fix that eventually.
+Building is the usual CMake recipe
+
+```
+cd build && cmake -DCMAKE_INSTALL_PREFIX=somewhere ..
+make
+make test
+make install
+```
 
 ## Conventions
 
-* Same units as in ITU's documentation (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
-* Similar variable names as in ITU's reports. An exception is that I use `el` instead of `θ` or `th` where that means elevation.
+* Same units as in ITU's reports (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
+* Similar variable names as in ITU's reports. As an exception, I use `el` instead of `θ` or `th` where this means elevation.
 
 ## Outlook
 
 The library is about 30% complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented.
 
-This is the first time I write anything in Fortran. I'm using gfortran 8.2 and 8.3. There is a header for C and bindings for Python, which are automatically generated. There is also a Guile sandbox at [mod/prop.scm](mod/prop.scm).
+This is the first time I write anything in Fortran. I'm using gfortran 8.2 and 8.3. There is a header for C and bindings for Python, which are automatically generated. There is also a Guile sandbox at [sandbox/prop.scm](sandbox/prop.scm).
+
+Calling the library with out-of-range parameters will abort, which is inconvenient if you're using it from Python or Guile. Eventually we'll have some other mechanism to signal errors.
 
 ## Random links
 

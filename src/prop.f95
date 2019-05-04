@@ -9,7 +9,9 @@
 
 module prop
 
+  use config
   use iso_c_binding
+
   real, allocatable, save :: p839h0(:, :)
   real, allocatable, save :: p837R001(:, :)
   real, allocatable, save :: p1510Ta(:, :)
@@ -19,7 +21,7 @@ module prop
   real, parameter, dimension(18) :: p840p = (/ 0.1, 0.2, 0.3, 0.5, 1., 2., 3., 5., &
        10., 20., 30., 50., 60., 70., 80., 90., 95., 99. /)
 
-  real, allocatable, save :: p840Lred(:, :, :)  ! total columnar content of cloud liquied water reduced to 273.15 K
+  real, allocatable, save :: p840Lred(:, :, :)  ! total columnar content of cloud liquid water reduced to 273.15 K
   real, allocatable, save :: p453Nwet(:, :, :)  ! wet term of surface refractivity
   real, allocatable, save :: p836rho(:, :, :)   ! surface water vapor density
   real, allocatable, save :: p836V(:, :, :)     ! total columnar water vapor content
@@ -27,22 +29,42 @@ module prop
 
 contains
 
-  integer function load_lat_lon(path, m, n, a) &
+  integer function try_open(port, fname) &
        result(ierror)
 
-    character(len=*), intent(in) :: path
+    integer, intent(in) :: port
+    character(len=*), intent(in) :: fname
+    character(256) :: iomsg
+
+    open(port, file=trim(datadir // fname), action='read', iostat=ierror, iomsg=iomsg)
+    if (ierror/=0) then
+       open(port, file=trim(test_datadir // fname), action='read', iostat=ierror, iomsg=iomsg)
+       if (ierror/=0) then
+          write(*, *) 'cannot open [' // trim(datadir // fname) // '] ... ', trim(iomsg)
+          write(*, *) 'cannot open [' // trim(test_datadir // fname) // '] ... ', trim(iomsg)
+          return
+       end if
+    end if
+
+  end function try_open
+
+
+  integer function load_lat_lon(fname, m, n, a) &
+       result(ierror)
+
+    character(len=*), intent(in) :: fname
     integer, intent(in) :: m, n
     real, allocatable, dimension(:, :), intent(out) :: a
 
-    character(256) :: iomsg
     real, allocatable, dimension(:, :) :: x
 
     allocate(x(n, m), STAT=ierror)
-    open(1, file=path, action='read', iostat=ierror, iomsg=iomsg)
+
+    ierror = try_open(1, fname)
     if (ierror/=0) then
-       write(*, *) 'cannot open [' // path // '] ... ', trim(iomsg)
        return
     end if
+
     read(1, *) x
     allocate(a(m, n), STAT=ierror)
     a = transpose(x)
@@ -58,7 +80,6 @@ contains
     integer, intent(in) :: m, n
     real, allocatable, dimension(:, :, :), intent(out) :: a
 
-    character(256) :: iomsg
     real, allocatable, dimension(:, :) :: x
 
     block
@@ -77,11 +98,12 @@ contains
          else
             write(fname, '(A, I1)') '0', int(p(i)*10)
          end if
-         open(1, file=(path1 // trim(adjustl(fname)) // path2), action='read', iostat=ierror, iomsg=iomsg)
+
+         ierror = try_open(1, (path1 // trim(adjustl(fname)) // path2))
          if (ierror/=0) then
-            write(*, *) 'cannot open [' // (path1 // trim(adjustl(fname)) // path2) // '] ... ' // trim(iomsg)
             return
          end if
+
          read(1, *) x
          a(i, :, :) = transpose(x)
       end do
@@ -187,7 +209,7 @@ contains
        ! according to ITU-R P.839-4, lat +90:-1.5:-90 (or th 0:1.5:180) and lon 0:1.5:360.
        ! used by p839_rain_height.
 
-       ierror = load_lat_lon('../data/P839/h0.txt', 121, 241, p839h0)
+       ierror = load_lat_lon('P839/h0.txt', 121, 241, p839h0)
        if (ierror/=0) then
           return
        end if
@@ -195,7 +217,7 @@ contains
        ! according to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
        ! used by p837_rainfall_rate.
 
-       ierror = load_lat_lon('../data/P837/R001.txt', 1441, 2881, p837R001)
+       ierror = load_lat_lon('P837/R001.txt', 1441, 2881, p837R001)
        if (ierror/=0) then
           return
        end if
@@ -203,7 +225,7 @@ contains
        ! according to ITU-R P.840-7, lat +90:1.125:-90 (or th: -90:1.125:+90) and lon 0:1.125:+360.
        ! used by p840_Lred.
 
-       ierror = load_p_lat_lon('../data/P840/Lred Annual Maps/Lred_', '_v4.txt', p840p, 161, 321, p840Lred)
+       ierror = load_p_lat_lon('P840/Lred Annual Maps/Lred_', '_v4.txt', p840p, 161, 321, p840Lred)
        if (ierror/=0) then
           return
        end if
@@ -211,7 +233,7 @@ contains
        ! according to ITU-R P.453-13 §2.2, lat -90:0.75:+90 and lon -180:0.75:+180
        ! used by p453_Nwet.
 
-       ierror = load_p_lat_lon('../data/P453/P.453_NWET_Maps_Annual/NWET_Annual_', '.TXT', p840p, 241, 481, p453Nwet)
+       ierror = load_p_lat_lon('P453/P.453_NWET_Maps_Annual/NWET_Annual_', '.TXT', p840p, 241, 481, p453Nwet)
        if (ierror/=0) then
           return
        end if
@@ -219,7 +241,7 @@ contains
        ! according to ITU-R P.1510-1 Annex 1, lat -90:0.75:+90 and lon -180:0.75:+180
        ! used by p1510_temp.
 
-       ierror = load_lat_lon('../data/P1510/T_Annual.TXT', 241, 481, p1510Ta)
+       ierror = load_lat_lon('P1510/T_Annual.TXT', 241, 481, p1510Ta)
        if (ierror/=0) then
           return
        end if
@@ -227,7 +249,7 @@ contains
        ! according to ITU-R P.1511-1 Annex 1 and included in P.836-6 data package
        ! lat +90.5:-0.5:-90.5 and lon -0.5:0.5:360.5 for bicubic interpolation.
 
-       ierror = load_lat_lon('../data/P836/TOPO_0DOT5.txt', 363, 723, p1511topo)
+       ierror = load_lat_lon('P836/TOPO_0DOT5.txt', 363, 723, p1511topo)
        if (ierror/=0) then
           return
        end if
@@ -235,19 +257,19 @@ contains
        ! according to ITU-R P.836-6 Anexes 1 and 2
        ! lat +90:-1.125:-90 and lon 0:+1.125:360
 
-       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Surface Water Vapor Density/RHO Annual Maps/RHO_', &
+       ierror = load_p_lat_lon('P836/P_836_Maps_annual/Surface Water Vapor Density/RHO Annual Maps/RHO_', &
             '_v4.txt', p840p, 161, 321, p836rho)
        if (ierror/=0) then
           return
        end if
 
-       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Total Columnar Water Content/V Annual Maps/V_', &
+       ierror = load_p_lat_lon('P836/P_836_Maps_annual/Total Columnar Water Content/V Annual Maps/V_', &
             '_v4.txt', p840p, 161, 321, p836V)
        if (ierror/=0) then
           return
        end if
 
-       ierror = load_p_lat_lon('../data/P836/P_836_Maps_annual/Total Columnar Water Content/VSCH Annual Maps/VSCH_', &
+       ierror = load_p_lat_lon('P836/P_836_Maps_annual/Total Columnar Water Content/VSCH Annual Maps/VSCH_', &
             '_v4.txt', p840p, 161, 321, p836vsch)
        if (ierror/=0) then
           return
