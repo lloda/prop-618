@@ -11,7 +11,7 @@
 ;; the .f95 declarations. Try to complain if we don't understand, so that the
 ;; declarations are not missed and can be fixed.
 
-(import (srfi :1) (srfi :2) (srfi :8) (srfi :26) (srfi :71) (srfi :19)
+(import (srfi :1) (srfi :2) (srfi :8) (srfi :26) (srfi :19)
         (ice-9 rdelim) (ice-9 format) (system foreign) (ice-9 match)
         (ice-9 pretty-print))
 
@@ -36,32 +36,32 @@
            (let* ((line (read-line-w/o-comment o))
                   (line (and line (string-map (match-lambda (#\, #\space) (x x)) line)))
                   (tokens (and line (call-with-input-string line read-list)))
-                  (isep (and tokens (and line (list-index (cut eq? <> '::) tokens))))
-                  ((values pre post) (if isep (split-at tokens isep) (values #f #f)))
-                  (post (and post (not (null? post)) (cdr post))))
-             (cond ((and tokens (not isep))
-                    (match tokens
-                      (() (loop (+ 1 i) dict))            ; blank
-                      (('result . x) (loop (+ 1 i) dict)) ; result spec which we don't use
-                      (x (throw 'expecting-arg-type-declaration i 'tokens tokens 'line line))))
-                   ((and isep (not post))
-                    (throw 'expecting-vars-of-type i line))
-                   (pre
-                    (match (list pre post)
-                      (((fortran-type (c-type) stuff ...) (vars ...))
-                       (when (list-index (cut eq? <> 'dimension) stuff)
-                         (throw 'dimension-not-supported i line))
-                       (let* ((iinout (list-index (cut eq? <> 'intent) stuff))
-                              (inout (if iinout
-                                       (match (drop stuff iinout)
-                                         (('intent (inout) . x) inout)
-                                         (x (throw 'bad-inout-clause x)))
-                                       'inout)))
-                         (loop (+ 1 i)
-                               (fold (lambda (var dict) (assq-set! dict var (list c-type inout))) dict vars))))
-                      (x (throw 'some-args-types-missing-before-this-line i line))))
-                   (else
-                    (loop (+ 1 i) dict))))))))
+                  (isep (and tokens (and line (list-index (cut eq? <> '::) tokens)))))
+             (receive (pre post) (if isep (split-at tokens isep) (values #f #f))
+               (let ((post (and post (not (null? post)) (cdr post))))
+                 (cond ((and tokens (not isep))
+                        (match tokens
+                          (() (loop (+ 1 i) dict))            ; blank
+                          (('result . x) (loop (+ 1 i) dict)) ; result spec which we don't use
+                          (x (throw 'expecting-arg-type-declaration i 'tokens tokens 'line line))))
+                       ((and isep (not post))
+                        (throw 'expecting-vars-of-type i line))
+                       (pre
+                        (match (list pre post)
+                          (((fortran-type (c-type) stuff ...) (vars ...))
+                           (when (list-index (cut eq? <> 'dimension) stuff)
+                             (throw 'dimension-not-supported i line))
+                           (let* ((iinout (list-index (cut eq? <> 'intent) stuff))
+                                  (inout (if iinout
+                                           (match (drop stuff iinout)
+                                             (('intent (inout) . x) inout)
+                                             (x (throw 'bad-inout-clause x)))
+                                           'inout)))
+                             (loop (+ 1 i)
+                                   (fold (lambda (var dict) (assq-set! dict var (list c-type inout))) dict vars))))
+                          (x (throw 'some-args-types-missing-before-this-line i line))))
+                       (else
+                        (loop (+ 1 i) dict))))))))))
 
 ; line is a function or subroutine line. Try to get bind and the args.
 (define (parse-header o type i line)
@@ -86,10 +86,10 @@
               (let ((bind-name (string-drop-right (string-drop a 6) 1)))
                 (match tokens
                   ((fortran-type (c-type) 'function name (. args) '&)
-                   (let (((values i dict) (parse-args o (+ 1 i) args)))
+                   (receive (i dict) (parse-args o (+ 1 i) args)
                      (values i (list c-type bind-name dict))))
                   (('subroutine name (. args) '&)
-                   (let (((values i dict) (parse-args o (+ 1 i) args)))
+                   (receive (i dict) (parse-args o (+ 1 i) args)
                      (values i (list 'void bind-name dict))))
                   (x (values (+ 1 i) #f)))))))
          (x (throw 'cannot-parse-bind-line bind-line))))
@@ -102,10 +102,10 @@
         (let ((line (read-line-w/o-comment o)))
           (cond ((not line) (reverse! xpts))
                 ((string-contains line "subroutine")
-                 (let (((values i def) (parse-header o 'subroutine i line)))
+                 (receive (i def) (parse-header o 'subroutine i line)
                    (loop (+ 1 i) (if def (cons def xpts) xpts))))
                 ((string-contains line "function")
-                 (let (((values i def) (parse-header o 'function i line)))
+                 (receive (i def) (parse-header o 'function i line)
                    (loop (+ 1 i) (if def (cons def xpts) xpts))))
                 (else
                  (loop (+ 1 i) xpts))))))))
@@ -257,8 +257,7 @@ if ec!=0:
                         (((rtype bind-name x ...) ...)
                          (append (map make-sname bind-name)
                                  (map make-iname bind-name)))))
-          (import (srfi :1)  (srfi :8) (srfi :26) (srfi :71)
-                  (system foreign) (rnrs bytevectors))
+          (import (srfi :1) (system foreign) (rnrs bytevectors))
           (define liba
             (dynamic-link ,(format #f "lib~a" libname)))
           (define-syntax %callp

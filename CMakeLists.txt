@@ -106,7 +106,7 @@ endif ()
 
 # Guile, just test the bindings.
 
-if (GUILE_FOUND)
+if (GUILE_EXECUTABLE)
   foreach (target test-3)
 # FIXME Would like a way to make these depend on mod/*.py
     add_test (${target} ${GUILE_EXECUTABLE} -q -L "${CMAKE_SOURCE_DIR}/mod" "${CMAKE_SOURCE_DIR}/test/${target}.scm")

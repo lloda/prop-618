@@ -7,6 +7,7 @@ script:
 
 matrix:
   include:
+   # using the included bindings #################
    - os: linux
      addons:
        apt:
@@ -17,5 +18,15 @@ matrix:
      install:
      before_install:
        - export FC=gfortran-8
-       - echo $LD_LIBRARY_PATH
-       # - cmake --help-module-list # quite outdated usually :-/
+   # generating the bindings ourselves ###########
+   - os: linux
+     addons:
+       apt:
+         sources:
+           - ubuntu-toolchain-r-test
+         packages:
+           - gcc-8 gfortran-8 python3 guile-2.0
+     install:
+     before_install:
+       - export FC=gfortran-8
+       - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:. # for test/test-3.scm

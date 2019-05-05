@@ -7,7 +7,7 @@ This is a translation into code of [ITU-R P.618](https://www.itu.int/dms_pubrec/
 
 You probably need to be familiar with the relevant ITU-R papers to use this at all.
 
-The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI. C headers are included, plus bindings for Python and Guile.
+The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI. C headers are included, plus bindings for Python and Guile. These are automatically generated from the Fortran.
 
 Building is the usual CMake recipe
 
@@ -23,13 +23,14 @@ make install
 * Same units as in ITU's reports (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
 * Similar variable names as in ITU's reports. As an exception, I use `el` instead of `θ` or `th` where this means elevation.
 
-## Outlook
+## Outlook & bugs
 
-The library is about 30% complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented.
+The library is maybe halfway complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented. The functions do work and pass ITU's validation table (linked below) but I'm not settled on function names and error handling, so the interface could change in the future.
 
-This is the first time I write anything in Fortran. I'm using gfortran 8.2 and 8.3. There is a header for C and bindings for Python, which are automatically generated. There is also a Guile sandbox at [sandbox/prop.scm](sandbox/prop.scm).
+* Calling the library with out-of-range parameters will abort, which is inconvenient if you're using it from Python or Guile. Eventually we'll have some other mechanism to signal errors.
+* Tests depend on `.` (or the CMake build directory) being in the dynamic library path.
 
-Calling the library with out-of-range parameters will abort, which is inconvenient if you're using it from Python or Guile. Eventually we'll have some other mechanism to signal errors.
+This is the first time I write anything in Fortran; I'm using gfortran 8.2 and 8.3.
 
 ## Random links
 
@@ -39,6 +40,7 @@ Calling the library with out-of-range parameters will abort, which is inconvenie
 * [Fortran wiki book](https://en.wikibooks.org/wiki/Category:Book:Fortran)
 * [Array functions in Fortran](https://www.phy.ornl.gov/csep/pl/node18.html)
 * [gfortran intrinsic procedures](https://gcc.gnu.org/onlinedocs/gfortran/Intrinsic-Procedures.html#Intrinsic-Procedures)
+* [Example CMakeLists.txt](https://github.com/stevengj/nlopt/blob/master/CMakeLists.txt)
 * [UseLATEX.cmake](https://gitlab.kitware.com/kmorel/UseLATEX/blob/master/UseLATEX.pdf)
 * [Water humidity calculator](https://www.cactus2000.de/uk/unit/masshum.shtml)
 * [Fortran & C interoperability](https://gcc.gnu.org/onlinedocs/gfortran/Interoperability-with-C.html)

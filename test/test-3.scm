@@ -1,5 +1,5 @@
 ; (test-3.scm) -*- coding: utf-8; mode: scheme -*-
-; test the generated Python bindings.
+; test the generated Guile bindings.
 
 ; (c) lloda@sarc.name 2019
 ; This library is free software; you can redistribute it and/or modify it under
