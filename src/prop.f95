@@ -709,15 +709,12 @@ contains
 
     real :: rp
 
+    rp = (P+e) / 1013.25      ! after (26b)
+
+    ! (25)
+
     block
       real :: t1, t2, t3
-
-      ! after (26b)
-
-      rp = (P+e) / 1013.25
-
-      ! (25)
-
       t1 = 4.64/(1.+0.066*(rp**(-2.3))) * exp(-((f-59.7)/(2.87 + 12.4 * exp(-7.9*rp)))**2)
       t2 = (0.14*exp(2.12*rp)) / ((f-118.75)**2 + 0.031*exp(2.2*rp))
       t3 = 0.0114/(1+0.14*rp**(-2.6)) * f &
@@ -726,11 +723,10 @@ contains
       ho = (6.1)/(1+0.17*(rp**(-1.1))) * (1. + t1 + t2 + t3)
     end block
 
+    ! (26)
+
     block
       real :: sw
-
-      ! (26)
-
       if (f>350.) then
          stop 101
       end if
@@ -1014,6 +1010,69 @@ contains
   end function p1511_topoh
 
 
+  ! Height scaling procedure for X = V or X = rho, after ITU-R P.836-6 Annex 2.
+
+  real function p836_height_scale(X, lat, lon, ppc, h) &
+       result(xx)
+
+    real, intent(in), dimension(:, :, :) :: X
+    real, intent(in) :: lat  ! latitude (°)
+    real, intent(in) :: lon  ! longitude (°)
+    real, intent(in) :: ppc  ! probability (%)
+    real, intent(in) :: h    ! altitude (km)
+
+    real :: dp, dx, dy
+    integer :: ip, ix, iy
+
+    real, dimension(2, 2, 2) :: vi
+    real, dimension(2, 2, 2) :: vschi
+    real, dimension(2, 2, 2) :: hi
+
+    call lookup_pxy_find(p840p, size(X, 2), size(X, 3), &
+         ppc, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, &
+         ip, ix, iy, &
+         dp, dx, dy)
+
+    vi = X(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
+    vschi = p836vsch(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
+    hi = reshape( spread( (/ &
+         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+0)*1.125), &
+         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+0)*1.125), &
+         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+1)*1.125), &
+         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+1)*1.125) /), &
+         dim=2, ncopies=2), (/ 2, 2, 2 /), order=(/ 2, 3, 1 /))
+    vi = vi * exp(-(h-hi)/vschi)
+
+    xx = &
+         + vi(1, 1, 1)*(1-dp)*(1-dx)*(1-dy) &
+         + vi(1, 1, 2)*(1-dp)*(1-dx)*dy &
+         + vi(1, 2, 1)*(1-dp)*dx*(1-dy) &
+         + vi(1, 2, 2)*(1-dp)*dx*dy &
+         + vi(2, 1, 1)*dp*(1-dx)*(1-dy) &
+         + vi(2, 1, 2)*dp*(1-dx)*dy &
+         + vi(2, 2, 1)*dp*dx*(1-dy) &
+         + vi(2, 2, 2)*dp*dx*dy
+
+  end function p836_height_scale
+
+
+  ! Water vapor density, ρ in g/m³ exceeded for ppc of an average year.
+  ! After ITU-R P.836-6 Annex 2.
+
+  real(C_DOUBLE) function p836_rho(lat, lon, ppc, h) &
+       bind(c, name='p836_rho') &
+       result(rho)
+
+    real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
+    real(C_DOUBLE), intent(in) :: lon  ! longitude (°)
+    real(C_DOUBLE), intent(in) :: ppc  ! probability (%)
+    real(C_DOUBLE), intent(in) :: h    ! altitude (km)
+
+    rho = p836_height_scale(p836rho, lat, lon, ppc, h)
+
+  end function p836_rho
+
+
   ! Total vaper vapor content, after ITU-R P.836-6 Annex 2.
 
   real(C_DOUBLE) function p836_V(lat, lon, ppc, h) &
@@ -1025,38 +1084,9 @@ contains
     real(C_DOUBLE), intent(in) :: ppc  ! probability (%)
     real(C_DOUBLE), intent(in) :: h    ! altitude (km)
 
-    real :: dp, dx, dy
-    integer :: ip, ix, iy
-
-    real, dimension(2, 2, 2) :: vi
-    real, dimension(2, 2, 2) :: vschi
-    real, dimension(2, 2, 2) :: hi
-
-    call lookup_pxy_find(p840p, size(p836V, 2), size(p836V, 3), &
-         ppc, max(0., min(180., (90.-lat)))/1.125, modulo(lon, 360.)/1.125, &
-         ip, ix, iy, &
-         dp, dx, dy)
-
-    vi = p836V(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
-    vschi = p836vsch(ip-1:ip, ix+1:ix+2, iy+1:iy+2)
-    hi = reshape( spread( (/ &
-         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+0)*1.125), &
-         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+0)*1.125), &
-         p1511_topoh(90.-(ix+0)*1.125, 0.+(iy+1)*1.125), &
-         p1511_topoh(90.-(ix+1)*1.125, 0.+(iy+1)*1.125) /), &
-         dim=2, ncopies=2), (/ 2, 2, 2 /), order=(/ 2, 3, 1 /))
-    vi = vi * exp(-(h-hi)/vschi)
-
-    Vt = &
-         + vi(1, 1, 1)*(1-dp)*(1-dx)*(1-dy) &
-         + vi(1, 1, 2)*(1-dp)*(1-dx)*dy &
-         + vi(1, 2, 1)*(1-dp)*dx*(1-dy) &
-         + vi(1, 2, 2)*(1-dp)*dx*dy &
-         + vi(2, 1, 1)*dp*(1-dx)*(1-dy) &
-         + vi(2, 1, 2)*dp*(1-dx)*dy &
-         + vi(2, 2, 1)*dp*dx*(1-dy) &
-         + vi(2, 2, 2)*dp*dx*dy
+    Vt = p836_height_scale(p836V, lat, lon, ppc, h)
 
   end function p836_V
+
 
 end module prop

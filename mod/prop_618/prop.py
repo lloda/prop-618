@@ -142,6 +142,15 @@ def p1511_topoh(lat, lon):
     result_ = liba.p1511_topoh(byref(p_lat), byref(p_lon))
     return result_
 
+def p836_rho(lat, lon, ppc, h):
+    p_lat = c_double(lat)
+    p_lon = c_double(lon)
+    p_ppc = c_double(ppc)
+    p_h = c_double(h)
+    liba.p836_rho.restype = c_double
+    result_ = liba.p836_rho(byref(p_lat), byref(p_lon), byref(p_ppc), byref(p_h))
+    return result_
+
 def p836_V(lat, lon, ppc, h):
     p_lat = c_double(lat)
     p_lon = c_double(lon)

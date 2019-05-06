@@ -18,12 +18,12 @@ def p835_ref(h):
     p_h = c_double(h)
     p_P = c_double(0)
     p_rho = c_double(0)
-    p_T = c_double(0)
+    p_temp = c_double(0)
     p_error = c_int32(0)
-    liba.p835_ref(byref(p_h), byref(p_P), byref(p_rho), byref(p_T), byref(p_error))
+    liba.p835_ref(byref(p_h), byref(p_P), byref(p_rho), byref(p_temp), byref(p_error))
     return p_P.value, \
            p_rho.value, \
-           p_T.value, \
+           p_temp.value, \
            p_error.value
 
 # end of atmospheres.py

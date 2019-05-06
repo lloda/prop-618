@@ -13,7 +13,7 @@ atmospheres_init
 
 void
 p835_ref
-(double const * h, double  * P, double  * rho, double  * T, int32_t  * error);
+(double const * h, double  * P, double  * rho, double  * temp, int32_t  * error);
 
 #ifdef __cplusplus
 } // extern "C"

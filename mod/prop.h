@@ -68,6 +68,10 @@ p1511_topoh
 (double const * lat, double const * lon);
 
 double
+p836_rho
+(double const * lat, double const * lon, double const * ppc, double const * h);
+
+double
 p836_V
 (double const * lat, double const * lon, double const * ppc, double const * h);
 

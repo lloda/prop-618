@@ -86,7 +86,7 @@ contains
   end function num_test
 
   ! ---------------------
-  ! p835_ref
+  ! reference atmosphere from P.835
   ! ---------------------
 
   integer function test_p835_ref(hg, Pspec, rhospec, Tspec) &
@@ -125,7 +125,7 @@ contains
   end function test_p835
 
   ! ---------------------
-  ! p839_rain_height
+  ! rain height from P.839
   ! ---------------------
 
   integer function test_p839_rain_height_ref(lat, lon, hspec) &
@@ -197,7 +197,7 @@ contains
   end function test_p838_coeffs
 
   ! ---------------------
-  ! p618_rain
+  ! rain (P.618)
   ! ---------------------
 
   integer function test_p618_rain_ref(id, attpt, lat, lon, hs, fghz, el, taudeg, p, r001) &
@@ -242,7 +242,7 @@ contains
          write(line, '(I2, A, F7.3, A, F7.3, A)') i+22, ' lat ', lat, ' lon ', lon, ' r001 '
 
          ! FIXME p837_rainfall_rate isn't the same method used for R₀₀₁ column
-         ! (see comment in validation table)
+         ! Tolerance is met as per the validation table (see comment there).
 
          ne = ne + num_test(trim(line), r001, p837_rainfall_rate(lat, lon), rspec=5e-4)
        end block
@@ -260,7 +260,7 @@ contains
   end function test_p618_rain
 
   ! ---------------------
-  ! p676_gas_specific
+  ! specific gas attenuation (P.676)
   ! ---------------------
 
   integer function test_p676_gas_specific() &
@@ -319,7 +319,7 @@ contains
   end function test_p676_gas_specific
 
   ! ---------------------
-  ! p676 total path
+  ! total gas atteinuation along path (P.676)
   ! ---------------------
 
   integer function test_p676_gas() &
@@ -350,16 +350,32 @@ contains
     do i=1, 64
        write(line, '(I2, A, F10.7, A)') i+21, ' hₛ ', c(i, 3), ' Pdry'
        block
-         real :: P, rho, T
+         real :: P, rho, temp
          integer :: error
-         call p835_ref(c(i, 3), P, rho, T, error)
-         ne = ne + num_test(trim(line), c(i, 11), P, &
-              rspec=5e-6)
+         call p835_ref(c(i, 3), P, rho, temp, error)
+         ne = ne + num_test(trim(line), c(i, 11), P, rspec=5e-6)
        end block
     end do
 
-    write(*, *) achar(10)
+    write(*, *)
+    do i=1, 64
+       write(line, '(I2, A)') i+21, ' ρ(P)'
+       block
+         ne = ne + num_test(trim(line), c(i, 6), p836_rho(c(i, 1), c(i, 2), c(i, 5), c(i, 3)), &
+              rspec=6e-15)
+       end block
+    end do
 
+    write(*, *)
+    do i=1, 64
+       write(line, '(I2, A)') i+21, ' e'
+       block
+         ne = ne + num_test(trim(line), c(i, 10), (c(i, 6)*p1510_temp(c(i, 1), c(i, 2)))/216.7, &
+              rspec=6e-15)
+       end block
+    end do
+
+    write(*, *)
     do i=1, 64
        write(line, '(I2, A)') i+21, ' Vt'
        ne = ne + num_test(trim(line), c(i, 18), &
@@ -367,8 +383,7 @@ contains
             rspec=5e-15)
     end do
 
-    write(*, *) achar(10)
-
+    write(*, *)
     do i=1, 64
        write(line, '(I2, A)') i+21, ' A_gas'
        ne = ne + num_test(trim(line), c(i, 31), &
@@ -438,7 +453,7 @@ contains
   end function test_p840_Lred
 
   ! ---------------------
-  ! p840_clouds
+  ! clouds
   ! ---------------------
 
   integer function test_p840_clouds() &
@@ -500,7 +515,7 @@ contains
   end function test_p840_clouds
 
   ! ---------------------
-  ! p840_clouds
+  ! scintillation
   ! ---------------------
 
   integer function test_p618_scint() &
@@ -592,7 +607,7 @@ contains
     real, parameter :: lat = 46.2208
     real, parameter :: lon = 6.137
     real, parameter :: hs = 0.412
-    real, parameter :: f = 19.5
+    real, parameter :: freq = 19.5
     real, parameter :: el = 36.6141654045094
     real, parameter :: Deff = 1.2 * sqrt(0.65)
     real, parameter :: taudeg = 0
@@ -602,13 +617,14 @@ contains
     character(len=200) :: line
 
     write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 Att_Tot Sample total attenuation CDF'
-    do i=1, size(At, 1)
+
+    do i=1, size(ppc, 1)
        xasc = Asc(i)
        xar = Ar(i)
        xac = Ac(i)
        xag = Ag(i)
        xat = xag + sqrt((xar +xac)**2 + xasc**2) ! FIXME its own p618_function
-       write(line, '(I2, A, ES12.6, A, ES12.6, A, ES12.6, A, ES12.6, A, ES12.6, A)') &
+       write(line, '(I3, A, ES12.6, A, ES12.6, A, ES12.6, A, ES12.6, A, ES12.6, A)') &
             99+i, ' ppc ', ppc(i), ' Asc ', xasc, ' Ar ', xar, ' Ac ', xac, ' Ag ', xag, ' At '
        ne = ne + num_test(trim(line), At(i), xat, rspec=5e-15)
     end do

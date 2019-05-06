@@ -23,16 +23,16 @@ make install
 * Same units as in ITU's reports (latitude/longitude is in °, probabilities are in %, frequencies are in GHz, and so on).
 * Similar variable names as in ITU's reports. As an exception, I use `el` instead of `θ` or `th` where this means elevation.
 
-## Outlook & bugs
+## Outlook
 
-The library is maybe halfway complete. Look at the [TODO](TODO) file or the tests in [src/test0.f95](src/test0.f95) to see what's implemented. The functions do work and pass ITU's validation table (linked below) but I'm not settled on function names and error handling, so the interface could change in the future.
+The library is maybe halfway complete. Look at the [TODO](TODO) file or the tests in [test/test0.f95](test/test0.f95) to see what's implemented. The functions do work and pass ITU's validation table (linked below) but I'm not settled on function names and error handling, so the interface could change in the future.
 
 * Calling the library with out-of-range parameters will abort, which is inconvenient if you're using it from Python or Guile. Eventually we'll have some other mechanism to signal errors.
 * Tests depend on `.` (or the CMake build directory) being in the dynamic library path.
 
 This is the first time I write anything in Fortran; I'm using gfortran 8.2 and 8.3.
 
-## Random links
+## Links
 
 * [Fortran libraries](https://github.com/rabbiabram/awesome-fortran)
 * [Generating Fortran interfaces](http://fortranwiki.org/fortran/show/Generating+C+Interfaces)
