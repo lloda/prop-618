@@ -25,7 +25,7 @@ make install
 
 ## Outlook
 
-The library is maybe halfway complete. Look at the [TODO](TODO) file or the tests in [test/test0.f95](test/test0.f95) to see what's implemented. The functions do work and pass ITU's validation table (linked below) but I'm not settled on function names and error handling, so the interface could change in the future.
+The library is maybe halfway complete. Look at the [TODO](TODO) file or the tests in [test/test-0.f95](test/test-0.f95) to see what's implemented. The functions do work and pass ITU's validation table (linked below) but I'm not settled on function names and error handling, so the interface could change in the future.
 
 * Calling the library with out-of-range parameters will abort, which is inconvenient if you're using it from Python or Guile. Eventually we'll have some other mechanism to signal errors.
 * Tests depend on `.` (or the CMake build directory) being in the dynamic library path.

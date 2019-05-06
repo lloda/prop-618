@@ -3,7 +3,7 @@
 help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip checkbox [C-ct] flip TODO
 
 * TODO
-  - [-] gas & water vapor, P676 [7/9]
+  - [-] gas & water vapor, P676 [8/10]
     + [X] specific attenuation
     + [X] tests from validation table (P676-11 SpAtt 1-9)
     + [X] tests from validation table (P676-11 SpAtt 22-23)
@@ -11,6 +11,7 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
     + [X] tests from validation table (P676-11 A_Gas)
     + [X] Vt for P676-11 (37) from P.836-6
     + [X] P_dry for P676-11 (37) from P.835-6
+    + [X] tests from P618-13 Att_Tot
     + [ ] slant propagation, simpler P676-11 Annex 2 method
     + [ ] any path propagation, layer gral P676-11 Annex 1 method / P619 §C2ss
   - [X] rain, P618 [2/2]

@@ -31,6 +31,7 @@ program test0
   n = n + test_p618_att_tot_ppc()
 
   write(*, *) achar(10), n, ' errors.'
+
   stop n
 
 contains
@@ -616,8 +617,57 @@ contains
     integer :: i
     character(len=200) :: line
 
+    ne = 0
+
     write(*, *) achar(10), 'CG-3M3J-13-ValEx-Rev4_2.xlsx / P618-13 Att_Tot Sample total attenuation CDF'
 
+    write(*, *)
+    do i=1, size(ppc, 1)
+       xasc = p618_scint(freq, el, Deff, ppc(i), p453_Nwet(lat, lon, 50.))
+       write(line, '(I3, A, ES12.6, A)') 99+i, ' ppc ', ppc(i), ' Asc '
+       ne = ne + num_test(trim(line), Asc(i), xasc, rspec=5e-9)
+    end do
+
+    ! see the comment re: precision in test_p618_rain()
+    write(*, *)
+    do i=1, size(ppc, 1)
+       xar = p618_rain(lat, lon, hs, freq, el, taudeg, ppc(i), p837_rainfall_rate(lat, lon))
+       write(line, '(I3, A, ES12.6, A)') 99+i, ' ppc ', ppc(i), ' Ar '
+       ne = ne + num_test(trim(line), Ar(i), xar, rspec=6e-5)
+    end do
+
+    write(*, *)
+    do i=1, 8
+       block
+         xac = p840_clouds(freq, el, p840_Lred(lat, lon, max(1., ppc(i))))  ! P.618-13 (61)
+         write(line, '(I3, A, ES12.6, A)') 99+i, ' ppc ', ppc(i), ' Ac '
+         ne = ne + num_test(trim(line), Ac(i), xac, rspec=5e-9)
+       end block
+    end do
+
+    write(*, *)
+    do i=1, size(ppc, 1)
+       block
+         real :: rho, temp, e, V
+         real :: Pd, rhod, tempd
+         integer :: error
+
+         ! from P.618-13 (62) I'd say max(1.0) for both, but the validation table has a clear
+         ! inflexion point at 0.1, and clamping at 0.1 for ρ reduces the error from 1e-2 to 1e-8.
+
+         rho = p836_rho(lat, lon, max(0.1, ppc(i)), hs)
+         temp = p1510_temp(lat, lon)
+         e = (rho*temp)/216.7
+         V = p836_V(lat, lon, max(1.0, ppc(i)), hs)
+         call p835_ref(hs, Pd, rhod, tempd, error) ! only need Pd
+
+         xag = p676_gas(el, freq, Pd, e, temp, V, hs)
+         write(line, '(I3, A, ES12.6, A)') 99+i, ' ppc ', ppc(i), ' Ag '
+         ne = ne + num_test(trim(line), Ag(i), xag, rspec=5e-7)
+       end block
+    end do
+
+    write(*, *)
     do i=1, size(ppc, 1)
        xasc = Asc(i)
        xar = Ar(i)
