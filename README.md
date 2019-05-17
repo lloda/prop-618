@@ -34,6 +34,7 @@ This is the first time I write anything in Fortran; I'm using gfortran 8.2 and 8
 
 ## Links
 
+* [Fortran intro for C/C++ programmers](http://www.icl.utk.edu/~mgates3/docs/fortran.html)
 * [Fortran libraries](https://github.com/rabbiabram/awesome-fortran)
 * [Generating Fortran interfaces](http://fortranwiki.org/fortran/show/Generating+C+Interfaces)
 * [Fortran guide](http://www.egr.unlv.edu/~ed/fortranv3.pdf)

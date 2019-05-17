@@ -117,15 +117,7 @@ endif ()
 # documentation
 # -------------------
 
-# queries(config/UseLATEX.cmake)
-# set (LATEX_OUTPUT_PATH build)
-# add_latex_document (docs/prop-doc.tex
-#   INPUTS docs/paper-prologue.tex docs/margins.tex
-#   # USE_BIBLATEX # problems with biblatex & biber
-#   BIBFILES docs/biblio.bib
-#   # USE_INDEX
-#   # USE_GLOSSARY
-#   )
+# add_subdirectory (docs)
 
 # -------------------
 # install
