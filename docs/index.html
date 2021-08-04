@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- prop-618 (version 16, updated 2021 August 4)
+
+(c) lloda 2019-2021
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. -->
+<title>prop-618 — ITU propagation models for Earth-space telecommunications systems</title>
+
+<meta name="description" content="prop-618 — ITU propagation models for Earth-space telecommunications systems">
+<meta name="keywords" content="prop-618 — ITU propagation models for Earth-space telecommunications systems">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link href="#Top" rel="start" title="Top">
+<link href="#Indices" rel="index" title="Indices">
+<link href="#Overview" rel="next" title="Overview">
+<style type="text/css">
+<!--
+a.copiable-anchor {visibility: hidden; text-decoration: none; line-height: 0em}
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+span:hover a.copiable-anchor {visibility: visible}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+<script type='text/javascript'>
+MathJax = {
+  options: {
+    skipHtmlTags: {'[-]': ['pre']},
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  },
+};
+</script><script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script>
+</head>
+
+<body lang="en">
+<h1 class="settitle" align="center"><code>prop-618</code> — ITU propagation models for Earth-space telecommunications systems</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="top" id="Top">
+<div class="header">
+<p>
+Next: <a href="#Overview" accesskey="n" rel="next">Overview</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="prop_002d618"></span><h1 class="top"><code>prop-618</code></h1>
+
+<p><code>prop-618</code> (version 16, updated 2021 August 4)
+</p>
+<p>(c) lloda 2019&ndash;2021
+</p>
+<div class="display">
+<pre class="display">Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+</pre></div>
+
+<p><code>prop-618</code> is a translation into code of [<a href="#Sources">ITU-618</a>]
+ and other references given there and in this <a href="https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx">ITU table</a>. It is written in Fortran and offers bindings to C, Python, and Guile.
+</p>
+
+
+
+<ul class="section-toc">
+<li><a href="#Overview" accesskey="1">Overview</a></li>
+<li><a href="#Usage" accesskey="2">Usage</a></li>
+<li><a href="#Extras" accesskey="3">Extras</a></li>
+<li><a href="#Reference" accesskey="4">Reference</a></li>
+<li><a href="#Sources" accesskey="5">Sources</a></li>
+<li><a href="#Indices" accesskey="6">Indices</a></li>
+<li><a href="#Notes" accesskey="7">Notes</a></li>
+</ul>
+<hr>
+<div class="chapter" id="Overview">
+<div class="header">
+<p>
+Next: <a href="#Usage" accesskey="n" rel="next">Usage</a>, Previous: <a href="#Top" accesskey="p" rel="prev"><code>prop-618</code></a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Overview-1"></span><h2 class="chapter">1 Overview</h2>
+
+<ul class="section-toc">
+<li><a href="#Attenuation" accesskey="1">Attenuation</a></li>
+</ul>
+<hr>
+<div class="section" id="Attenuation">
+<div class="header">
+<p>
+Up: <a href="#Overview" accesskey="u" rel="up">Overview</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Attenuation-1"></span><h3 class="section">1.1 Attenuation</h3>
+
+<p>The overall attenuation is </p>
+<div class="displaymath"><em class="tex2jax_process">\[  A_T(p) = A_G(p) + \sqrt{(A_R(p) + A_C(p))^2 + A_S^2(p)}
+\]</em></div>
+<p>Each component is ‘attenuation exceeded for <em class='tex2jax_process'>\(p\)</em> of an average year’ </p>
+<ul>
+<li> <em class='tex2jax_process'>\(A_G\)</em>: atmospheric gases </li><li> <em class='tex2jax_process'>\(A_R\)</em>: rain </li><li> <em class='tex2jax_process'>\(A_C\)</em>: clouds </li><li> <em class='tex2jax_process'>\(A_S\)</em>: tropospheric scintillation </li></ul>
+
+<ul class="section-toc">
+<li><a href="#Atmospheric-gases" accesskey="1">Atmospheric gases</a></li>
+<li><a href="#Rain" accesskey="2">Rain</a></li>
+</ul>
+<hr>
+<div class="subsection" id="Atmospheric-gases">
+<div class="header">
+<p>
+Next: <a href="#Rain" accesskey="n" rel="next">Rain</a>, Up: <a href="#Attenuation" accesskey="u" rel="up">Attenuation</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Atmospheric-gases-1"></span><h4 class="subsection">1.1.1 Atmospheric gases</h4>
+
+<p>The computation in FIXME requires pressure, temperature and humidity data for each layer of the atmosphere. In the absence of specific data, location-dependent reference data is provided in FIXMEand a generic mean global atmosphere is provided in FIXME</p>
+<hr>
+</div>
+<div class="subsection" id="Rain">
+<div class="header">
+<p>
+Previous: <a href="#Atmospheric-gases" accesskey="p" rel="prev">Atmospheric gases</a>, Up: <a href="#Attenuation" accesskey="u" rel="up">Attenuation</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Rain-1"></span><h4 class="subsection">1.1.2 Rain</h4>
+
+<p>A procedure to compute attenuation due to rain is given in FIXME. This uses the rain height map from FIXME, the average annual rainfall rate map from FIXME, and the specific attenuation coefficients from FIXME. </p>
+<hr>
+</div>
+</div>
+</div>
+<div class="chapter" id="Usage">
+<div class="header">
+<p>
+Next: <a href="#Extras" accesskey="n" rel="next">Extras</a>, Previous: <a href="#Overview" accesskey="p" rel="prev">Overview</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Usage-1"></span><h2 class="chapter">2 Usage</h2>
+
+<hr>
+</div>
+<div class="chapter" id="Extras">
+<div class="header">
+<p>
+Next: <a href="#Reference" accesskey="n" rel="next">Reference</a>, Previous: <a href="#Usage" accesskey="p" rel="prev">Usage</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Extras-1"></span><h2 class="chapter">3 Extras</h2>
+
+
+
+
+
+<hr>
+</div>
+<div class="chapter" id="Reference">
+<div class="header">
+<p>
+Next: <a href="#Sources" accesskey="n" rel="next">Sources</a>, Previous: <a href="#Extras" accesskey="p" rel="prev">Extras</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Reference-1"></span><h2 class="chapter">4 Reference</h2>
+
+<ul class="section-toc">
+<li><a href="#Module-atmospheres" accesskey="1">Module <code>atmospheres</code></a></li>
+<li><a href="#Module-prop" accesskey="2">Module <code>prop</code></a></li>
+</ul>
+<hr>
+<div class="section" id="Module-atmospheres">
+<div class="header">
+<p>
+Next: <a href="#Module-prop" accesskey="n" rel="next">Module <code>prop</code></a>, Up: <a href="#Reference" accesskey="u" rel="up">Reference</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Module-atmospheres-1"></span><h3 class="section">4.1 Module <code>atmospheres</code></h3>
+
+<span id="x_002datmospheres_002dinit"></span><dl class="def">
+<dt id="index-init"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>init</strong> <em>()</em><a href='#index-init' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-init-1"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>init</strong><a href='#index-init-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-atmospheres_005finit"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>atmospheres_init</strong> <em>()</em><a href='#index-atmospheres_005finit' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-atmospheres_005finit-1"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>atmospheres_init</strong> <em>()</em><a href='#index-atmospheres_005finit-1' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp835_002dref"></span><dl class="def">
+<dt id="index-p835_005fref"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p835_ref</strong> <em>(h)</em><a href='#index-p835_005fref' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p835_002dref"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p835-ref</strong> <em>h</em><a href='#index-p835_002dref' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p835_005fref-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p835_ref</strong> <em>(double const * h, double  * P, double  * rho, double  * temp, int32_t  * error)</em><a href='#index-p835_005fref-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p835_005fref-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p835_ref</strong> <em>(h, P, rho, temp, error)</em><a href='#index-p835_005fref-2' class='copiable-anchor'> &para;</a></span></dt>
+<dd><pre class="verbatim">    real(C_DOUBLE), intent(in) :: h                   ! geometric height (km)
+    real(C_DOUBLE), intent(out) :: P                  ! dry air partial pressure (hPa)
+    real(C_DOUBLE), intent(out) :: rho                ! water vapor density (g/m³)
+    real(C_DOUBLE), intent(out) :: temp               ! temperature (K)
+    integer(C_INT32_T), intent(out):: error           ! error - 0 means none
+</pre>
+</dd></dl>
+
+<hr>
+</div>
+<div class="section" id="Module-prop">
+<div class="header">
+<p>
+Previous: <a href="#Module-atmospheres" accesskey="p" rel="prev">Module <code>atmospheres</code></a>, Up: <a href="#Reference" accesskey="u" rel="up">Reference</a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Module-prop-1"></span><h3 class="section">4.2 Module <code>prop</code></h3>
+
+<span id="x_002dprop_002dinit"></span><dl class="def">
+<dt id="index-init-2"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>init</strong> <em>()</em><a href='#index-init-2' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-init-3"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>init</strong><a href='#index-init-3' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-prop_005finit"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>prop_init</strong> <em>()</em><a href='#index-prop_005finit' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-prop_005finit-1"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>prop_init</strong> <em>()</em><a href='#index-prop_005finit-1' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp839_002drain_002dheight"></span><dl class="def">
+<dt id="index-p839_005frain_005fheight"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p839_rain_height</strong><a href='#index-p839_005frain_005fheight' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p839_002drain_002dheight"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p839-rain-height</strong><a href='#index-p839_002drain_002dheight' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p839_005frain_005fheight-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p839_rain_height</strong><a href='#index-p839_005frain_005fheight-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p839_005frain_005fheight-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p839_rain_height</strong><a href='#index-p839_005frain_005fheight-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp837_002drainfall_002drate"></span><dl class="def">
+<dt id="index-p837_005frainfall_005frate"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p837_rainfall_rate</strong><a href='#index-p837_005frainfall_005frate' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p837_002drainfall_002drate"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p837-rainfall-rate</strong><a href='#index-p837_002drainfall_002drate' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p837_005frainfall_005frate-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p837_rainfall_rate</strong><a href='#index-p837_005frainfall_005frate-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p837_005frainfall_005frate-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p837_rainfall_rate</strong><a href='#index-p837_005frainfall_005frate-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp1510_002dtemp"></span><dl class="def">
+<dt id="index-p1510_005ftemp"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p1510_temp</strong><a href='#index-p1510_005ftemp' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1510_002dtemp"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p1510-temp</strong><a href='#index-p1510_002dtemp' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1510_005ftemp-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p1510_temp</strong><a href='#index-p1510_005ftemp-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1510_005ftemp-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p1510_temp</strong><a href='#index-p1510_005ftemp-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp838_002dcoeffs"></span><dl class="def">
+<dt id="index-p838_005fcoeffs"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p838_coeffs</strong><a href='#index-p838_005fcoeffs' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p838_002dcoeffs"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p838-coeffs</strong><a href='#index-p838_002dcoeffs' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p838_005fcoeffs-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p838_coeffs</strong><a href='#index-p838_005fcoeffs-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p838_005fcoeffs-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p838_coeffs</strong><a href='#index-p838_005fcoeffs-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp618_002drain"></span><dl class="def">
+<dt id="index-p618_005frain"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p618_rain</strong><a href='#index-p618_005frain' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_002drain"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p618-rain</strong><a href='#index-p618_002drain' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_005frain-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p618_rain</strong><a href='#index-p618_005frain-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_005frain-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p618_rain</strong><a href='#index-p618_005frain-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp676_002dvapor_002dpressure"></span><dl class="def">
+<dt id="index-p676_005fvapor_005fpressure"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p676_vapor_pressure</strong><a href='#index-p676_005fvapor_005fpressure' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_002dvapor_002dpressure"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p676-vapor-pressure</strong><a href='#index-p676_002dvapor_002dpressure' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fvapor_005fpressure-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p676_vapor_pressure</strong><a href='#index-p676_005fvapor_005fpressure-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fvapor_005fpressure-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p676_vapor_pressure</strong><a href='#index-p676_005fvapor_005fpressure-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp676_002dgas_002dspecific"></span><dl class="def">
+<dt id="index-p676_005fgas_005fspecific"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas_specific</strong><a href='#index-p676_005fgas_005fspecific' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_002dgas_002dspecific"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p676-gas-specific</strong><a href='#index-p676_002dgas_002dspecific' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fgas_005fspecific-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas_specific</strong><a href='#index-p676_005fgas_005fspecific-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fgas_005fspecific-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas_specific</strong><a href='#index-p676_005fgas_005fspecific-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp676_002deq_002dheight"></span><dl class="def">
+<dt id="index-p676_005feq_005fheight"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p676_eq_height</strong><a href='#index-p676_005feq_005fheight' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_002deq_002dheight"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p676-eq-height</strong><a href='#index-p676_002deq_002dheight' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005feq_005fheight-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p676_eq_height</strong><a href='#index-p676_005feq_005fheight-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005feq_005fheight-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p676_eq_height</strong><a href='#index-p676_005feq_005fheight-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp676_002dgas"></span><dl class="def">
+<dt id="index-p676_005fgas"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas</strong><a href='#index-p676_005fgas' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_002dgas"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p676-gas</strong><a href='#index-p676_002dgas' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fgas-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas</strong><a href='#index-p676_005fgas-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p676_005fgas-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p676_gas</strong><a href='#index-p676_005fgas-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp840_002dLred"></span><dl class="def">
+<dt id="index-p840_005fLred"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p840_Lred</strong><a href='#index-p840_005fLred' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_002dLred"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p840-Lred</strong><a href='#index-p840_002dLred' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_005fLred-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p840_Lred</strong><a href='#index-p840_005fLred-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_005fLred-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p840_Lred</strong><a href='#index-p840_005fLred-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp453_002dNwet"></span><dl class="def">
+<dt id="index-p453_005fNwet"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p453_Nwet</strong><a href='#index-p453_005fNwet' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p453_002dNwet"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p453-Nwet</strong><a href='#index-p453_002dNwet' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p453_005fNwet-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p453_Nwet</strong><a href='#index-p453_005fNwet-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p453_005fNwet-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p453_Nwet</strong><a href='#index-p453_005fNwet-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp840_002dclouds"></span><dl class="def">
+<dt id="index-p840_005fclouds"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p840_clouds</strong><a href='#index-p840_005fclouds' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_002dclouds"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p840-clouds</strong><a href='#index-p840_002dclouds' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_005fclouds-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p840_clouds</strong><a href='#index-p840_005fclouds-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p840_005fclouds-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p840_clouds</strong><a href='#index-p840_005fclouds-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp618_002dscint"></span><dl class="def">
+<dt id="index-p618_005fscint"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p618_scint</strong><a href='#index-p618_005fscint' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_002dscint"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p618-scint</strong><a href='#index-p618_002dscint' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_005fscint-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p618_scint</strong><a href='#index-p618_005fscint-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p618_005fscint-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p618_scint</strong><a href='#index-p618_005fscint-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp1511_002dtopoh"></span><dl class="def">
+<dt id="index-p1511_005ftopoh"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p1511_topoh</strong><a href='#index-p1511_005ftopoh' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1511_002dtopoh"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p1511-topoh</strong><a href='#index-p1511_002dtopoh' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1511_005ftopoh-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p1511_topoh</strong><a href='#index-p1511_005ftopoh-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p1511_005ftopoh-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p1511_topoh</strong><a href='#index-p1511_005ftopoh-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp836_002drho"></span><dl class="def">
+<dt id="index-p836_005frho"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p836_rho</strong><a href='#index-p836_005frho' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_002drho"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p836-rho</strong><a href='#index-p836_002drho' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_005frho-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p836_rho</strong><a href='#index-p836_005frho-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_005frho-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p836_rho</strong><a href='#index-p836_005frho-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<span id="x_002dp836_002dV"></span><dl class="def">
+<dt id="index-p836_005fV"><span class="category">Python&nbsp;function<!-- /@w -->: </span><span><strong>p836_V</strong><a href='#index-p836_005fV' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_002dV"><span class="category">Guile&nbsp;function<!-- /@w -->: </span><span><strong>p836-V</strong><a href='#index-p836_002dV' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_005fV-1"><span class="category">C&nbsp;function<!-- /@w -->: </span><span><strong>p836_V</strong><a href='#index-p836_005fV-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-p836_005fV-2"><span class="category">Fortran&nbsp;function<!-- /@w -->: </span><span><strong>p836_V</strong><a href='#index-p836_005fV-2' class='copiable-anchor'> &para;</a></span></dt>
+</dl>
+
+<hr>
+</div>
+</div>
+<div class="chapter" id="Sources">
+<div class="header">
+<p>
+Next: <a href="#Indices" accesskey="n" rel="next">Indices</a>, Previous: <a href="#Reference" accesskey="p" rel="prev">Reference</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Sources-1"></span><h2 class="chapter">5 Sources</h2>
+
+<table>
+<tr><td width="10%"></td></tr>
+<tr><td width="10%"><span id="ITU_002d618"></span>[ITU-618]</td><td width="90%">ITU-R P.618-13: Propagation data and prediction methods required for the design of Earth-space telecommunication systems. <a href="https://www.itu.int/rec/R-REC-P.618/en">https://www.itu.int/rec/R-REC-P.618/en</a>, April 2019.</td></tr>
+</table>
+
+<hr>
+</div>
+<div class="unnumbered" id="Indices">
+<div class="header">
+<p>
+Next: <a href="#Notes" accesskey="n" rel="next">Notes</a>, Previous: <a href="#Sources" accesskey="p" rel="prev">Sources</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Indices-1"></span><h2 class="unnumbered">Indices</h2>
+
+
+
+<hr>
+</div>
+<div class="unnumbered" id="Notes">
+<div class="header">
+<p>
+Previous: <a href="#Indices" accesskey="p" rel="prev">Indices</a>, Up: <a href="#Top" accesskey="u" rel="up"><code>prop-618</code></a> &nbsp; [<a href="#Indices" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Notes-1"></span><h2 class="unnumbered">Notes</h2>
+
+<ol>
+<li> <code>ra::</code> uses the non standard <code>#pragma once</code> (supported on all major compilers).
+</li></ol>
+
+</div>
+</div>
+
+
+<a href='js_licenses.html' rel='jslicense'><small>JavaScript license information</small></a>
+</body>
+</html>
