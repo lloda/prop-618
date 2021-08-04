@@ -1,0 +1,318 @@
+@c -*- mode: texinfo; coding: utf-8 -*-
+@c %**start of header
+@setfilename prop-618.info
+@documentencoding UTF-8
+@settitle @code{prop-618} — ITU propagation models for Earth-space telecommunications systems
+@c %**end of header
+
+@set VERSION 16
+@set UPDATED 2021 August 4
+
+@copying
+@code{prop-618} (version @value{VERSION}, updated @value{UPDATED})
+
+(c) lloda 2019--2021
+
+@smalldisplay
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+@end smalldisplay
+@end copying
+
+@dircategory Software libraries
+@direntry
+* prop-618: (prop-618.info).  ITU propagation models for Earth-space telecommunications systems
+@end direntry
+
+@include my-bib-macros.texi
+@mybibuselist{Sources}
+
+@titlepage
+@title @code{prop-618}
+@subtitle version @value{VERSION}, updated @value{UPDATED}
+@author lloda
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@ifnottex
+@node Top
+@top @code{prop-618}
+
+@insertcopying
+
+@code{prop-618} is a translation into code of @mybibcite{ITU-618} and other references given there and in this @url{https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx,ITU table}. It is written in Fortran and offers bindings to C, Python, and Guile.
+
+@menu
+* Overview::
+* Usage::
+* Extras::
+* Reference::
+* @mybibnode{}::
+* Indices::
+@end menu
+
+@end ifnottex
+
+@iftex
+@shortcontents
+@end iftex
+
+@c ------------------------------------------------
+@node Overview
+@chapter Overview
+@c ------------------------------------------------
+
+@c ------------------------------------------------
+@node Attenuation
+@section Attenuation
+@c ------------------------------------------------
+
+The overall attenuation is @c \cite[(60)]{ITU-P.618-13}
+
+@displaymath
+  A_T(p) = A_G(p) + \sqrt{(A_R(p) + A_C(p))^2 + A_S^2(p)}
+@end displaymath
+
+Each component is ‘attenuation exceeded for @math{p} of an average year’ @c \cite[\S2.2.2.1 Step 9]{ITU-P.618-13},
+
+@itemize
+@item @math{A_G}: atmospheric gases @c \cite[(20)]{ITU-P.676-11}
+@item @math{A_R}: rain @c \cite[(8)]{ITU-P.618-13}.
+@item @math{A_C}: clouds @c \cite{ITU-P.840-7}.
+@item @math{A_S}: tropospheric scintillation @c \cite[(46)]{ITU-P.618-13}.
+@end itemize
+
+@c ------------------------------------------------
+@node Atmospheric gases
+@subsection Atmospheric gases
+@c ------------------------------------------------
+
+The computation in FIXME @c \cite[(20)]{ITU-P.676-11}
+requires pressure, temperature and humidity data for each layer of the atmosphere. In the absence of specific data, location-dependent reference data is provided in FIXME@c ~\cite[Annex~2]{ITU-P.835-6}\footnote{Cf accompanying data in \cite{ITU-prop-soft}.}
+and a generic mean global atmosphere is provided in FIXME@c ~\cite[Annex~1]{ITU-P.835-6}.
+
+@c ------------------------------------------------
+@node Rain
+@subsection Rain
+@c ------------------------------------------------
+
+A procedure to compute attenuation due to rain is given in FIXME. @c \cite[\S2.2.1.1]{ITU-P.618-13}
+This uses the rain height map from FIXME, @c \cite[\S2.2.1.1]{ITU-P.839-4}
+the average annual rainfall rate map from FIXME, @c \cite{ITU-P.837-7}\footnote{A procedure to compute monthly rainfall rates is also given in~\cite{ITU-P.837-7} and is not yet implemented.\todo{}}
+and the specific attenuation coefficients from FIXME. @c \cite{ITU-P.838-3}
+
+@c ------------------------------------------------
+@node Usage
+@chapter Usage
+@c ------------------------------------------------
+
+@c ------------------------------------------------
+@node Extras
+@chapter Extras
+@c ------------------------------------------------
+
+@c \cite{ITU-P.676-11}
+
+@c \cite{ITU-e2s-val}
+
+@c \paragraph{Earth stations vs aeronautical mobile terminals}
+
+@c See \cite{ITU-P.682-3} and \cite{ITU-P.619-3}\dots
+
+@c ------------------------------------------------
+@node Reference
+@chapter Reference
+@c ------------------------------------------------
+
+@c ------------------------------------------------
+@node Module @code{atmospheres}
+@section Module @code{atmospheres}
+@c ------------------------------------------------
+
+@anchor{x-atmospheres-init}
+@deffn @w{Python function} init ()
+@deffnx @w{Guile function} init
+@deffnx @w{C function} atmospheres_init ()
+@deffnx @w{Fortran function} atmospheres_init ()
+
+@end deffn
+
+@anchor{x-p835-ref}
+@deffn @w{Python function} p835_ref (h)
+@deffnx @w{Guile function} p835-ref h
+@deffnx @w{C function} p835_ref (double const * h, double  * P, double  * rho, double  * temp, int32_t  * error)
+@deffnx @w{Fortran function} p835_ref (h, P, rho, temp, error)
+@verbatim
+    real(C_DOUBLE), intent(in) :: h                   ! geometric height (km)
+    real(C_DOUBLE), intent(out) :: P                  ! dry air partial pressure (hPa)
+    real(C_DOUBLE), intent(out) :: rho                ! water vapor density (g/m³)
+    real(C_DOUBLE), intent(out) :: temp               ! temperature (K)
+    integer(C_INT32_T), intent(out):: error           ! error - 0 means none
+@end verbatim
+
+@end deffn
+
+@c ------------------------------------------------
+@node Module @code{prop}
+@section Module @code{prop}
+@c ------------------------------------------------
+
+@anchor{x-prop-init}
+@deffn @w{Python function} init ()
+@deffnx @w{Guile function} init
+@deffnx @w{C function} prop_init ()
+@deffnx @w{Fortran function} prop_init ()
+@end deffn
+
+@anchor{x-p839-rain-height}
+@deffn @w{Python function} p839_rain_height
+@deffnx @w{Guile function} p839-rain-height
+@deffnx @w{C function} p839_rain_height
+@deffnx @w{Fortran function} p839_rain_height
+@end deffn
+
+@anchor{x-p837-rainfall-rate}
+@deffn @w{Python function} p837_rainfall_rate
+@deffnx @w{Guile function} p837-rainfall-rate
+@deffnx @w{C function} p837_rainfall_rate
+@deffnx @w{Fortran function} p837_rainfall_rate
+@end deffn
+
+@anchor{x-p1510-temp}
+@deffn @w{Python function} p1510_temp
+@deffnx @w{Guile function} p1510-temp
+@deffnx @w{C function} p1510_temp
+@deffnx @w{Fortran function} p1510_temp
+@end deffn
+
+@anchor{x-p838-coeffs}
+@deffn @w{Python function} p838_coeffs
+@deffnx @w{Guile function} p838-coeffs
+@deffnx @w{C function} p838_coeffs
+@deffnx @w{Fortran function} p838_coeffs
+@end deffn
+
+@anchor{x-p618-rain}
+@deffn @w{Python function} p618_rain
+@deffnx @w{Guile function} p618-rain
+@deffnx @w{C function} p618_rain
+@deffnx @w{Fortran function} p618_rain
+@end deffn
+
+@anchor{x-p676-vapor-pressure}
+@deffn @w{Python function} p676_vapor_pressure
+@deffnx @w{Guile function} p676-vapor-pressure
+@deffnx @w{C function} p676_vapor_pressure
+@deffnx @w{Fortran function} p676_vapor_pressure
+@end deffn
+
+@anchor{x-p676-gas-specific}
+@deffn @w{Python function} p676_gas_specific
+@deffnx @w{Guile function} p676-gas-specific
+@deffnx @w{C function} p676_gas_specific
+@deffnx @w{Fortran function} p676_gas_specific
+@end deffn
+
+@anchor{x-p676-eq-height}
+@deffn @w{Python function} p676_eq_height
+@deffnx @w{Guile function} p676-eq-height
+@deffnx @w{C function} p676_eq_height
+@deffnx @w{Fortran function} p676_eq_height
+@end deffn
+
+@anchor{x-p676-gas}
+@deffn @w{Python function} p676_gas
+@deffnx @w{Guile function} p676-gas
+@deffnx @w{C function} p676_gas
+@deffnx @w{Fortran function} p676_gas
+@end deffn
+
+@anchor{x-p840-Lred}
+@deffn @w{Python function} p840_Lred
+@deffnx @w{Guile function} p840-Lred
+@deffnx @w{C function} p840_Lred
+@deffnx @w{Fortran function} p840_Lred
+@end deffn
+
+@anchor{x-p453-Nwet}
+@deffn @w{Python function} p453_Nwet
+@deffnx @w{Guile function} p453-Nwet
+@deffnx @w{C function} p453_Nwet
+@deffnx @w{Fortran function} p453_Nwet
+@end deffn
+
+@anchor{x-p840-clouds}
+@deffn @w{Python function} p840_clouds
+@deffnx @w{Guile function} p840-clouds
+@deffnx @w{C function} p840_clouds
+@deffnx @w{Fortran function} p840_clouds
+@end deffn
+
+@anchor{x-p618-scint}
+@deffn @w{Python function} p618_scint
+@deffnx @w{Guile function} p618-scint
+@deffnx @w{C function} p618_scint
+@deffnx @w{Fortran function} p618_scint
+@end deffn
+
+@anchor{x-p1511-topoh}
+@deffn @w{Python function} p1511_topoh
+@deffnx @w{Guile function} p1511-topoh
+@deffnx @w{C function} p1511_topoh
+@deffnx @w{Fortran function} p1511_topoh
+@end deffn
+
+@anchor{x-p836-rho}
+@deffn @w{Python function} p836_rho
+@deffnx @w{Guile function} p836-rho
+@deffnx @w{C function} p836_rho
+@deffnx @w{Fortran function} p836_rho
+@end deffn
+
+@anchor{x-p836-V}
+@deffn @w{Python function} p836_V
+@deffnx @w{Guile function} p836-V
+@deffnx @w{C function} p836_V
+@deffnx @w{Fortran function} p836_V
+@end deffn
+
+@c ------------------------------------------------
+@node @mybibnode{}
+@chapter Sources
+@c ------------------------------------------------
+
+@multitable @columnfractions .1 .9
+
+@item @mybibitem{ITU-618} @tab ITU-R P.618-13: Propagation data and prediction methods required for the design of Earth-space telecommunication systems. @url{https://www.itu.int/rec/R-REC-P.618/en}, April 2019.
+
+@end multitable
+
+@c ------------------------------------------------
+@node Indices
+@unnumbered Indices
+@c ------------------------------------------------
+
+@c @node Concept Index
+@c @unnumbered Concept Index
+@printindex cp
+@c @node Function Index
+@c @unnumbered Function Index
+@c @printindex fn
+
+@c \nocite{JLangReference,FalkoffIverson1968,Abrams1970,FalkoffIverson1973,FalkoffIverson1978,APLexamples1,ArraysCowan,KonaTheLanguage,blitz++2001}
+
+@c ------------------------------------------------
+@node Notes
+@unnumbered Notes
+@c ------------------------------------------------
+
+@enumerate
+@item
+@code{ra::} uses the non standard @code{#pragma once} (supported on all major compilers).
+@end enumerate
+
+@bye

@@ -5,7 +5,7 @@
 
 This is a translation into code of [ITU-R P.618](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-13-201712-I!!PDF-E.pdf) and other references given there and in this [ITU table](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx). The implementations I could find were all in Matlabese (from ITU itself or national offices), which I couldn't use, or don't seem to give the source [(like this one)](https://logiciels.cnes.fr/fr/content/propa).
 
-You probably need to be familiar with the relevant ITU-R papers to use this at all.
+You probably need to be familiar with the relevant ITU-R papers to use this at all. Eventually there will be a manual in [lloda.github.io/prop-618](https://lloda.github.io/prop-618).
 
 The library is written in Fortran (`-std=f2018`). It uses the C compatibility feature (`bind(c)`) which makes it easy to call from C, or anything with an FFI. C headers are included, plus bindings for Python and Guile. These are automatically generated from the Fortran.
 
