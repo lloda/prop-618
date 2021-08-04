@@ -1,7 +1,7 @@
 ; (test-3.scm) -*- coding: utf-8; mode: scheme -*-
 ; test the generated Guile bindings.
 
-; (c) lloda@sarc.name 2019
+; (c) lloda@sarc.name 2019, 2021
 ; This library is free software; you can redistribute it and/or modify it under
 ; the terms of the GNU Lesser General Public License as published by the Free
 ; Software Foundation; either version 3 of the License, or (at your option) any
@@ -20,5 +20,6 @@
 (define hr (p839-rain-height 3.133 101.7))
 (test-approximate 4.9579744 hr 1e-15)
 
-(test-end)
-(exit (test-runner-fail-count (test-runner-current)))
+(define error-count (test-runner-fail-count (test-runner-current)))
+(test-end "prop-618")
+(exit error-count)

@@ -20,6 +20,7 @@
 project (prop_618)
 enable_language (Fortran C)
 cmake_minimum_required (VERSION 3.5)
+set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 include_directories (${CMAKE_SOURCE_DIR}/mod)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/config)
 
