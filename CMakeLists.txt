@@ -101,7 +101,8 @@ if (Python3_FOUND)
   foreach (target test-2)
 # FIXME Would like a way to make these depend on mod/*.py
     add_test (${target} ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/${target}.py")
-    set_tests_properties (${target} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/mod")
+    set_tests_properties (${target} PROPERTIES ENVIRONMENT
+      "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/;PYTHONPATH=${CMAKE_SOURCE_DIR}/mod")
   endforeach ()
 endif ()
 
@@ -111,6 +112,8 @@ if (GUILE_EXECUTABLE)
   foreach (target test-3)
 # FIXME Would like a way to make these depend on mod/*.py
     add_test (${target} ${GUILE_EXECUTABLE} -q -L "${CMAKE_SOURCE_DIR}/mod" "${CMAKE_SOURCE_DIR}/test/${target}.scm")
+    set_tests_properties (${target} PROPERTIES ENVIRONMENT
+      "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}")
   endforeach ()
 endif ()
 
