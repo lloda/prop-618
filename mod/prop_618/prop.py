@@ -1,5 +1,5 @@
 
-# prop.py generated from prop.f95 by protos.scm
+# This file, prop.py, has been generated from prop.f90 by protos.scm
 
 import ctypes
 from ctypes import c_int32, c_double, byref

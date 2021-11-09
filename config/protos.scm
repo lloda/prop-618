@@ -1,14 +1,14 @@
 ;; (prop.scm) -*- coding: utf-8; mode: scheme -*-
 ;; generate bindings from Fortran module.
 
-;; (c) lloda@sarc.name 2019
+;; (c) lloda@sarc.name 2019, 2021
 ;; This library is free software; you can redistribute it and/or modify it under
 ;; the terms of the GNU Lesser General Public License as published by the Free
 ;; Software Foundation; either version 3 of the License, or (at your option) any
 ;; later version.
 
 ;; This is a hack and not a parser, so a fairly rigid format is required from
-;; the .f95 declarations. Try to complain if we don't understand, so that the
+;; the .f90 declarations. Try to complain if we don't understand, so that the
 ;; declarations are not missed and can be fixed.
 
 (import (srfi :1) (srfi :2) (srfi :8) (srfi :26) (srfi :19)
@@ -123,7 +123,8 @@
 
   (call-with-output-file dest
     (lambda (o)
-      (format o "\n// ~a generated from ~a by protos.scm\n" (basename dest) tag)
+      (format o "\n// This file, ~a, has been generated from ~a by protos.scm\n"
+              (basename dest) tag)
       (format o "
 #pragma once
 #include <stdint.h>
@@ -165,7 +166,8 @@ extern \"C\" {
 
   (call-with-output-file dest
     (lambda (o)
-      (format o "\n# ~a generated from ~a by protos.scm\n" (basename dest) tag)
+      (format o "\n# This file, ~a, has been generated from ~a by protos.scm\n"
+              (basename dest) tag)
       (format o "
 import ctypes
 from ctypes import c_int32, c_double, byref
@@ -249,7 +251,8 @@ if ec!=0:
 
   (call-with-output-file dest
     (lambda (o)
-      (format o "\n;;; ~a generated from ~a by protos.scm\n\n" (basename dest) tag)
+      (format o "\n;;; This file, ~a, has been generated from ~a by protos.scm\n\n"
+              (basename dest) tag)
       (for-each (lambda (e) (pretty-print e o))
 ; FIXME fix module name and library path at install
         `((define-module (prop-618 ,(string->symbol libname))

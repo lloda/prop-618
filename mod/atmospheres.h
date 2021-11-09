@@ -1,5 +1,5 @@
 
-// atmospheres.h generated from atmospheres.f95 by protos.scm
+// This file, atmospheres.h, has been generated from atmospheres.f90 by protos.scm
 
 #pragma once
 #include <stdint.h>

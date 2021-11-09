@@ -1,4 +1,4 @@
-! (prop.f95) -*- coding: utf-8; mode: f90 -*-
+! (config.f90.in) -*- coding: utf-8; mode: f90 -*-
 ! installation variables
 
 ! (c) lloda@sarc.name 2019

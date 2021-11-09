@@ -1,5 +1,5 @@
 
-# atmospheres.py generated from atmospheres.f95 by protos.scm
+# This file, atmospheres.py, has been generated from atmospheres.f90 by protos.scm
 
 import ctypes
 from ctypes import c_int32, c_double, byref

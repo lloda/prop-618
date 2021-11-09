@@ -1,5 +1,5 @@
-! (test-0.f95) -*- coding: utf-8; mode: f90 -*-
-! tests for prop.f95, atmospheres.f95
+! (test-0.f90) -*- coding: utf-8; mode: f90 -*-
+! tests for prop.f90, atmospheres.f90
 
 ! (c) lloda@sarc.name 2019
 ! This library is free software; you can redistribute it and/or modify it under

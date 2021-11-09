@@ -28,7 +28,7 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
   - [ ] effects <10 GHz (ionospheric scintillation, Faraday rotation, etc.)
   - [ ] Earth to space interference (P619)
   - [ ] frequency scaling procedure from P.618-13 2.2.1.3
-  - [-] atmospheres.f95, P835 [1/7]
+  - [-] atmospheres.f90, P835 [1/7]
     + [X] reference
     + [ ] low latitude (annual)
     + [ ] mid latitude (summer)

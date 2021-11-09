@@ -1,5 +1,5 @@
 
-// prop.h generated from prop.f95 by protos.scm
+// This file, prop.h, has been generated from prop.f90 by protos.scm
 
 #pragma once
 #include <stdint.h>

@@ -1,4 +1,4 @@
-! (prop.f95) -*- coding: utf-8; mode: f90 -*-
+! (prop.f90) -*- coding: utf-8; mode: f90 -*-
 ! propagation functions following ITU models
 
 ! (c) lloda@sarc.name 2019
