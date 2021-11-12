@@ -274,14 +274,14 @@ contains
     ! 50% humidity - [g0, gw] = p676d11_ga(20.0, 1013.25, 11.508, 300.0)
 
     write(*, *) achar(10), 'p676 50%'
-    call p676_gas_specific(0, 20.0, 1013.25, vapor_pressure(11.508, 300.), 300.0, go, gw)
+    call p676_gas_specific(0, 20.0, 1013.25, p676_vapor_pressure(11.508, 300.), 300.0, go, gw)
     ne = ne + num_test('g₀', 0.0106557034883802, go, rspec=5e-15)
     ne = ne + num_test('gw', 0.145950346093096, gw, rspec=5e-15)
 
     ! 30% humidity - [g0, gw] = p676d11_ga(20.0, 1013.25, 6.9045, 300.0)
 
     write(*, *) achar(10), 'p676 30%'
-    call p676_gas_specific(0, 20.0, 1013.25, vapor_pressure(6.9045, 300.), 300.0, go, gw)
+    call p676_gas_specific(0, 20.0, 1013.25, p676_vapor_pressure(6.9045, 300.), 300.0, go, gw)
     ne = ne + num_test('g₀', 0.0105877535759878, go, rspec=5e-15)
     ne = ne + num_test('gw', 0.0867126146205278, gw, rspec=5e-15)
 
@@ -295,7 +295,7 @@ contains
       integer :: i
 
       do i=1, size(fghz, 1)
-         call p676_gas_specific(0, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
+         call p676_gas_specific(0, fghz(i), 1013.25, p676_vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
       end do
@@ -311,7 +311,7 @@ contains
       integer :: i
 
       do i=1, size(fghz, 1)
-         call p676_gas_specific(1, fghz(i), 1013.25, vapor_pressure(7.5, 288.15), 288.15, go, gw)
+         call p676_gas_specific(1, fghz(i), 1013.25, p676_vapor_pressure(7.5, 288.15), 288.15, go, gw)
          ne = ne + num_test('g₀', got(i), go, rspec=8e-15)
          ne = ne + num_test('gw', gwt(i), gw, rspec=8e-15)
       end do

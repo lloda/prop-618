@@ -196,6 +196,8 @@ contains
 
   end function lookup_pxy
 
+  ! name='...' is unnecessary, but we leave it here to exercise config/proto.scm.
+  ! we need to keep it when we want to preserve case, however.
 
   integer(C_INT32_T) function prop_init() &
        bind(c, name='prop_init') &
@@ -302,7 +304,7 @@ contains
   ! According to ITU-R P.839-4, lat +90:-1.5:-90 lon 0:1.5:360
 
   real(C_DOUBLE) function p839_rain_height(lat, lon) &
-       bind(c, name='p839_rain_height') &
+       bind(c) &
        result(h)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
@@ -316,7 +318,7 @@ contains
   ! According to ITU-R P.837-7, lat -90:0.125:+90 and lon -180:0.125:+180.
 
   real(C_DOUBLE) function p837_rainfall_rate(lat, lon) &
-       bind(c, name='p837_rainfall_rate') &
+       bind(c) &
        result(R001)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
@@ -330,7 +332,7 @@ contains
   ! According to ITU-R P.1510-1, lat -90:0.75:+90 and lon -180:0.75:+180
 
   real(C_DOUBLE) function p1510_temp(lat, lon) &
-       bind(c, name='p1510_temp') &
+       bind(c) &
        result(h)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
@@ -353,7 +355,7 @@ contains
 
 
   subroutine p838_coeffs(freq, kh, ah, kv, av) &
-       bind(c, name='p838_coeffs')
+       bind(c)
 
     real(C_DOUBLE), intent(in) :: freq
     real(C_DOUBLE), intent(out) :: kv, kh, av, ah
@@ -397,7 +399,7 @@ contains
   ! Equation & table numbers from ITU-R P.618-13 except where indicated.
 
   real(C_DOUBLE) function p618_rain(lat, lon, hs, freq, eldeg, taudeg, ppc, r001) &
-       bind(c, name='p618_rain') &
+       bind(c) &
        result(att)
 
     real(C_DOUBLE), intent(in) :: freq     ! frequency (GHz)
@@ -508,8 +510,8 @@ contains
   end function p618_rain
 
 
-  real(C_DOUBLE) function vapor_pressure(rho, temp) &
-       bind(c, name='p676_vapor_pressure') &
+  real(C_DOUBLE) function p676_vapor_pressure(rho, temp) &
+       bind(c) &
        result(e)
 
     real(C_DOUBLE), intent(in) :: rho   ! water vapor density (g/m³)
@@ -517,13 +519,13 @@ contains
 
     e = rho * temp/216.7;               ! P676 (4)
 
-  end function vapor_pressure
+  end function p676_vapor_pressure
 
 
   ! Equation & table numbers from ITU-R P.676-11.
 
   subroutine p676_gas_specific(scut, f, P, e, temp, go, gw) &
-       bind(c, name='p676_gas_specific')
+       bind(c)
 
     integer(C_INT32_T), intent(in) :: scut   ! use Annex 1 (20) if 0, else Annex 2 (22-23)
     real(C_DOUBLE), intent(in) :: f          ! frequency (GHz)
@@ -699,7 +701,7 @@ contains
 
 
   subroutine p676_eq_height(f, e, P, ho, hw) &
-       bind(c, name='p676_eq_height')
+       bind(c)
 
     real(C_DOUBLE), intent(in) :: f       ! frequency (GHz)
     real(C_DOUBLE), intent(in) :: e       ! vapor part. pressure e(P) (hPa) (4)
@@ -746,7 +748,7 @@ contains
   ! one way is, make p optional, and in that case compute it from P835-6.
 
   real(C_DOUBLE) function p676_gas(eldeg, freq, P, e, temp, Vt, hs) &
-       bind(c, name='p676_gas') &
+       bind(c) &
        result(att)
 
     real(C_DOUBLE), intent(in) :: eldeg         ! elevation angle (°)
@@ -774,7 +776,7 @@ contains
          end if
 
          Tref = 14.*log(0.22/3.67 * Vt) + 3 + 273.15
-         eref = vapor_pressure(Vt/3.67, Tref)
+         eref = p676_vapor_pressure(Vt/3.67, Tref)
 
          ! go1 go2 are wasted here. Maybe we should go back to split gas -> dry & wet.
 
@@ -880,7 +882,7 @@ contains
   ! Equation numbers from ITU-R P.840-7 except where indicated.
 
   real(C_DOUBLE) function p840_clouds(freq, eldeg, Lred) &
-       bind(c, name='p840_clouds') &
+       bind(c) &
        result(Ac)
 
     real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
@@ -924,7 +926,7 @@ contains
   ! Equation numbers from ITU-R P.618-13 except where indicated.
 
   real(C_DOUBLE) function p618_scint(freq, eldeg, Deff, ppc, Nwet) &
-       bind(c, name='p618_scint') &
+       bind(c) &
        result(As)
 
     real(C_DOUBLE), intent(in) :: freq      ! freq (GHz)
@@ -967,7 +969,7 @@ contains
   ! Uses bicubic interpolation as described in ITU-R P.1144 Annex 1.2.
 
   real(C_DOUBLE) function p1511_topoh(lat, lon) &
-       bind(c, name='p1511_topoh') &
+       bind(c) &
        result(h)
 
     real(C_DOUBLE), intent(in) :: lat, lon
@@ -1060,7 +1062,7 @@ contains
   ! After ITU-R P.836-6 Annex 2.
 
   real(C_DOUBLE) function p836_rho(lat, lon, ppc, h) &
-       bind(c, name='p836_rho') &
+       bind(c) &
        result(rho)
 
     real(C_DOUBLE), intent(in) :: lat  ! latitude (°)
