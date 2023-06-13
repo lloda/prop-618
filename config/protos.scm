@@ -73,7 +73,6 @@
       (#f
        (values (+ 1 i) #f))
       (('bind extra ...)
-       (pk 'EXTRA extra)
        (define (parse-bind bind-arg . extra)
          (unless (or (equal? extra '()) (equal? extra '(&)))
            (throw 'unexpected-extra-symbols-in-bind-line extra bind-line))

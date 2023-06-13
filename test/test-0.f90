@@ -320,7 +320,7 @@ contains
   end function test_p676_gas_specific
 
   ! ---------------------
-  ! total gas atteinuation along path (P.676)
+  ! total gas attenuation along path (P.676)
   ! ---------------------
 
   integer function test_p676_gas() &
