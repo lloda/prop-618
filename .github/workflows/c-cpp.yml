@@ -26,22 +26,22 @@ jobs:
       run: make
     - name: test
       run: ctest --output-on-failure
-  rebuild:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: update
-      run: |
-         sudo apt update
-         sudo apt install gcc-11 gfortran-11 python3 guile-3.0
-    - name: configure
-      run: cmake .
-      env:
-        FC: gfortran-11
-        CXX: g++-11
-        CC: gcc-11
-        LD_LIBRARY_PATH: $LD_LIBRARY_PATH:. # for test/test-3
-    - name: build
-      run: make
-    - name: test
-      run: ctest --output-on-failure
+  # rebuild:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: update
+  #     run: |
+  #        sudo apt update
+  #        sudo apt install gcc-11 gfortran-11 python3 guile-3.0
+  #   - name: configure
+  #     run: cmake .
+  #     env:
+  #       FC: gfortran-11
+  #       CXX: g++-11
+  #       CC: gcc-11
+  #       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:. # for test/test-3
+  #   - name: build
+  #     run: make
+  #   - name: test
+  #     run: ctest --output-on-failure

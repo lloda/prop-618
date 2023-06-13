@@ -1,5 +1,5 @@
 
-# prop-618 ![(travis build status)](https://travis-ci.org/lloda/prop-618.svg?branch=master) #
+# prop-618 [![C/C++ CI](https://github.com/lloda/prop-618/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/lloda/prop-618/actions/workflows/c-cpp.yml)
 
 ## Propagation models for Earth-space telecommunications systems
 
