@@ -35,4 +35,17 @@ rerr = rel_error(4.9579744, hr)
 print("lat {0:f} lon {1:f} hr {2:f} rerr {3:s}".format(lat, lon, hr, repr(rerr)));
 ne += (rerr>=1e-15)
 
+# not in validation tables, just exercise eldeg = 5 limit
+
+hs = 0.4
+temp = 290
+P = prop.p676_vapor_pressure(7.5, temp)
+Vt = prop.p836_V(45., 6., 1, hs)
+eldeg = 5
+fghz = 10
+A = prop.p676_gas(eldeg, fghz, 1013.25, P, temp, Vt, hs)
+rerr = rel_error(0.7464453612889095, A)
+print("eldeg {0:f} fghz {1:f} rerr {2:s}".format(eldeg, fghz, repr(rerr)));
+ne += (rerr>=1e-15)
+
 sys.exit(ne)

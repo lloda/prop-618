@@ -23,7 +23,7 @@ help: [C-uc .] insert timestamp [C-cc] flip checkbox [C-uucc] partial flip check
   - [X] scintillation loss (P.618-13 2.4)
   - [ ] total loss (P.618-13)
   - [ ] aeronautical mobile specifics (P682)
-  - [ ] lower elevation angle effects (<5°) P676, P619, P682
+  - [ ] lower elevation angle effects (<5°, <10°) P676, P619, P682
   - [ ] tropospheric effects (P834)
   - [ ] effects <10 GHz (ionospheric scintillation, Faraday rotation, etc.)
   - [ ] Earth to space interference (P619)

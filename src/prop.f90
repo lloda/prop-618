@@ -756,7 +756,7 @@ contains
     real(C_DOUBLE), intent(in) :: P             ! dry air pressure (hPa)
     real(C_DOUBLE), intent(in) :: e             ! vapor part. pressure e(P) (hPa)
     real(C_DOUBLE), intent(in) :: temp          ! temperature (K)
-    real(C_DOUBLE), intent(in), optional :: Vt  ! total vaper vapor content (kg/m^2), cf p836_V()
+    real(C_DOUBLE), intent(in), optional :: Vt  ! total water vapor content (kg/m^2), cf p836_V()
     real(C_DOUBLE), intent(in), optional :: hs  ! station height above mean sea level (km)
 
     real :: go, gw, ho, hw, attw
@@ -823,7 +823,7 @@ contains
        end block
     end if
 
-    if (eldeg>=10. .and. eldeg<=90.) then ! §2.2.1
+    if (eldeg>=5. .and. eldeg<=90.) then ! §2.2.1
 
        ! ! debug intermediate values
        ! write(*, *) 'ho', ho
@@ -836,7 +836,7 @@ contains
        ! write(*, *) 'Aw/sinθ', hw*gw / sin(deg2rad(eldeg))
 
        att = (ho*go + attw) / sin(deg2rad(eldeg))  ! (29)
-    else
+    else ! FIXME §2.2.2
        stop 105
     end if
 
@@ -1059,7 +1059,7 @@ contains
 
 
   ! Water vapor density, ρ in g/m³ exceeded for ppc of an average year.
-  ! After ITU-R P.836-6 Annex 2.
+  ! After ITU-R P.836-6 Annex 1.
 
   real(C_DOUBLE) function p836_rho(lat, lon, ppc, h) &
        bind(c) &
@@ -1075,7 +1075,8 @@ contains
   end function p836_rho
 
 
-  ! Total vaper vapor content, after ITU-R P.836-6 Annex 2.
+  ! Total water vapor content.
+  ! After ITU-R P.836-6 Annex 2.
 
   real(C_DOUBLE) function p836_V(lat, lon, ppc, h) &
        bind(c, name='p836_V') &
